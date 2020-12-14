@@ -1,0 +1,15 @@
+<RCC>
+    <qresource prefix="/">
+        <file>res/images/backward.png</file>
+        <file>res/images/exit.png</file>
+        <file>res/images/exit2.png</file>
+        <file>res/images/forward.png</file>
+        <file>res/images/pause.png</file>
+        <file>res/images/stop.png</file>
+        <file>res/images/reset.svg</file>
+        <file>res/images/x.svg</file>
+        <file>res/icons/folder-3.ico</file>
+        <file>res/icons/system-search-6.ico</file>
+        <file>res/icons/text-x-preview.ico</file>
+    </qresource>
+</RCC>
