@@ -21,6 +21,7 @@
 #include "ui_MainWindow.h"
 
 #include "PathsAnalyzer.h"
+#include "SearchInDirs.h"
 #include "widgets/DialogDroppedDir.h"
 
 #include <QDropEvent>
@@ -76,9 +77,15 @@ void MainWindow::registerPaths(const QVector<QString> &paths)
     analyzer.analyze(paths);
 
     if (analyzer.isAllDir()) {
-        DialogDroppedDir dlg(analyzer.analyzedMap(), this);
+        DialogDroppedDir dlg(analyzer.dirs(), this);
 
         if (dlg.exec() == QDialog::Rejected)
             return;
+
+        if (!dlg.isRegisterDroppedDir()) {
+            SearchInDirs searchInDirs(dlg.searchSettings());
+
+            qDebug() << searchInDirs.exec(analyzer.dirs());
+        }
     }
 }

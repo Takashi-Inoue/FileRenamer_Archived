@@ -20,25 +20,21 @@
 #ifndef SEARCHSETTINGS_H
 #define SEARCHSETTINGS_H
 
-#include <AbstractSettings.h>
+#include "AbstractSettings.h"
 
 class SearchSettings : public AbstractSettings
 {
 public:
     enum Entry {
-        searchFiles, searchDirs, filter, hierarchy
+        searchDirs, searchFiles, filter, hierarchy
     };
 
-    SearchSettings()
-        : AbstractSettings(QStringLiteral("Search")
-                         , QHash<int, QPair<QString, QVariant>>{
-                               {searchFiles, {QStringLiteral("SearchFiles"), true}}
-                             , {searchDirs,  {QStringLiteral("SearchDirs"),  false}}
-                             , {filter,      {QStringLiteral("Filter"),      QString("")}}
-                             , {hierarchy,   {QStringLiteral("Hierarchy"),   0}}
-                           })
-    {}
+    SearchSettings();
 
+    QStringList filters() const;
+    int searchHierarchy() const;
+    bool isSearchDirs() const;
+    bool isSearchFiles() const;
 };
 
 #endif // SEARCHSETTINGS_H

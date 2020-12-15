@@ -20,9 +20,7 @@
 #include "DialogDroppedDir.h"
 #include "ui_DialogDroppedDir.h"
 
-#include "Settings/SearchSettings.h"
-
-DialogDroppedDir::DialogDroppedDir(const QMap<QString, QVector<QString>> &dirMap, QWidget *parent)
+DialogDroppedDir::DialogDroppedDir(const QVector<ParentChildrenPair> &dirs, QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::DialogDroppedDir)
 {
@@ -34,16 +32,16 @@ DialogDroppedDir::DialogDroppedDir(const QMap<QString, QVector<QString>> &dirMap
     ui->tableWidget->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
     ui->tableWidget->horizontalHeaderItem(0)->setIcon(QIcon(":/res/icons/folder-3.ico"));
 
-    for (auto itr = dirMap.begin(), end = dirMap.end(); itr != end; ++itr) {
-        auto pathItem = new QTableWidgetItem(itr.key());
+    for (const ParentChildrenPair &parentChildren : dirs) {
+        auto parentDirItem = new QTableWidgetItem(parentChildren.first);
 
-        for (QStringView name : itr.value()) {
-            auto nameItem = new QTableWidgetItem(name.toString());
+        for (QStringView childName : parentChildren.second) {
+            auto childNameItem = new QTableWidgetItem(childName.toString());
             int row = ui->tableWidget->rowCount();
 
             ui->tableWidget->insertRow(row);
-            ui->tableWidget->setItem(row, 0, nameItem);
-            ui->tableWidget->setItem(row, 1, pathItem);
+            ui->tableWidget->setItem(row, 0, childNameItem);
+            ui->tableWidget->setItem(row, 1, parentDirItem);
         }
     }
 
@@ -65,13 +63,12 @@ DialogDroppedDir::DialogDroppedDir(const QMap<QString, QVector<QString>> &dirMap
     ui->pushButtonRegisterDir->setText(registerDirText[itemCount == 1]);
     ui->pushButtonSearch->setText(searchText[itemCount == 1]);
 
-    SearchSettings settings;
-    settings.read();
+    m_settings.read();
 
-    ui->checkBoxDirs->setChecked(settings.value(SearchSettings::searchDirs, false));
-    ui->checkBoxFiles->setChecked(settings.value(SearchSettings::searchFiles, true));
-    ui->lineEditFilter->setText(settings.value(SearchSettings::filter, QString("")));
-    ui->spinBoxHierarchy->setValue(settings.value(SearchSettings::hierarchy, 0));
+    ui->checkBoxDirs->setChecked(m_settings.value(SearchSettings::searchDirs, false));
+    ui->checkBoxFiles->setChecked(m_settings.value(SearchSettings::searchFiles, true));
+    ui->lineEditFilter->setText(m_settings.value(SearchSettings::filter, QString("")));
+    ui->spinBoxHierarchy->setValue(m_settings.value(SearchSettings::hierarchy, 0));
 }
 
 DialogDroppedDir::~DialogDroppedDir()
@@ -79,9 +76,14 @@ DialogDroppedDir::~DialogDroppedDir()
     delete ui;
 }
 
-bool DialogDroppedDir::isRegisterDir() const
+bool DialogDroppedDir::isRegisterDroppedDir() const
 {
     return m_isRegisterDir;
+}
+
+const SearchSettings &DialogDroppedDir::searchSettings() const
+{
+    return m_settings;
 }
 
 void DialogDroppedDir::on_pushButtonBack_clicked()
@@ -94,14 +96,22 @@ void DialogDroppedDir::on_pushButtonBack_clicked()
 
 void DialogDroppedDir::on_pushButtonOk_clicked()
 {
-    SearchSettings settings;
+    QString filtersString = ui->lineEditFilter->text();
+    QStringList filters = filtersString.split(';', Qt::SkipEmptyParts);
 
-    settings.setValue(SearchSettings::searchDirs, ui->checkBoxDirs->isChecked());
-    settings.setValue(SearchSettings::searchFiles, ui->checkBoxFiles->isChecked());
-    settings.setValue(SearchSettings::filter, ui->lineEditFilter->text());
-    settings.setValue(SearchSettings::hierarchy, ui->spinBoxHierarchy->value());
+    for (QString &filter : filters) {
+        if (!filter.contains('*') && !filter.contains('?'))
+            filter = QString("*%1*").arg(filter);
+    }
 
-    settings.write();
+    filtersString = filters.join(';');
+
+    m_settings.setValue(SearchSettings::searchDirs, ui->checkBoxDirs->isChecked());
+    m_settings.setValue(SearchSettings::searchFiles, ui->checkBoxFiles->isChecked());
+    m_settings.setValue(SearchSettings::filter, filtersString);
+    m_settings.setValue(SearchSettings::hierarchy, ui->spinBoxHierarchy->value());
+
+    m_settings.write();
 
     accept();
 }

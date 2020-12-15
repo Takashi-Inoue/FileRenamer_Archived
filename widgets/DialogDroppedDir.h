@@ -20,7 +20,10 @@
 #ifndef DIALOGDROPPEDDIR_H
 #define DIALOGDROPPEDDIR_H
 
+#include "Settings/SearchSettings.h"
+
 #include <QDialog>
+#include "QStringVector.h"
 
 namespace Ui {
 class DialogDroppedDir;
@@ -31,12 +34,15 @@ class DialogDroppedDir : public QDialog
     Q_OBJECT
 
 public:
-    explicit DialogDroppedDir(const QMap<QString, QVector<QString>> &dirMap, QWidget *parent = nullptr);
+    using ParentChildrenPair = QPair<QString, QStringVector>;
+
+    explicit DialogDroppedDir(const QVector<ParentChildrenPair> &dirs, QWidget *parent = nullptr);
     ~DialogDroppedDir();
 
-private slots:
-    bool isRegisterDir() const;
+    bool isRegisterDroppedDir() const;
+    const SearchSettings &searchSettings() const;
 
+private slots:
     void on_pushButtonBack_clicked();
     void on_pushButtonOk_clicked();
     void on_pushButtonRegisterDir_clicked();
@@ -46,6 +52,7 @@ private:
     Ui::DialogDroppedDir *ui;
 
     bool m_isRegisterDir = false;
+    SearchSettings m_settings;
 };
 
 #endif // DIALOGDROPPEDDIR_H

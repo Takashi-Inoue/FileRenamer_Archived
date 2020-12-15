@@ -17,30 +17,12 @@
  * along with APPNAME.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef SEARCHINDIRS_H
-#define SEARCHINDIRS_H
+#ifndef QSTRINGVECTOR_H
+#define QSTRINGVECTOR_H
 
-#include "Settings/SearchSettings.h"
+#include <QString>
+#include <QVector>
 
-#include <QDir>
-#include "QStringVector.h"
+using QStringVector = QVector<QString>;
 
-class SearchInDirs
-{
-public:
-    using ParentChildrenPair = QPair<QString, QStringVector>;
-
-    SearchInDirs(const SearchSettings &settings);
-
-    QVector<ParentChildrenPair> exec(QVector<ParentChildrenPair> targetDirs);
-
-private:
-    void searchForDirs(const QDir &parentDir, QVector<ParentChildrenPair> &targetDirs);
-    void searchForFiles(const QDir &parentDir);
-    void searchOneLayer(QVector<ParentChildrenPair> &targetDirs, const QStringList &nameFilters);
-
-    const SearchSettings m_settings;
-    QVector<ParentChildrenPair> m_resultPaths;
-};
-
-#endif // SEARCHINDIRS_H
+#endif // QSTRINGVECTOR_H

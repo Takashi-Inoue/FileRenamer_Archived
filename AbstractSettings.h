@@ -38,7 +38,7 @@ public:
     void setValue(int entry, QVariant value);
 
     template<typename T>
-    T value(int entry, T defaultValue)
+    T value(int entry, T defaultValue) const
     {
         auto itr = m_valuesHash.find(entry);
 

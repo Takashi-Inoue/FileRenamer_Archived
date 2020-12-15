@@ -21,40 +21,45 @@
 
 #include <QFileInfo>
 
-void PathsAnalyzer::analyze(const QVector<QString> &paths)
+void PathsAnalyzer::analyze(const QStringVector &paths)
 {
-    m_isAllDir = false;
-    m_pathsMap.clear();
+    m_dirs.clear();
+    m_files.clear();
 
-    int dirCount = 0;
-    int itemCount = paths.size();
-
-    if (itemCount == 0)
+    if (paths.size() == 0)
         return;
 
     for (const QString &path : paths) {
         QFileInfo fileInfo(path);
 
-        if (fileInfo.isRelative() || !fileInfo.exists()) {
-            --itemCount;
+        if (fileInfo.isRelative() || !fileInfo.exists())
             continue;
-        }
 
-        if (fileInfo.isDir())
-            ++dirCount;
+        QVector<ParentChildrenPair> &paths = fileInfo.isDir() ? m_dirs : m_files;
+        const QString parentDir = fileInfo.absolutePath();
 
-        m_pathsMap[fileInfo.absolutePath()] << fileInfo.fileName();
+        auto itr = std::find_if(paths.begin(), paths.end(), [&](ParentChildrenPair &path) {
+            return path.first == parentDir;
+        });
+
+        if (itr == paths.end())
+            itr = paths.insert(itr, ParentChildrenPair(parentDir, QStringVector()));
+
+        itr->second << fileInfo.fileName();
     }
+}
 
-    m_isAllDir = ((itemCount != 0) & (dirCount == itemCount));
+QVector<PathsAnalyzer::ParentChildrenPair> PathsAnalyzer::dirs() const
+{
+    return m_dirs;
+}
+
+QVector<PathsAnalyzer::ParentChildrenPair> PathsAnalyzer::files() const
+{
+    return m_files;
 }
 
 bool PathsAnalyzer::isAllDir() const
 {
-    return m_isAllDir;
-}
-
-const QMap<QString, QVector<QString>> &PathsAnalyzer::analyzedMap() const
-{
-    return m_pathsMap;
+    return !m_dirs.isEmpty() & m_files.isEmpty();
 }

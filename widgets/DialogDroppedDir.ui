@@ -196,7 +196,11 @@
             </property>
             <layout class="QHBoxLayout" name="horizontalLayout_2">
              <item>
-              <widget class="QLineEdit" name="lineEditFilter"/>
+              <widget class="QLineEdit" name="lineEditFilter">
+               <property name="toolTip">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:11pt;&quot;&gt;Sample:&lt;br/&gt;*.txt;music.mp3;sample??? &lt;/span&gt;&lt;/p&gt;&lt;p&gt;Please separate by the ';' each filters. &lt;br/&gt;&lt;/p&gt;&lt;table border=&quot;1&quot; style=&quot; border-color:#888888; border-style:solid; margin:0px;margin: 4px;&quot; cellspacing=&quot;0&quot;&gt;&lt;tr&gt;&lt;td style=&quot;padding:3;&quot;&gt;&lt;p&gt;?&lt;/p&gt;&lt;/td&gt;&lt;td style=&quot; padding:3;&quot;&gt;&lt;p&gt;matches any single character.&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot; padding:3;&quot;&gt;&lt;p&gt;*&lt;/p&gt;&lt;/td&gt;&lt;td style=&quot; padding:3;&quot;&gt;&lt;p&gt;matches zero or more of any characters.&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
+              </widget>
              </item>
             </layout>
            </widget>

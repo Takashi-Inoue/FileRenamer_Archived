@@ -15,6 +15,7 @@ SOURCES += \
     Path/PathRoot.cpp \
     PathsAnalyzer.cpp \
     SearchInDirs.cpp \
+    Settings/SearchSettings.cpp \
     StringBuilder/BuilderChain.cpp \
     StringBuilder/File/BuilderChainOnFile.cpp \
     StringBuilder/File/MD5Hash.cpp \
@@ -43,6 +44,7 @@ HEADERS += \
     Path/ParentDir.h \
     Path/PathRoot.h \
     PathsAnalyzer.h \
+    QStringVector.h \
     SearchInDirs.h \
     Settings/SearchSettings.h \
     StringBuilder/AbstractInsertString.h \
