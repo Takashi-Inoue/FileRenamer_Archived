@@ -21,17 +21,22 @@
 
 namespace StringBuilder {
 
-Number::Number(int pos, int start, int step, int digit, QObject *parent)
+Number::Number(int pos, int start, int step, int digit, QStringView prefix, QStringView suffix, QObject *parent)
     : AbstractInsertString(pos, parent)
     , m_step(step)
     , m_digit(digit)
+    , m_prefix(prefix.toString())
+    , m_suffix(suffix.toString())
     , m_currentNumber(start)
 {
 }
 
 void Number::build(QString &result)
 {
-    QString numberString = QString("%1").arg(m_currentNumber, m_digit, 10, QLatin1Char('0'));
+    QString numberString = QString("%1%2%3")
+                           .arg(m_prefix)
+                           .arg(m_currentNumber, m_digit, 10, QLatin1Char('0'))
+                           .arg(m_suffix);
 
     result.insert(posToInsert(result.size()), numberString);
 

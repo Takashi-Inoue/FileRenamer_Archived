@@ -27,6 +27,9 @@ WidgetOnlyPositionFixer::WidgetOnlyPositionFixer(QWidget *parent) :
     ui->setupUi(this);
 
     ui->labelTitle->setText(windowTitle());
+
+    connect(ui->widgetPositionFixer, &WidgetPositionFixer::changeStarted
+          , this, &AbstractStringBuilderWidget::changeStarted);
 }
 
 WidgetOnlyPositionFixer::~WidgetOnlyPositionFixer()

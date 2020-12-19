@@ -28,7 +28,6 @@ ReplaceString::ReplaceString(QStringView before, QStringView after, bool isCaseS
     , m_after(after.toString())
     , m_caseSensitivity(Qt::CaseSensitivity(isCaseSensitive))
 {
-    Q_ASSERT(!before.isEmpty());
 }
 
 void ReplaceString::build(QString &result)

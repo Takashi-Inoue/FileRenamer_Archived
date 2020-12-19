@@ -28,6 +28,18 @@ WidgetReplaceSetting::WidgetReplaceSetting(QWidget *parent) :
     ui(new Ui::WidgetReplaceSetting)
 {
     ui->setupUi(this);
+
+    connect(ui->checkBoxCaseSensitive, &QCheckBox::clicked
+          , this, &AbstractStringBuilderWidget::changeStarted);
+
+    connect(ui->checkBoxUseRegex, &QCheckBox::clicked
+          , this, &AbstractStringBuilderWidget::changeStarted);
+
+    connect(ui->lineEditAfter, &QLineEdit::textChanged
+          , this, &AbstractStringBuilderWidget::changeStarted);
+
+    connect(ui->lineEditBefore, &QLineEdit::textChanged
+          , this, &AbstractStringBuilderWidget::changeStarted);
 }
 
 WidgetReplaceSetting::~WidgetReplaceSetting()

@@ -67,7 +67,12 @@ void FormStringBuilderChain::createNewSetting()
 {
     auto widget = new FormStringBuilder(this);
 
+    widget->setAttribute(Qt::WA_DeleteOnClose, true);
+
     connect(widget, &FormStringBuilder::changeStarted, m_timer, qOverload<>(&QTimer::start));
+    connect(widget, &FormStringBuilder::destroyed, m_timer, qOverload<>(&QTimer::start));
 
     ui->vLayout->insertWidget(ui->vLayout->count() - 2, widget);
+
+    m_timer->start();
 }

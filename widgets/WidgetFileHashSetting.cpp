@@ -40,6 +40,12 @@ WidgetFileHashSetting::WidgetFileHashSetting(QWidget *parent)
 //    ui->comboBoxHashType->addItem(QStringLiteral("SHA3-512"), Algorithm::Sha3_512);
     ui->comboBoxHashType->addItem(QStringLiteral("MD5"), Algorithm::Md5);
     ui->comboBoxHashType->addItem(QStringLiteral("SHA1"), Algorithm::Sha1);
+
+    connect(ui->comboBoxHashType, &QComboBox::currentIndexChanged
+          , this, &AbstractStringBuilderWidget::changeStarted);
+
+    connect(ui->widgetPositionFixer, &WidgetPositionFixer::changeStarted
+          , this, &AbstractStringBuilderWidget::changeStarted);
 }
 
 WidgetFileHashSetting::~WidgetFileHashSetting()

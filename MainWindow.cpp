@@ -48,10 +48,11 @@ MainWindow::MainWindow(QWidget *parent)
     ui->tableView->setHorizontalHeader(new PathHeaderView(ui->tableView));
     ui->tableView->setModel(m_pathModel);
 
-    // test code
-    connect(ui->actionRename, &QAction::triggered, this, [this]() {
+    connect(ui->formStringBuilderChain, &FormStringBuilderChain::settingsChanged, this, [this]() {
         m_pathModel->startCreateNewNames(ui->formStringBuilderChain->builderChain());
     });
+
+    m_pathModel->startCreateNewNames(ui->formStringBuilderChain->builderChain());
 }
 
 MainWindow::~MainWindow()

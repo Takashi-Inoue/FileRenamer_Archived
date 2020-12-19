@@ -27,6 +27,24 @@ WidgetNumberSetting::WidgetNumberSetting(QWidget *parent) :
     ui(new Ui::WidgetNumberSetting)
 {
     ui->setupUi(this);
+
+    connect(ui->spinBoxStart, &QSpinBox::valueChanged
+          , this, &AbstractStringBuilderWidget::changeStarted);
+
+    connect(ui->spinBoxStep, &QSpinBox::valueChanged
+          , this, &AbstractStringBuilderWidget::changeStarted);
+
+    connect(ui->spinBoxDigit, &QSpinBox::valueChanged
+          , this, &AbstractStringBuilderWidget::changeStarted);
+
+    connect(ui->lineEditPrefix, &QLineEdit::textChanged
+          , this, &AbstractStringBuilderWidget::changeStarted);
+
+    connect(ui->lineEditSuffix, &QLineEdit::textChanged
+          , this, &AbstractStringBuilderWidget::changeStarted);
+
+    connect(ui->widgetPositionFixer, &WidgetPositionFixer::changeStarted
+          , this, &AbstractStringBuilderWidget::changeStarted);
 }
 
 WidgetNumberSetting::~WidgetNumberSetting()
@@ -39,5 +57,6 @@ QSharedPointer<StringBuilder::AbstractStringBuilder> WidgetNumberSetting::String
     return QSharedPointer<StringBuilder::Number>::create(
                 ui->widgetPositionFixer->value()
               , ui->spinBoxStart->value(), ui->spinBoxStep->value(), ui->spinBoxDigit->value()
+              , ui->lineEditPrefix->text(), ui->lineEditSuffix->text()
                 );
 }

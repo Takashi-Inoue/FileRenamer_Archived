@@ -28,13 +28,15 @@ class Number : public AbstractInsertString
 {
     Q_OBJECT
 public:
-    Number(int pos, int start, int step, int digit, QObject *parent = nullptr);
+    Number(int pos, int start, int step, int digit, QStringView prefix, QStringView suffix, QObject *parent = nullptr);
 
     void build(QString &result) override;
 
 private:
     const int m_step;
     const int m_digit;
+    const QString m_prefix;
+    const QString m_suffix;
 
     int m_currentNumber;
 };

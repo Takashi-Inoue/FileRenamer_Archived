@@ -43,6 +43,9 @@ FormStringBuilder::FormStringBuilder(QWidget *parent)
         connect(widget, &AbstractStringBuilderWidget::changeStarted
               , this, &FormStringBuilder::changeStarted);
     }
+
+    connect(ui->comboBoxBuilders, &QComboBox::currentIndexChanged
+          , this, &FormStringBuilder::changeStarted);
 }
 
 FormStringBuilder::~FormStringBuilder()

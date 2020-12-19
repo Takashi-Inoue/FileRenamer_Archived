@@ -28,9 +28,7 @@ WidgetPositionFixer::WidgetPositionFixer(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    connect(ui->spinBox, &QSpinBox::valueChanged, this, [this]() {
-        emit changeStarted();
-    });
+    connect(ui->spinBox, &QSpinBox::valueChanged, this, &WidgetPositionFixer::changeStarted);
 }
 
 WidgetPositionFixer::~WidgetPositionFixer()
