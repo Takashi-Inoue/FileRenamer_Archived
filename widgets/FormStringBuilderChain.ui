@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>FormFormatSettings</class>
- <widget class="QWidget" name="FormFormatSettings">
+ <class>FormStringBuilderChain</class>
+ <widget class="QWidget" name="FormStringBuilderChain">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -46,7 +46,7 @@
   <connection>
    <sender>pushButton</sender>
    <signal>clicked()</signal>
-   <receiver>FormFormatSettings</receiver>
+   <receiver>FormStringBuilderChain</receiver>
    <slot>createNewSetting()</slot>
    <hints>
     <hint type="sourcelabel">

@@ -18,6 +18,7 @@
  */
 
 #include "BuilderChain.h"
+#include "AbstractStringBuilder.h"
 
 namespace StringBuilder {
 
@@ -26,9 +27,24 @@ BuilderChain::BuilderChain(QObject *parent)
 {
 }
 
-void BuilderChain::addCreator(QSharedPointer<AbstractStringBuilder> creator)
+void BuilderChain::addCreator(QSharedPointer<AbstractStringBuilder> builder)
 {
-    m_creators << creator;
+    m_builders << builder;
+}
+
+QString BuilderChain::build()
+{
+    QString result;
+
+    for (QSharedPointer<AbstractStringBuilder> &builder : m_builders)
+        builder->build(result);
+
+    return result;
+}
+
+bool BuilderChain::isEmpty() const
+{
+    return m_builders.isEmpty();
 }
 
 } // namespace StringBuilder

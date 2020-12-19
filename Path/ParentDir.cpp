@@ -18,7 +18,7 @@
  */
 
 #include "ParentDir.h"
-#include "EntityName.h"
+#include "PathEntity.h"
 
 #include <QCollator>
 
@@ -30,12 +30,26 @@ ParentDir::ParentDir(QStringView path)
     Q_ASSERT(!path.isEmpty());
 }
 
-void ParentDir::addChild(QSharedPointer<EntityName> child)
+void ParentDir::addEntity(QSharedPointer<PathEntity> entity)
 {
-    m_children << child;
+    QWriteLocker locker(&m_lock);
+
+    m_children << entity;
 }
 
-QSharedPointer<EntityName> ParentDir::entity(int index) const
+void ParentDir::removeEntity(QWeakPointer<PathEntity> entity)
+{
+    QWriteLocker locker(&m_lock);
+
+    m_children.removeOne(entity);
+}
+
+const QVector<QSharedPointer<PathEntity>> &ParentDir::allEntities() const
+{
+    return m_children;
+}
+
+QSharedPointer<PathEntity> ParentDir::entity(int index) const
 {
     Q_ASSERT(index < m_children.size());
 
@@ -56,7 +70,7 @@ void ParentDir::sort(QCollator &collator, Qt::SortOrder order)
 {
     QWriteLocker locker(&m_lock);
 
-    using EntityPtr = QSharedPointer<EntityName>;
+    using EntityPtr = QSharedPointer<PathEntity>;
 
     std::sort(m_children.begin(), m_children.end(), [&](const EntityPtr &lhs, const EntityPtr &rhs) {
         return order == Qt::AscendingOrder ? collator.compare(lhs->name(), rhs->name()) < 0

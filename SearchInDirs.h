@@ -32,15 +32,21 @@ public:
 
     SearchInDirs(const SearchSettings &settings);
 
-    QVector<ParentChildrenPair> exec(QVector<ParentChildrenPair> targetDirs);
+    QVector<ParentChildrenPair> dirs() const;
+    QVector<ParentChildrenPair> files() const;
+
+    void exec(QVector<ParentChildrenPair> targetDirs);
 
 private:
     void searchForDirs(const QDir &parentDir, QVector<ParentChildrenPair> &targetDirs);
     void searchForFiles(const QDir &parentDir);
     void searchOneLayer(QVector<ParentChildrenPair> &targetDirs, const QStringList &nameFilters);
+    QString addSeparator(QStringView dirPath);
 
     const SearchSettings m_settings;
-    QVector<ParentChildrenPair> m_resultPaths;
+
+    QVector<ParentChildrenPair> m_dirs;
+    QVector<ParentChildrenPair> m_files;
 };
 
 #endif // SEARCHINDIRS_H

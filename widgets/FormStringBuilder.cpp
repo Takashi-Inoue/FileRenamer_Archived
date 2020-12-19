@@ -17,16 +17,16 @@
  * along with APPNAME.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "FormTextFormatSetting.h"
-#include "ui_FormTextFormatSetting.h"
+#include "FormStringBuilder.h"
+#include "ui_FormStringBuilder.h"
 
 #include <QPushButton>
 #include <QResizeEvent>
 #include <QDebug>
 
-FormTextFormatSetting::FormTextFormatSetting(QWidget *parent)
+FormStringBuilder::FormStringBuilder(QWidget *parent)
     : QFrame(parent)
-    , ui(new Ui::FormTextFormatSetting)
+    , ui(new Ui::FormStringBuilder)
     , m_buttonClose(new QPushButton(QIcon(":/res/images/x.svg"), QString(), this))
 {
     ui->setupUi(this);
@@ -38,14 +38,19 @@ FormTextFormatSetting::FormTextFormatSetting(QWidget *parent)
     m_buttonClose->resize(20, 20);
 
     connect(m_buttonClose, &QPushButton::clicked, this, &QWidget::close);
+
+    for (auto widget : findChildren<AbstractStringBuilderWidget *>()) {
+        connect(widget, &AbstractStringBuilderWidget::changeStarted
+              , this, &FormStringBuilder::changeStarted);
+    }
 }
 
-FormTextFormatSetting::~FormTextFormatSetting()
+FormStringBuilder::~FormStringBuilder()
 {
     delete ui;
 }
 
-QSharedPointer<StringBuilder::AbstractStringBuilder> FormTextFormatSetting::StringBuilder() const
+QSharedPointer<StringBuilder::AbstractStringBuilder> FormStringBuilder::stringBuilder() const
 {
     auto widget = qobject_cast<AbstractStringBuilderWidget *>(ui->stackedWidget->currentWidget());
 
@@ -54,17 +59,17 @@ QSharedPointer<StringBuilder::AbstractStringBuilder> FormTextFormatSetting::Stri
     return widget->StringBuilder();
 }
 
-void FormTextFormatSetting::enterEvent(QEvent *)
+void FormStringBuilder::enterEvent(QEnterEvent *)
 {
     m_buttonClose->setVisible(true);
 }
 
-void FormTextFormatSetting::leaveEvent(QEvent *)
+void FormStringBuilder::leaveEvent(QEvent *)
 {
     m_buttonClose->setVisible(false);
 }
 
-void FormTextFormatSetting::resizeEvent(QResizeEvent *event)
+void FormStringBuilder::resizeEvent(QResizeEvent *event)
 {
     m_buttonClose->move(event->size().width() - 4 - 20, 2);
 }

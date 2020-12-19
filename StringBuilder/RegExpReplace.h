@@ -33,7 +33,7 @@ public:
     RegExpReplace(QStringView regexp, QStringView after, bool isCaseSensitive
                 , QObject *parent = nullptr);
 
-    void create(QString &result) override;
+    void build(QString &result) override;
 
 protected:
     const QRegularExpression m_regexp;

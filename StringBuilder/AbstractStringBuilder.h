@@ -29,13 +29,9 @@ class AbstractStringBuilder : public QObject
 {
     Q_OBJECT
 public:
-    AbstractStringBuilder(QObject *parent = nullptr)
-        : QObject(parent)
-    {}
+    using QObject::QObject;
 
-    virtual ~AbstractStringBuilder() = default;
-
-    virtual void create(QString &result) = 0;
+    virtual void build(QString &result) = 0;
 };
 
 } // namespace StringBuilder

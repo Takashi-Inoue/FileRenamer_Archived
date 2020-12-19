@@ -17,28 +17,30 @@
  * along with APPNAME.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef NUMBER_H
-#define NUMBER_H
+#ifndef IFILEINFO_H
+#define IFILEINFO_H
 
-#include "AbstractInsertString.h"
+#include <QCryptographicHash>
+#include <QString>
 
-namespace StringBuilder {
+namespace StringBuilderOnFile {
 
-class Number : public AbstractInsertString
+class IFileInfo
 {
-    Q_OBJECT
 public:
-    Number(int pos, int start, int step, int digit, QObject *parent = nullptr);
+    IFileInfo() = default;
+    virtual ~IFileInfo() = default;
 
-    void build(QString &result) override;
+    virtual bool isDir() const = 0;
+    virtual QString fullPath() const = 0;
+    virtual QString fileName() const = 0;
+    virtual QString completeBaseName() const = 0;
+    virtual QString suffix() const = 0;
+    virtual QString hashHex(QCryptographicHash::Algorithm algorithm) const = 0;
 
-private:
-    const int m_step;
-    const int m_digit;
-
-    int m_currentNumber;
+    virtual void setHashHex(QCryptographicHash::Algorithm algorithm, QString hashHex) = 0;
 };
 
-} // namespace StringBuilder
+} // namespace StringBuilderOnFile
 
-#endif // NUMBER_H
+#endif // IFILEINFO_H

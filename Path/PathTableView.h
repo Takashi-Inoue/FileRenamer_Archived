@@ -17,29 +17,31 @@
  * along with APPNAME.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "MD5Hash.h"
+#ifndef PATHTABLEVIEW_H
+#define PATHTABLEVIEW_H
 
-#include <QCryptographicHash>
+#include <QTableView>
 
-namespace StringBuilder {
-namespace File {
+class QAction;
 
-void MD5Hash::create(QString &result)
+class PathTableView : public QTableView
 {
-    emit needFileInfo(this);
+    Q_OBJECT
+public:
+    PathTableView(QWidget *parent = nullptr);
 
-    QFile file(m_fileInfo.filePath());
+    QVector<QAction *> actionsToChangeItem() const;
 
-    if (!file.open(QFile::ReadOnly))
-        return;
+protected:
+    void contextMenuEvent(QContextMenuEvent *event) override;
 
-    QCryptographicHash hash(QCryptographicHash::Md5);
+private slots:
+    void onActionCopyNameTriggered();
+    void onActionDeleteTriggered();
 
-    if (!hash.addData(&file))
-        return;
+private:
+    QAction *m_actionCopyName;
+    QAction *m_actionDeleteItem;
+};
 
-    result.insert(posToInsert(result.size()), hash.result().toHex());
-}
-
-} // namespace File
-} // namespace StringBuilder
+#endif // PATHTABLEVIEW_H

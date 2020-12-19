@@ -19,7 +19,7 @@
 
 #include "WidgetOriginalNameSetting.h"
 
-#include "StringBuilder/File/OriginalName.h"
+#include "StringBuilderOnFile/OriginalName.h"
 
 WidgetOriginalNameSetting::WidgetOriginalNameSetting(QWidget *parent)
     : WidgetOnlyPositionFixer(parent)
@@ -29,5 +29,5 @@ WidgetOriginalNameSetting::WidgetOriginalNameSetting(QWidget *parent)
 
 QSharedPointer<StringBuilder::AbstractStringBuilder> WidgetOriginalNameSetting::StringBuilder() const
 {
-    return QSharedPointer<StringBuilder::File::OriginalName>::create(posToInsert());
+    return QSharedPointer<StringBuilderOnFile::OriginalName>::create(posToInsert());
 }

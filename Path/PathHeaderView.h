@@ -17,20 +17,19 @@
  * along with APPNAME.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "OriginalName.h"
+#ifndef PATHHEADERVIEW_H
+#define PATHHEADERVIEW_H
 
-namespace StringBuilder {
-namespace File {
+#include <QHeaderView>
 
-void OriginalName::create(QString &result)
+class PathHeaderView : public QHeaderView
 {
-    emit needFileInfo(this);
+    Q_OBJECT
+public:
+    explicit PathHeaderView(QWidget *parent = nullptr);
 
-    QString name = m_fileInfo.isDir() ? m_fileInfo.fileName()
-                                      : m_fileInfo.baseName();
+protected:
+    void mouseMoveEvent(QMouseEvent *e) override;
+};
 
-    result.insert(posToInsert(result.size()), name);
-}
-
-} // File StringBuilder
-} // namespace StringBuilder
+#endif // PATHHEADERVIEW_H

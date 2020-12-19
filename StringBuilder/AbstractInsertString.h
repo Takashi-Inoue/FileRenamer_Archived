@@ -36,12 +36,12 @@ public:
     {}
 
 protected:
-    int posToInsert(int targetLength)
+    qsizetype posToInsert(qsizetype targetLength)
     {
-        int pos = qMin<int>(m_pos, targetLength);
+        qsizetype pos = qMin<qsizetype>(m_pos, targetLength);
 
         if (m_pos < 0)
-            pos = qMax<int>(0, targetLength + m_pos);
+            pos = qMax<qsizetype>(0, targetLength + m_pos);
 
         return pos;
     }

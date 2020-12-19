@@ -29,7 +29,7 @@ Number::Number(int pos, int start, int step, int digit, QObject *parent)
 {
 }
 
-void Number::create(QString &result)
+void Number::build(QString &result)
 {
     QString numberString = QString("%1").arg(m_currentNumber, m_digit, 10, QLatin1Char('0'));
 

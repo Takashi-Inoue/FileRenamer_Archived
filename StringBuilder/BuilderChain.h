@@ -34,10 +34,12 @@ class BuilderChain : public QObject
 public:
     BuilderChain(QObject *parent = nullptr);
 
-    virtual void addCreator(QSharedPointer<AbstractStringBuilder> creator);
+    virtual void addCreator(QSharedPointer<AbstractStringBuilder> builder);
+    virtual QString build();
+    bool isEmpty() const;
 
 protected:
-    QVector<QSharedPointer<AbstractStringBuilder>> m_creators;
+    QVector<QSharedPointer<AbstractStringBuilder>> m_builders;
 };
 
 } // namespace StringBuilder

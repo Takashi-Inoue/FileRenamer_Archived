@@ -17,24 +17,21 @@
  * along with APPNAME.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef MD5HASH_H
-#define MD5HASH_H
+#include "PathHeaderView.h"
 
-#include "AbstractNeedFileInfo.h"
+#include <QMouseEvent>
 
-namespace StringBuilder {
-namespace File {
-
-class MD5Hash : public AbstractNeedFileInfo
+PathHeaderView::PathHeaderView(QWidget *parent)
+    : QHeaderView(Qt::Horizontal, parent)
 {
-    Q_OBJECT
-public:
-    using AbstractNeedFileInfo::AbstractNeedFileInfo;
+    setDefaultSectionSize(150);
+    setStretchLastSection(true);
+    setSortIndicatorShown(true);
+}
 
-    void create(QString &result) override;
-};
+void PathHeaderView::mouseMoveEvent(QMouseEvent *event)
+{
+    QHeaderView::mouseMoveEvent(event);
 
-} // namespace File
-} // namespace StringBuilder
-
-#endif // MD5HASH_H
+    setSectionsClickable(logicalIndexAt(event->pos()) != 1);
+}

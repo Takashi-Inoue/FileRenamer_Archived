@@ -22,30 +22,29 @@
 
 #include "StringBuilder/BuilderChain.h"
 
-namespace Path {class EntityName;}
+namespace Path {class PathEntity;}
 
-namespace StringBuilder {
-namespace File {
+namespace StringBuilderOnFile {
 
 class AbstractNeedFileInfo;
+class IFileInfo;
 
-class BuilderChainOnFile : public BuilderChain
+class BuilderChainOnFile : public StringBuilder::BuilderChain
 {
     Q_OBJECT
 public:
     using BuilderChain::BuilderChain;
 
-    void addCreator(QSharedPointer<AbstractStringBuilder> creator) override;
-    void setPathEntityName(QWeakPointer<Path::EntityName> pathEntityName);
+    void addCreator(QSharedPointer<StringBuilder::AbstractStringBuilder> creator) override;
+    void setFileInfo(QSharedPointer<IFileInfo> fileInfo);
 
 private slots:
-    void onNeedFileInfo(StringBuilder::File::AbstractNeedFileInfo *stringBuilder);
+    void onNeedFileInfo(StringBuilderOnFile::AbstractNeedFileInfo *stringBuilder);
 
 private:
-    QWeakPointer<Path::EntityName> m_pathEntityName;
+    QSharedPointer<IFileInfo> m_fileInfo;
 };
 
-} // namespace File
-} // namespace StringBuilder
+} // namespace StringBuilderOnFile
 
 #endif // BUILDERCHAINONFILE_H

@@ -21,10 +21,13 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QSharedPointer>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
+
+class PathModel;
 
 class MainWindow : public QMainWindow
 {
@@ -42,5 +45,7 @@ private:
     void registerPaths(const QVector<QString> &paths);
 
     Ui::MainWindow *ui;
+
+    PathModel *m_pathModel;
 };
 #endif // MAINWINDOW_H

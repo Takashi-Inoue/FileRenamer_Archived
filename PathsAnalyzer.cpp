@@ -32,11 +32,14 @@ void PathsAnalyzer::analyze(const QStringVector &paths)
     for (const QString &path : paths) {
         QFileInfo fileInfo(path);
 
-        if (fileInfo.isRelative() || !fileInfo.exists())
+        if (fileInfo.isRoot() || fileInfo.isRelative() || !fileInfo.exists())
             continue;
 
         QVector<ParentChildrenPair> &paths = fileInfo.isDir() ? m_dirs : m_files;
-        const QString parentDir = fileInfo.absolutePath();
+        QString parentDir = fileInfo.absolutePath();
+
+        if (!parentDir.endsWith('/'))
+            parentDir += '/';
 
         auto itr = std::find_if(paths.begin(), paths.end(), [&](ParentChildrenPair &path) {
             return path.first == parentDir;

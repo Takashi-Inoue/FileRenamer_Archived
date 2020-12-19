@@ -1,0 +1,70 @@
+/*
+ * Copyright YEAR Takashi Inoue
+ *
+ * This file is part of APPNAME.
+ *
+ * APPNAME is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * APPNAME is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with APPNAME.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#include "PathEntityInfo.h"
+#include "PathEntity.h"
+
+namespace Path {
+
+PathEntityInfo::PathEntityInfo(QSharedPointer<PathEntity> entity)
+    : m_entity(entity)
+{
+    Q_ASSERT(entity != nullptr);
+}
+
+bool PathEntityInfo::isDir() const
+{
+    return m_entity->isDir();
+}
+
+QString PathEntityInfo::fullPath() const
+{
+    return m_entity->fullPath();
+}
+
+QString PathEntityInfo::fileName() const
+{
+    return m_entity->name();
+}
+
+QString PathEntityInfo::completeBaseName() const
+{
+    QString name = m_entity->name();
+
+    return name.left(name.lastIndexOf('.'));
+}
+
+QString PathEntityInfo::suffix() const
+{
+    QString name = m_entity->name();
+
+    return name.mid(name.lastIndexOf('.') + 1);
+}
+
+QString PathEntityInfo::hashHex(QCryptographicHash::Algorithm algorithm) const
+{
+    return m_entity->hashHex(algorithm);
+}
+
+void PathEntityInfo::setHashHex(QCryptographicHash::Algorithm algorithm, QString hashHex)
+{
+    m_entity->setHashHex(algorithm, hashHex);
+}
+
+} // namespace Path

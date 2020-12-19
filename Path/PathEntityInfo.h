@@ -17,28 +17,35 @@
  * along with APPNAME.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef FORMFORMATSETTINGS_H
-#define FORMFORMATSETTINGS_H
+#ifndef PATHENTITYINFO_H
+#define PATHENTITYINFO_H
 
-#include <QWidget>
+#include "StringBuilderOnFile/IFileInfo.h"
 
-namespace Ui {
-class FormFormatSettings;
-}
+#include <QSharedPointer>
 
-class FormFormatSettings : public QWidget
+namespace Path {
+
+class PathEntity;
+
+class PathEntityInfo : public StringBuilderOnFile::IFileInfo
 {
-    Q_OBJECT
-
 public:
-    explicit FormFormatSettings(QWidget *parent = nullptr);
-    ~FormFormatSettings();
+    PathEntityInfo(QSharedPointer<PathEntity> entity);
 
-public slots:
-    void createNewSetting();
+    bool isDir() const override;
+    QString fullPath() const override;
+    QString fileName() const override;
+    QString completeBaseName() const override;
+    QString suffix() const override;
+    QString hashHex(QCryptographicHash::Algorithm algorithm) const override;
+
+    void setHashHex(QCryptographicHash::Algorithm algorithm, QString hashHex) override;
 
 private:
-    Ui::FormFormatSettings *ui;
+    QSharedPointer<PathEntity> m_entity;
 };
 
-#endif // FORMFORMATSETTINGS_H
+} // namespace Path
+
+#endif // PATHENTITYINFO_H

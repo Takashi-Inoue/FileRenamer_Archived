@@ -32,7 +32,7 @@ class WidgetInsertTextSetting : public AbstractStringBuilderWidget
 
 public:
     explicit WidgetInsertTextSetting(QWidget *parent = nullptr);
-    ~WidgetInsertTextSetting();
+    ~WidgetInsertTextSetting() override;
 
     QSharedPointer<StringBuilder::AbstractStringBuilder> StringBuilder() const override;
 

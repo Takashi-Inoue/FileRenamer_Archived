@@ -17,17 +17,19 @@
  * along with APPNAME.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "WidgetMD5Setting.h"
+#include "OriginalName.h"
+#include "IFileInfo.h"
 
-#include "StringBuilder/File/MD5Hash.h"
+namespace StringBuilderOnFile {
 
-WidgetMD5Setting::WidgetMD5Setting(QWidget *parent)
-    : WidgetOnlyPositionFixer(parent)
+void OriginalName::build(QString &result)
 {
-    setTitle(QStringLiteral("MD5 Hash"));
+    emit needFileInfo(this);
+
+    QString name = m_fileInfo->isDir() ? m_fileInfo->fileName()
+                                       : m_fileInfo->completeBaseName();
+
+    result.insert(posToInsert(result.size()), name);
 }
 
-QSharedPointer<StringBuilder::AbstractStringBuilder> WidgetMD5Setting::StringBuilder() const
-{
-    return QSharedPointer<StringBuilder::File::MD5Hash>::create(posToInsert());
-}
+} // namespace StringBuilderOnFile

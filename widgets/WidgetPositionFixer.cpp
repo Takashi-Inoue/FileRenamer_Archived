@@ -20,11 +20,17 @@
 #include "WidgetPositionFixer.h"
 #include "ui_WidgetPositionFixer.h"
 
+#include <QDebug>
+
 WidgetPositionFixer::WidgetPositionFixer(QWidget *parent) :
     QFrame(parent),
     ui(new Ui::WidgetPositionFixer)
 {
     ui->setupUi(this);
+
+    connect(ui->spinBox, &QSpinBox::valueChanged, this, [this]() {
+        emit changeStarted();
+    });
 }
 
 WidgetPositionFixer::~WidgetPositionFixer()

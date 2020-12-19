@@ -21,6 +21,8 @@
 #include "ui_MainWindow.h"
 
 #include "PathsAnalyzer.h"
+#include "Path/PathHeaderView.h"
+#include "Path/PathModel.h"
 #include "SearchInDirs.h"
 #include "widgets/DialogDroppedDir.h"
 
@@ -31,6 +33,7 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
+    , m_pathModel(new PathModel(this))
 {
     ui->setupUi(this);
 
@@ -41,6 +44,14 @@ MainWindow::MainWindow(QWidget *parent)
     paths.pop_front();
 
     registerPaths({paths.begin(), paths.end()});
+
+    ui->tableView->setHorizontalHeader(new PathHeaderView(ui->tableView));
+    ui->tableView->setModel(m_pathModel);
+
+    // test code
+    connect(ui->actionRename, &QAction::triggered, this, [this]() {
+        m_pathModel->startCreateNewNames(ui->formStringBuilderChain->builderChain());
+    });
 }
 
 MainWindow::~MainWindow()
@@ -76,16 +87,32 @@ void MainWindow::registerPaths(const QVector<QString> &paths)
 
     analyzer.analyze(paths);
 
-    if (analyzer.isAllDir()) {
-        DialogDroppedDir dlg(analyzer.dirs(), this);
+    if (!analyzer.isAllDir()) {
+        m_pathModel->addPathsAsDirs(analyzer.dirs());
+        m_pathModel->addPathsAsFiles(analyzer.files());
 
-        if (dlg.exec() == QDialog::Rejected)
-            return;
-
-        if (!dlg.isRegisterDroppedDir()) {
-            SearchInDirs searchInDirs(dlg.searchSettings());
-
-            qDebug() << searchInDirs.exec(analyzer.dirs());
-        }
+        return;
     }
+
+    DialogDroppedDir dlg(analyzer.dirs(), this);
+
+    if (dlg.exec() == QDialog::Rejected)
+        return;
+
+    if (dlg.isRegisterDroppedDir()) {
+        m_pathModel->addPathsAsDirs(analyzer.dirs());
+
+        return;
+    }
+
+    SearchInDirs searchInDirs(dlg.searchSettings());
+
+    searchInDirs.exec(analyzer.dirs());
+
+    m_pathModel->addPathsAsDirs(searchInDirs.dirs());
+    m_pathModel->addPathsAsFiles(searchInDirs.files());
+
+    QHeaderView *header = ui->tableView->horizontalHeader();
+
+    m_pathModel->sort(header->sortIndicatorSection(), header->sortIndicatorOrder());
 }

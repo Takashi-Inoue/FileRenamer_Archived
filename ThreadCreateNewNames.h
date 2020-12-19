@@ -17,39 +17,45 @@
  * along with APPNAME.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PARENTDIR_H
-#define PARENTDIR_H
+#ifndef THREADCREATENEWNAMES_H
+#define THREADCREATENEWNAMES_H
+
+#include <QThread>
 
 #include <QReadWriteLock>
-#include <QSharedPointer>
-#include <QVector>
+#include <QWeakPointer>
 
 namespace Path {
+class PathRoot;
+}
 
-class PathEntity;
+namespace StringBuilderOnFile {
+class BuilderChainOnFile;
+}
 
-class ParentDir
+class ThreadCreateNewNames : public QThread
 {
+    Q_OBJECT
 public:
-    ParentDir(QStringView path);
+    ThreadCreateNewNames(QWeakPointer<Path::PathRoot> pathRoot, QObject *parent = nullptr);
 
-    // Add / Remove entity;
-    void addEntity(QSharedPointer<PathEntity> entity);
-    void removeEntity(QWeakPointer<PathEntity> entity);
+    void setStringBuilderOnFile(QSharedPointer<StringBuilderOnFile::BuilderChainOnFile> builderChain);
+    void stop();
 
-    const QVector<QSharedPointer<PathEntity>> &allEntities() const;
-    QSharedPointer<PathEntity> entity(int index) const;
-    int entityCount() const;
-    QStringView path() const;
-    void sort(QCollator &collator, Qt::SortOrder order);
+signals:
+    void newNameCreated(int index);
+
+protected:
+    void run() override;
+
+    bool isStopRequested() const;
 
 private:
     mutable QReadWriteLock m_lock;
 
-    const QString m_path;
-    QVector<QSharedPointer<PathEntity>> m_children;
+    bool m_isStopRequested = false;
+    QWeakPointer<Path::PathRoot> m_pathRoot;
+    QSharedPointer<StringBuilderOnFile::BuilderChainOnFile> m_builderChain;
 };
 
-} // namespace Path
-
-#endif // PARENTDIR_H
+#endif // THREADCREATENEWNAMES_H

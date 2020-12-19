@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>FormTextFormatSetting</class>
- <widget class="QFrame" name="FormTextFormatSetting">
+ <class>FormStringBuilder</class>
+ <widget class="QFrame" name="FormStringBuilder">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -61,7 +61,7 @@
        </item>
        <item>
         <property name="text">
-         <string>MD5 Hash</string>
+         <string>Cryptographic Hash</string>
         </property>
        </item>
       </widget>
@@ -93,7 +93,7 @@
      <widget class="WidgetNumberSetting" name="page_2"/>
      <widget class="WidgetReplaceSetting" name="page_3"/>
      <widget class="WidgetInsertTextSetting" name="page_4"/>
-     <widget class="WidgetMD5Setting" name="page_5"/>
+     <widget class="WidgetFileHashSetting" name="page_5"/>
     </widget>
    </item>
   </layout>
@@ -124,9 +124,9 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>WidgetMD5Setting</class>
+   <class>WidgetFileHashSetting</class>
    <extends>QWidget</extends>
-   <header>widgets/WidgetMD5Setting.h</header>
+   <header>widgets/WidgetFileHashSetting.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
@@ -139,8 +139,8 @@
    <slot>setCurrentIndex(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>118</x>
-     <y>44</y>
+     <x>129</x>
+     <y>30</y>
     </hint>
     <hint type="destinationlabel">
      <x>240</x>

@@ -32,6 +32,9 @@ public:
     using QWidget::QWidget;
 
     virtual QSharedPointer<StringBuilder::AbstractStringBuilder> StringBuilder() const = 0;
+
+signals:
+    void changeStarted();
 };
 
 #endif // ABSTRACTStringBuilderWIDGET_H

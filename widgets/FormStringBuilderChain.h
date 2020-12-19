@@ -17,34 +17,40 @@
  * along with APPNAME.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ENTITYNAME_H
-#define ENTITYNAME_H
+#ifndef FORMSTRINGBUILDERCHAIN_H
+#define FORMSTRINGBUILDERCHAIN_H
 
-#include <QFileInfo>
-#include <QReadWriteLock>
-#include <QSharedPointer>
-#include <QString>
+#include <QWidget>
 
-namespace Path {
+class QTimer;
 
-class ParentDir;
+namespace Ui {
+class FormStringBuilderChain;
+}
 
-class EntityName
+namespace StringBuilderOnFile {
+class BuilderChainOnFile;
+}
+
+class FormStringBuilderChain : public QWidget
 {
-public:
-    EntityName(QWeakPointer<ParentDir> parent, QStringView name);
+    Q_OBJECT
 
-    QFileInfo fileInfo() const;
-    QStringView name() const;
-    QString path() const;
+public:
+    explicit FormStringBuilderChain(QWidget *parent = nullptr);
+    ~FormStringBuilderChain() override;
+
+    QSharedPointer<StringBuilderOnFile::BuilderChainOnFile> builderChain() const;
+
+signals:
+    void settingsChanged();
+
+public slots:
+    void createNewSetting();
 
 private:
-    mutable QReadWriteLock m_lock;
-
-    QWeakPointer<ParentDir> m_parent;
-    QString m_name;
+    Ui::FormStringBuilderChain *ui;
+    QTimer *m_timer;
 };
 
-} // namespace Path
-
-#endif // ENTITYNAME_H
+#endif // FORMSTRINGBUILDERCHAIN_H

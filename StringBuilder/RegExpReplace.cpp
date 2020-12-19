@@ -31,7 +31,7 @@ RegExpReplace::RegExpReplace(QStringView regexp, QStringView after, bool isCaseS
     Q_ASSERT(!regexp.isEmpty());
 }
 
-void RegExpReplace::create(QString &result)
+void RegExpReplace::build(QString &result)
 {
     result.replace(m_regexp, m_after);
 }

@@ -17,18 +17,27 @@
  * along with APPNAME.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef WIDGETMD5SETTING_H
-#define WIDGETMD5SETTING_H
+#ifndef WIDGETFILEHASHSETTING_H
+#define WIDGETFILEHASHSETTING_H
 
-#include "WidgetOnlyPositionFixer.h"
+#include "AbstractStringBuilderWidget.h"
 
-class WidgetMD5Setting : public WidgetOnlyPositionFixer
+namespace Ui {
+class WidgetFileHashSetting;
+}
+
+class WidgetFileHashSetting : public AbstractStringBuilderWidget
 {
     Q_OBJECT
+
 public:
-    explicit WidgetMD5Setting(QWidget *parent = nullptr);
+    explicit WidgetFileHashSetting(QWidget *parent = nullptr);
+    ~WidgetFileHashSetting() override;
 
     QSharedPointer<StringBuilder::AbstractStringBuilder> StringBuilder() const override;
+
+private:
+    Ui::WidgetFileHashSetting *ui;
 };
 
-#endif // WIDGETMD5SETTING_H
+#endif // WIDGETFILEHASHSETTING_H

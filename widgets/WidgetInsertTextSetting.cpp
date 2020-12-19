@@ -27,6 +27,12 @@ WidgetInsertTextSetting::WidgetInsertTextSetting(QWidget *parent) :
     ui(new Ui::WidgetInsertTextSetting)
 {
     ui->setupUi(this);
+
+    connect(ui->widgetPositionFixer, &WidgetPositionFixer::changeStarted
+          , this, &AbstractStringBuilderWidget::changeStarted);
+
+    connect(ui->lineEdit, &QLineEdit::textChanged
+          , this, &AbstractStringBuilderWidget::changeStarted);
 }
 
 WidgetInsertTextSetting::~WidgetInsertTextSetting()

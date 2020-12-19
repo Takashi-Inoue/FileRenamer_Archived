@@ -10,27 +10,32 @@ CONFIG += c++17
 
 SOURCES += \
     AbstractSettings.cpp \
-    Path/EntityName.cpp \
     Path/ParentDir.cpp \
+    Path/PathEntity.cpp \
+    Path/PathEntityInfo.cpp \
+    Path/PathHeaderView.cpp \
+    Path/PathModel.cpp \
     Path/PathRoot.cpp \
+    Path/PathTableView.cpp \
     PathsAnalyzer.cpp \
     SearchInDirs.cpp \
     Settings/SearchSettings.cpp \
     StringBuilder/BuilderChain.cpp \
-    StringBuilder/File/BuilderChainOnFile.cpp \
-    StringBuilder/File/MD5Hash.cpp \
-    StringBuilder/File/OriginalName.cpp \
     StringBuilder/InsertString.cpp \
     StringBuilder/Number.cpp \
     StringBuilder/RegExpReplace.cpp \
     StringBuilder/ReplaceString.cpp \
+    StringBuilderOnFile/BuilderChainOnFile.cpp \
+    StringBuilderOnFile/CryptographicHash.cpp \
+    StringBuilderOnFile/OriginalName.cpp \
+    ThreadCreateNewNames.cpp \
     main.cpp \
     MainWindow.cpp \
     widgets/DialogDroppedDir.cpp \
-    widgets/FormFormatSettings.cpp \
-    widgets/FormTextFormatSetting.cpp \
+    widgets/FormStringBuilder.cpp \
+    widgets/FormStringBuilderChain.cpp \
+    widgets/WidgetFileHashSetting.cpp \
     widgets/WidgetInsertTextSetting.cpp \
-    widgets/WidgetMD5Setting.cpp \
     widgets/WidgetNumberSetting.cpp \
     widgets/WidgetOnlyPositionFixer.cpp \
     widgets/WidgetOriginalNameSetting.cpp \
@@ -40,9 +45,13 @@ SOURCES += \
 HEADERS += \
     AbstractSettings.h \
     MainWindow.h \
-    Path/EntityName.h \
     Path/ParentDir.h \
+    Path/PathEntity.h \
+    Path/PathEntityInfo.h \
+    Path/PathHeaderView.h \
+    Path/PathModel.h \
     Path/PathRoot.h \
+    Path/PathTableView.h \
     PathsAnalyzer.h \
     QStringVector.h \
     SearchInDirs.h \
@@ -50,20 +59,22 @@ HEADERS += \
     StringBuilder/AbstractInsertString.h \
     StringBuilder/AbstractStringBuilder.h \
     StringBuilder/BuilderChain.h \
-    StringBuilder/File/AbstractNeedFileInfo.h \
-    StringBuilder/File/BuilderChainOnFile.h \
-    StringBuilder/File/MD5Hash.h \
-    StringBuilder/File/OriginalName.h \
     StringBuilder/InsertString.h \
     StringBuilder/Number.h \
     StringBuilder/RegExpReplace.h \
     StringBuilder/ReplaceString.h \
+    StringBuilderOnFile/AbstractNeedFileInfo.h \
+    StringBuilderOnFile/BuilderChainOnFile.h \
+    StringBuilderOnFile/CryptographicHash.h \
+    StringBuilderOnFile/IFileInfo.h \
+    StringBuilderOnFile/OriginalName.h \
+    ThreadCreateNewNames.h \
     widgets/AbstractStringBuilderWidget.h \
     widgets/DialogDroppedDir.h \
-    widgets/FormFormatSettings.h \
-    widgets/FormTextFormatSetting.h \
+    widgets/FormStringBuilder.h \
+    widgets/FormStringBuilderChain.h \
+    widgets/WidgetFileHashSetting.h \
     widgets/WidgetInsertTextSetting.h \
-    widgets/WidgetMD5Setting.h \
     widgets/WidgetNumberSetting.h \
     widgets/WidgetOnlyPositionFixer.h \
     widgets/WidgetOriginalNameSetting.h \
@@ -73,8 +84,9 @@ HEADERS += \
 FORMS += \
     MainWindow.ui \
     widgets/DialogDroppedDir.ui \
-    widgets/FormFormatSettings.ui \
-    widgets/FormTextFormatSetting.ui \
+    widgets/FormStringBuilder.ui \
+    widgets/FormStringBuilderChain.ui \
+    widgets/WidgetFileHashSetting.ui \
     widgets/WidgetInsertTextSetting.ui \
     widgets/WidgetNumberSetting.ui \
     widgets/WidgetOnlyPositionFixer.ui \

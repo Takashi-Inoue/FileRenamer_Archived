@@ -27,9 +27,20 @@ SearchInDirs::SearchInDirs(const SearchSettings &settings)
 {
 }
 
-QVector<SearchInDirs::ParentChildrenPair> SearchInDirs::exec(QVector<ParentChildrenPair> targetDirs)
+QVector<SearchInDirs::ParentChildrenPair> SearchInDirs::dirs() const
 {
-    m_resultPaths.clear();
+    return m_dirs;
+}
+
+QVector<SearchInDirs::ParentChildrenPair> SearchInDirs::files() const
+{
+    return m_files;
+}
+
+void SearchInDirs::exec(QVector<ParentChildrenPair> targetDirs)
+{
+    m_dirs.clear();
+    m_files.clear();
 
     const QStringList nameFilters = m_settings.filters();
     int hierarchy = m_settings.searchHierarchy();
@@ -40,8 +51,6 @@ QVector<SearchInDirs::ParentChildrenPair> SearchInDirs::exec(QVector<ParentChild
         if (--hierarchy == 0)
             break;
     }
-
-    return m_resultPaths;
 }
 
 void SearchInDirs::searchForDirs(const QDir &parentDir
@@ -52,13 +61,14 @@ void SearchInDirs::searchForDirs(const QDir &parentDir
     if (childrenNames.isEmpty())
         return;
 
-    targetDirs << ParentChildrenPair(parentDir.path(), {childrenNames.begin(), childrenNames.end()});
+    targetDirs << ParentChildrenPair(addSeparator(parentDir.path())
+                                   , {childrenNames.begin(), childrenNames.end()});
 
     if (!m_settings.isSearchDirs())
         return;
 
     if (parentDir.nameFilters().isEmpty()) {
-        m_resultPaths << targetDirs.last();
+        m_dirs << targetDirs.last();
         return;
     }
 
@@ -74,8 +84,8 @@ void SearchInDirs::searchForDirs(const QDir &parentDir
     if (childrenNames.isEmpty())
         return;
 
-    m_resultPaths << ParentChildrenPair(parentDir.path()
-                                      , QStringVector(childrenNames.begin(), childrenNames.end()));
+    m_dirs << ParentChildrenPair(addSeparator(parentDir.path())
+                               , QStringVector(childrenNames.begin(), childrenNames.end()));
 }
 
 void SearchInDirs::searchForFiles(const QDir &parentDir)
@@ -88,18 +98,18 @@ void SearchInDirs::searchForFiles(const QDir &parentDir)
     if (childrenNames.isEmpty())
         return;
 
-    m_resultPaths << ParentChildrenPair(parentDir.path()
-                                      , QStringVector(childrenNames.begin(), childrenNames.end()));
+    m_files << ParentChildrenPair(addSeparator(parentDir.path())
+                                , QStringVector(childrenNames.begin(), childrenNames.end()));
 }
 
 void SearchInDirs::searchOneLayer(QVector<ParentChildrenPair> &targetDirs
                                 , const QStringList &nameFilters)
 {
-    for (int i = 0, count = targetDirs.size(); i < count; ++i) {
+    for (int i = 0, count = int(targetDirs.size()); i < count; ++i) {
         const ParentChildrenPair &parentChildren = targetDirs.takeFirst();
 
         for (QStringView childName : parentChildren.second) {
-            QDir targetDir(QString("%1/%2").arg(parentChildren.first, childName));
+            QDir targetDir(QString("%1%2").arg(parentChildren.first, childName));
 
             targetDir.setNameFilters(nameFilters);
 
@@ -107,4 +117,12 @@ void SearchInDirs::searchOneLayer(QVector<ParentChildrenPair> &targetDirs
             searchForDirs(targetDir, targetDirs);
         }
     }
+}
+
+QString SearchInDirs::addSeparator(QStringView dirPath)
+{
+    if (dirPath.endsWith('/'))
+        return dirPath.toString();
+
+    return QString("%1/").arg(dirPath);
 }

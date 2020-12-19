@@ -17,35 +17,27 @@
  * along with APPNAME.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "EntityName.h"
-#include "ParentDir.h"
+#ifndef CRYPTOGRAPHICHASH_H
+#define CRYPTOGRAPHICHASH_H
 
-namespace Path {
+#include "AbstractNeedFileInfo.h"
 
-EntityName::EntityName(QWeakPointer<ParentDir> parent, QStringView name)
-    : m_parent(parent)
-    , m_name(name.toString())
+#include <QCryptographicHash>
+
+namespace StringBuilderOnFile {
+
+class CryptographicHash : public AbstractNeedFileInfo
 {
-    Q_ASSERT(parent != nullptr);
-    Q_ASSERT(!name.isEmpty());
-}
+    Q_OBJECT
+public:
+    CryptographicHash(QCryptographicHash::Algorithm algorithm, int pos, QObject *parent = nullptr);
 
-QFileInfo EntityName::fileInfo() const
-{
-    return QFileInfo(path());
-}
+    void build(QString &result) override;
 
-QStringView EntityName::name() const
-{
-    return m_name;
-}
+protected:
+    QCryptographicHash::Algorithm m_algorithm;
+};
 
-QString EntityName::path() const
-{
-    QReadLocker locker(&m_lock);
+} // namespace StringBuilderOnFile
 
-    return QString("%1/%2").arg(m_parent.lock()->path(), m_name);
-}
-
-} // namespace Path
-
+#endif // CRYPTOGRAPHICHASH_H

@@ -22,10 +22,11 @@
 
 #include <QReadWriteLock>
 #include <QSharedPointer>
+#include "QStringVector.h"
 
 namespace Path {
 
-class EntityName;
+class PathEntity;
 class ParentDir;
 
 class PathRoot final
@@ -36,18 +37,32 @@ class PathRoot final
     PathRoot &operator=(PathRoot &&) = delete;
 
 public:
+    using ParentChildrenPair = QPair<QString, QStringVector>;
+
     PathRoot() = default;
     ~PathRoot() = default;
 
+    // Add / Remove Data
     void addDir(QSharedPointer<ParentDir> dir);
+    void addPathsAsDirs(QVector<ParentChildrenPair> dirs);
+    void addPathsAsFiles(QVector<ParentChildrenPair> files);
+    void remove(int index, int count = 1);
+    void removeSpecifiedRows(QVector<int> rows);
+
     QSharedPointer<ParentDir> dir(QStringView path) const;
-    QSharedPointer<EntityName> entity(int index) const;
-    int entityCount() const;
-    void sort(Qt::SortOrder order);
+    QSharedPointer<PathEntity> entity(int index) const;
+    qsizetype entityCount() const;
+    void sortByEntityName(Qt::SortOrder order);
+    void sortByParentDir(Qt::SortOrder order);
 
 private:
+    enum class EntityType {dirs, files};
+
+    void addPaths(const QVector<ParentChildrenPair> &paths, EntityType entityType);
+
     mutable QReadWriteLock m_lock;
 
+    QVector<QSharedPointer<PathEntity>> m_entities;
     QVector<QSharedPointer<ParentDir>> m_dirs;
 };
 

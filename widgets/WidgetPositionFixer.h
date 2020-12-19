@@ -32,9 +32,12 @@ class WidgetPositionFixer : public QFrame
 
 public:
     explicit WidgetPositionFixer(QWidget *parent = nullptr);
-    ~WidgetPositionFixer();
+    ~WidgetPositionFixer() override;
 
     int value() const;
+
+signals:
+    void changeStarted();
 
 private slots:
     void on_pushButtonHead_clicked();

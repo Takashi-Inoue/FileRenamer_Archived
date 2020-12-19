@@ -17,24 +17,22 @@
  * along with APPNAME.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "FormFormatSettings.h"
-#include "ui_FormFormatSettings.h"
+#ifndef ORIGINALNAME_H
+#define ORIGINALNAME_H
 
-#include "FormTextFormatSetting.h"
+#include "AbstractNeedFileInfo.h"
 
-FormFormatSettings::FormFormatSettings(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::FormFormatSettings)
+namespace StringBuilderOnFile {
+
+class OriginalName : public AbstractNeedFileInfo
 {
-    ui->setupUi(this);
-}
+    Q_OBJECT
+public:
+    using AbstractNeedFileInfo::AbstractNeedFileInfo;
 
-FormFormatSettings::~FormFormatSettings()
-{
-    delete ui;
-}
+    void build(QString &result) override;
+};
 
-void FormFormatSettings::createNewSetting()
-{
-    ui->vLayout->insertWidget(ui->vLayout->count() - 2, new FormTextFormatSetting(this));
-}
+} // namespace StringBuilderOnFile
+
+#endif // ORIGINALNAME_H

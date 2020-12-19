@@ -11,5 +11,7 @@
         <file>res/icons/folder-3.ico</file>
         <file>res/icons/system-search-6.ico</file>
         <file>res/icons/text-x-preview.ico</file>
+        <file>res/images/rename_old.svg</file>
+        <file>res/images/rename_new.svg</file>
     </qresource>
 </RCC>

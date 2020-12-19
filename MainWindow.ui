@@ -44,7 +44,7 @@
           <property name="widgetResizable">
            <bool>true</bool>
           </property>
-          <widget class="FormFormatSettings" name="scrollAreaWidgetContents">
+          <widget class="FormStringBuilderChain" name="formStringBuilderChain">
            <property name="geometry">
             <rect>
              <x>0</x>
@@ -58,7 +58,26 @@
         </item>
        </layout>
       </widget>
-      <widget class="QTableView" name="tableView"/>
+      <widget class="PathTableView" name="tableView">
+       <property name="selectionBehavior">
+        <enum>QAbstractItemView::SelectRows</enum>
+       </property>
+       <property name="horizontalScrollMode">
+        <enum>QAbstractItemView::ScrollPerPixel</enum>
+       </property>
+       <property name="sortingEnabled">
+        <bool>true</bool>
+       </property>
+       <attribute name="horizontalHeaderShowSortIndicator" stdset="0">
+        <bool>true</bool>
+       </attribute>
+       <attribute name="horizontalHeaderStretchLastSection">
+        <bool>true</bool>
+       </attribute>
+       <attribute name="verticalHeaderVisible">
+        <bool>false</bool>
+       </attribute>
+      </widget>
      </widget>
     </item>
    </layout>
@@ -158,10 +177,15 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>FormFormatSettings</class>
+   <class>FormStringBuilderChain</class>
    <extends>QWidget</extends>
-   <header>widgets/FormFormatSettings.h</header>
+   <header>widgets/FormStringBuilderChain.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>PathTableView</class>
+   <extends>QTableView</extends>
+   <header>Path/PathTableView.h</header>
   </customwidget>
  </customwidgets>
  <resources>

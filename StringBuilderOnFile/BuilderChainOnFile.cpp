@@ -19,12 +19,11 @@
 
 #include "BuilderChainOnFile.h"
 #include "AbstractNeedFileInfo.h"
-#include "Path/EntityName.h"
+#include "Path/PathEntity.h"
 
-namespace StringBuilder {
-namespace File {
+namespace StringBuilderOnFile {
 
-void BuilderChainOnFile::addCreator(QSharedPointer<AbstractStringBuilder> creator)
+void BuilderChainOnFile::addCreator(QSharedPointer<StringBuilder::AbstractStringBuilder> creator)
 {
     auto needFileInfo = qobject_cast<AbstractNeedFileInfo *>(creator.get());
 
@@ -36,18 +35,17 @@ void BuilderChainOnFile::addCreator(QSharedPointer<AbstractStringBuilder> creato
     BuilderChain::addCreator(creator);
 }
 
-void BuilderChainOnFile::setPathEntityName(QWeakPointer<Path::EntityName> pathEntityName)
+void BuilderChainOnFile::setFileInfo(QSharedPointer<IFileInfo> fileInfo)
 {
-    m_pathEntityName = pathEntityName;
+    if (m_fileInfo != fileInfo)
+        m_fileInfo = fileInfo;
 }
 
 void BuilderChainOnFile::onNeedFileInfo(AbstractNeedFileInfo *stringBuilder)
 {
-    QSharedPointer<Path::EntityName> entityName = m_pathEntityName.lock();
+    Q_ASSERT(m_fileInfo != nullptr);
 
-    if (entityName != nullptr)
-        stringBuilder->setFileInfo(entityName->fileInfo());
+    stringBuilder->setFileInfo(m_fileInfo);
 }
 
-} // namespace File
-} // namespace StringBuilder
+} // namespace StringBuilderOnFile

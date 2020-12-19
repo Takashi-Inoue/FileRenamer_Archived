@@ -31,7 +31,7 @@ ReplaceString::ReplaceString(QStringView before, QStringView after, bool isCaseS
     Q_ASSERT(!before.isEmpty());
 }
 
-void ReplaceString::create(QString &result)
+void ReplaceString::build(QString &result)
 {
     result.replace(m_before, m_after, m_caseSensitivity);
 }

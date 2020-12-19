@@ -17,24 +17,41 @@
  * along with APPNAME.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ORIGINALNAME_H
-#define ORIGINALNAME_H
+#ifndef FORMSTRINGBUILDER_H
+#define FORMSTRINGBUILDER_H
 
-#include "AbstractNeedFileInfo.h"
+#include <QFrame>
+#include <QSharedPointer>
 
-namespace StringBuilder {
-namespace File {
+namespace StringBuilder {class AbstractStringBuilder;}
 
-class OriginalName : public AbstractNeedFileInfo
+class QPushButton;
+
+namespace Ui {
+class FormStringBuilder;
+}
+
+class FormStringBuilder : public QFrame
 {
     Q_OBJECT
-public:
-    using AbstractNeedFileInfo::AbstractNeedFileInfo;
 
-    void create(QString &result) override;
+public:
+    explicit FormStringBuilder(QWidget *parent = nullptr);
+    ~FormStringBuilder() override;
+
+    QSharedPointer<StringBuilder::AbstractStringBuilder> stringBuilder() const;
+
+signals:
+    void changeStarted();
+
+protected:
+    void enterEvent(QEnterEvent *event) override;
+    void leaveEvent(QEvent *event) override;
+    void resizeEvent(QResizeEvent *event) override;
+
+private:
+    Ui::FormStringBuilder *ui;
+    QPushButton *m_buttonClose;
 };
 
-} // File StringBuilder
-} // namespace StringBuilder
-
-#endif // ORIGINALNAME_H
+#endif // FORMSTRINGBUILDER_H

@@ -27,7 +27,7 @@ InsertString::InsertString(int pos, QStringView string, QObject *parent)
 {
 }
 
-void InsertString::create(QString &result)
+void InsertString::build(QString &result)
 {
     result.insert(posToInsert(result.size()), m_string);
 }

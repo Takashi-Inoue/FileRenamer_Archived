@@ -31,7 +31,7 @@ public:
     ReplaceString(QStringView before, QStringView after, bool isCaseSensitive
                 , QObject *parent = nullptr);
 
-    void create(QString &result) override;
+    void build(QString &result) override;
 
 protected:
     const QString m_before;

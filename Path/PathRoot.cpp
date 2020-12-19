@@ -19,6 +19,7 @@
 
 #include "PathRoot.h"
 #include "ParentDir.h"
+#include "PathEntity.h"
 
 #include <QCollator>
 
@@ -26,9 +27,44 @@ namespace Path {
 
 void PathRoot::addDir(QSharedPointer<ParentDir> dir)
 {
-    Q_ASSERT(m_dirs.contains(dir));
+    Q_ASSERT(!m_dirs.contains(dir));
 
+    QWriteLocker locker(&m_lock);
     m_dirs << dir;
+}
+
+void PathRoot::addPathsAsDirs(QVector<PathRoot::ParentChildrenPair> dirs)
+{
+    addPaths(dirs, EntityType::dirs);
+}
+
+void PathRoot::addPathsAsFiles(QVector<PathRoot::ParentChildrenPair> files)
+{
+    addPaths(files, EntityType::files);
+}
+
+void PathRoot::remove(int index, int count)
+{
+    QWriteLocker locker(&m_lock);
+
+    for (int i = 0; i < count; ++i) {
+        QSharedPointer<PathEntity> entity = m_entities.takeAt(index);
+
+        entity->parent().lock()->removeEntity(entity);
+    }
+}
+
+void PathRoot::removeSpecifiedRows(QVector<int> rows)
+{
+    std::sort(rows.begin(), rows.end(), std::greater<int>());
+
+    QWriteLocker locker(&m_lock);
+
+    for (int index : rows) {
+        QSharedPointer<PathEntity> entity = m_entities.takeAt(index);
+
+        entity->parent().lock()->removeEntity(entity);
+    }
 }
 
 QSharedPointer<ParentDir> PathRoot::dir(QStringView path) const
@@ -43,33 +79,35 @@ QSharedPointer<ParentDir> PathRoot::dir(QStringView path) const
     return *itr;
 }
 
-QSharedPointer<EntityName> PathRoot::entity(int index) const
+QSharedPointer<PathEntity> PathRoot::entity(int index) const
 {
-    Q_ASSERT(index >= 0);
+    Q_ASSERT(uint(index) < uint(m_entities.size()));
 
-    for (const QSharedPointer<ParentDir> &dir : m_dirs) {
-        const int entityCount = dir->entityCount();
-
-        if (index >= entityCount)
-            index -= entityCount;
-        else
-            return dir->entity(index);
-    }
-
-    return nullptr;
+    return m_entities[index];
 }
 
-int PathRoot::entityCount() const
+qsizetype PathRoot::entityCount() const
 {
-    int count = 0;
+    return m_entities.size();
+}
+
+void PathRoot::sortByEntityName(Qt::SortOrder order)
+{
+    QWriteLocker locker(&m_lock);
+
+    QCollator collator;
+    collator.setNumericMode(true);
+
+    for (QSharedPointer<ParentDir> &dir : m_dirs)
+        dir->sort(collator, order);
+
+    m_entities.clear();
 
     for (const QSharedPointer<ParentDir> &dir : m_dirs)
-        count += dir->entityCount();
-
-    return count;
+        m_entities << dir->allEntities();
 }
 
-void PathRoot::sort(Qt::SortOrder order)
+void PathRoot::sortByParentDir(Qt::SortOrder order)
 {
     QWriteLocker locker(&m_lock);
 
@@ -83,8 +121,32 @@ void PathRoot::sort(Qt::SortOrder order)
                                            : collator.compare(lhs->path(), rhs->path()) > 0;
     });
 
-    for (DirPtr &dir : m_dirs)
-        dir->sort(collator, order);
+    m_entities.clear();
+
+    for (const DirPtr &dir : m_dirs)
+        m_entities << dir->allEntities();
+}
+
+void PathRoot::addPaths(const QVector<ParentChildrenPair> &paths, EntityType entityType)
+{
+    for (const ParentChildrenPair &path : paths) {
+        QSharedPointer<ParentDir> parentDir = dir(path.first);
+
+        if (parentDir == nullptr) {
+            parentDir = QSharedPointer<ParentDir>::create(path.first);
+            addDir(parentDir);
+        }
+
+        QWriteLocker locker(&m_lock);
+
+        for (QStringView name : path.second) {
+            auto entity = QSharedPointer<PathEntity>::create(
+                              parentDir, name, entityType == EntityType::dirs);
+            parentDir->addEntity(entity);
+
+            m_entities << entity;
+        }
+    }
 }
 
 } // namespace Path

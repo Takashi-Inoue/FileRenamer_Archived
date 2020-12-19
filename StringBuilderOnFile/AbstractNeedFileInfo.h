@@ -22,37 +22,35 @@
 
 #include "StringBuilder/AbstractInsertString.h"
 
-#include <QFileInfo>
 #include <QMetaType>
 #include <QObject>
+#include <QSharedPointer>
 
-namespace StringBuilder {
-namespace File {
+namespace StringBuilderOnFile {
 
-class AbstractNeedFileInfo : public AbstractInsertString
+class IFileInfo;
+
+class AbstractNeedFileInfo : public StringBuilder::AbstractInsertString
 {
     Q_OBJECT
 public:
-    AbstractNeedFileInfo(int pos, QObject *parent = nullptr)
-        : AbstractInsertString(pos, parent)
-    {
-    }
+    using AbstractInsertString::AbstractInsertString;
 
-    void setFileInfo(const QFileInfo &fileInfo)
+    void setFileInfo(QSharedPointer<IFileInfo> fileInfo)
     {
-        m_fileInfo = fileInfo;
+        if (m_fileInfo !=fileInfo)
+            m_fileInfo = fileInfo;
     }
 
 signals:
-    void needFileInfo(StringBuilder::File::AbstractNeedFileInfo *stringBuilder);
+    void needFileInfo(StringBuilderOnFile::AbstractNeedFileInfo *stringBuilder);
 
 protected:
-    QFileInfo m_fileInfo;
+    QSharedPointer<IFileInfo> m_fileInfo;
 };
 
-} // File StringBuilder
-} // namespace StringBuilder
+} // namespace StringBuilderOnFile
 
-Q_DECLARE_METATYPE(StringBuilder::File::AbstractNeedFileInfo *)
+Q_DECLARE_METATYPE(StringBuilderOnFile::AbstractNeedFileInfo *)
 
 #endif // ABSTRACTNEEDFILEINFO_H
