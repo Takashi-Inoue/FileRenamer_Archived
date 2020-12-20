@@ -60,23 +60,13 @@ void ThreadCreateNewNames::run()
     m_isStopRequested = false;
     m_lock.unlock();
 
-    QSharedPointer<Path::PathRoot> root = m_pathRoot.lock();
+    HashToCheckEntities hashToCheckNames;
 
-    for (int i = 0, count = int(root->entityCount()); i < count; ++i) {
-        QSharedPointer<Path::PathEntity>entity = root->entity(i);
+    if (!createNewNames(hashToCheckNames))
+        return;
 
-        locker.relock();
-
-        m_builderChain->setFileInfo(QSharedPointer<Path::PathEntityInfo>::create(entity));
-        entity->setNewName(m_builderChain->build());
-
-        locker.unlock();
-
-        emit newNameCreated(i);
-
-        if (isStopRequested())
-            return;
-    }
+    if (!checkNewNames(hashToCheckNames))
+        return;
 }
 
 bool ThreadCreateNewNames::isStopRequested() const
@@ -84,4 +74,66 @@ bool ThreadCreateNewNames::isStopRequested() const
     QReadLocker locker(&m_lock);
 
     return m_isStopRequested;
+}
+
+bool ThreadCreateNewNames::checkNewNames(HashToCheckEntities &hashToCheckNames)
+{
+    bool isOk = true;
+
+    for (QList<EntityToIndex> &entityToIndexList : hashToCheckNames.values()) {
+        std::sort(entityToIndexList.begin(), entityToIndexList.end()
+                , [](const EntityToIndex &lhs, const EntityToIndex &rhs)
+        {
+            return lhs.first->newName() < rhs.first->newName();
+        });
+
+        for (qsizetype i = 0, count = entityToIndexList.size(); i < count - 1; ++i) {
+            EntityToIndex &lhs = entityToIndexList[i];
+            EntityToIndex &rhs = entityToIndexList[i + 1];
+
+            if (!lhs.first->checkForNewNameCollisions(rhs.first)) {
+                isOk = false;
+                emit newNameCollisionDetected({lhs.second, rhs.second});
+            }
+
+            if (isStopRequested())
+                return false;
+        }
+    }
+
+    if (isOk)
+        emit newNameCollisionNotDetected();
+
+    return true;
+}
+
+bool ThreadCreateNewNames::createNewNames(HashToCheckEntities &hashToCheckNames)
+{
+    QSharedPointer<Path::PathRoot> root = m_pathRoot.lock();
+
+    for (int i = 0, count = int(root->entityCount()); i < count; ++i) {
+        createOneNewName({root->entity(i), i}, hashToCheckNames);
+
+        if (isStopRequested())
+            return false;
+    }
+
+    return true;
+}
+
+void ThreadCreateNewNames::createOneNewName(EntityToIndex entityToIndex
+                                          , HashToCheckEntities &hashToCheckNames)
+{
+    QSharedPointer<Path::PathEntity> &entity = entityToIndex.first;
+
+    m_lock.lockForRead();
+
+    m_builderChain->setFileInfo(QSharedPointer<Path::PathEntityInfo>::create(entity));
+    entity->setNewName(m_builderChain->build());
+
+    hashToCheckNames[quintptr(entity->parent().lock().get())] << entityToIndex;
+
+    m_lock.unlock();
+
+    emit newNameCreated(entityToIndex.second);
 }

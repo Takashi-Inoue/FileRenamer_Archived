@@ -30,9 +30,13 @@ PathModel::PathModel(QObject *parent)
     , m_dataRoot(QSharedPointer<Path::PathRoot>::create())
     , m_threadCreateNewNames(new ThreadCreateNewNames(m_dataRoot, this))
 {
-    connect (m_threadCreateNewNames, &ThreadCreateNewNames::newNameCreated, this, [this](int row) {
-        emit dataChanged(index(row, int(HSection::newName)), index(row, int(HSection::newName)));
-    });
+    connect(m_threadCreateNewNames, &ThreadCreateNewNames::newNameCreated
+          , this, &PathModel::onNewNameCreated);
+
+    connect(m_threadCreateNewNames, &ThreadCreateNewNames::newNameCollisionDetected
+          , this, &PathModel::onNewNameCollisionDetected);
+
+    connect(m_threadCreateNewNames, &QThread::finished, this, &PathModel::onCreateNameCompleted);
 }
 
 QVariant PathModel::headerData(int section, Qt::Orientation orientation, int role) const
@@ -99,13 +103,12 @@ QVariant PathModel::data(const QModelIndex &index, int role) const
             return entity->parentPath();
     }
 
-    if (role == Qt::DecorationRole && hSection == HSection::originalName) {
-        static const QIcon icons[] = {
-            QFileIconProvider().icon(QAbstractFileIconProvider::File),
-            QFileIconProvider().icon(QAbstractFileIconProvider::Folder),
-        };
+    if (role == Qt::DecorationRole) {
+        if (hSection == HSection::originalName)
+            return entity->typeIcon();
 
-        return icons[entity->isDir()];
+        if (hSection == HSection::newName)
+            return entity->stateIcon();
     }
 
     return QVariant();
@@ -164,4 +167,29 @@ void PathModel::startCreateNewNames(QSharedPointer<StringBuilderOnFile::BuilderC
     m_threadCreateNewNames->wait();
     m_threadCreateNewNames->setStringBuilderOnFile(builderChain);
     m_threadCreateNewNames->start();
+}
+
+// private slots //
+void PathModel::onCreateNameCompleted()
+{
+    QModelIndex tl = index(0, int(HSection::newName));
+    QModelIndex br = index(int(m_dataRoot->entityCount()), int(HSection::newName));
+
+    emit dataChanged(tl, br, {Qt::DecorationRole});
+}
+
+void PathModel::onNewNameCollisionDetected(QPair<int, int> indices)
+{
+    QModelIndex lIndex = index(indices.first,  int(HSection::newName));
+    QModelIndex rIndex = index(indices.second, int(HSection::newName));
+
+    emit dataChanged(lIndex, lIndex, {Qt::DecorationRole});
+    emit dataChanged(rIndex, rIndex, {Qt::DecorationRole});
+}
+
+void PathModel::onNewNameCreated(int row)
+{
+    QModelIndex modelIndex = index(row, int(HSection::newName));
+
+    emit dataChanged(modelIndex, modelIndex, {Qt::DisplayRole});
 }

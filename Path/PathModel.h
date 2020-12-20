@@ -66,6 +66,11 @@ public:
     void copyOriginalNameToClipboard(int row) const;
     void startCreateNewNames(QSharedPointer<StringBuilderOnFile::BuilderChainOnFile> builderChain);
 
+private slots:
+    void onCreateNameCompleted();
+    void onNewNameCollisionDetected(QPair<int, int> indices);
+    void onNewNameCreated(int row);
+
 private:
     enum class HSection : int {
         originalName, newName, path

@@ -21,6 +21,7 @@
 #include "ParentDir.h"
 
 #include <QClipboard>
+#include <QFileIconProvider>
 #include <QGuiApplication>
 
 namespace Path {
@@ -84,12 +85,12 @@ QWeakPointer<ParentDir> PathEntity::parent() const
 
 QString PathEntity::hashHex(QCryptographicHash::Algorithm algorithm) const
 {
-    return m_hashs[algorithm];
+    return m_fileHashs[algorithm];
 }
 
 void PathEntity::setHashHex(QCryptographicHash::Algorithm algorithm, QStringView hashHex)
 {
-    m_hashs[algorithm] = hashHex.toString();
+    m_fileHashs[algorithm] = hashHex.toString();
 }
 
 void PathEntity::setNewName(QStringView newName)
@@ -98,6 +99,65 @@ void PathEntity::setNewName(QStringView newName)
 
     m_newName = m_isDir ? newName.toString()
                         : QString("%1%2").arg(newName, m_name.mid(m_name.indexOf('.')));
+
+    m_state = State::initial;
+}
+
+bool PathEntity::checkForNewNameCollisions(QSharedPointer<PathEntity> other)
+{
+    if (newName() == other->newName()) {
+        setState(State::hasCollision);
+        other->setState(State::hasCollision);
+
+        return false;
+    }
+
+    if (state() == State::initial)
+        setState(State::ready);
+
+    if (other->state() == State::initial)
+        other->setState(State::ready);
+
+    return true;
+}
+
+QIcon PathEntity::stateIcon() const
+{
+    static const QHash<int, QIcon> icons = {
+        {int(State::initial),      QIcon(":/res/images/circlegray.svg")},
+        {int(State::ready),        QIcon(":/res/images/circlegreen.svg")},
+        {int(State::hasCollision), QIcon(":/res/images/collision.svg")},
+        {int(State::success), QIcon()},
+        {int(State::failure), QIcon()},
+    };
+
+    QReadLocker locker(&m_lock);
+
+    return icons[int(m_state)];
+}
+
+QIcon PathEntity::typeIcon() const
+{
+    static const QIcon icons[] = {
+        QFileIconProvider().icon(QAbstractFileIconProvider::File),
+        QFileIconProvider().icon(QAbstractFileIconProvider::Folder),
+    };
+
+    return icons[m_isDir];
+}
+
+void PathEntity::setState(PathEntity::State state)
+{
+    QWriteLocker locker(&m_lock);
+
+    m_state = state;
+}
+
+PathEntity::State PathEntity::state() const
+{
+    QReadLocker locker(&m_lock);
+
+    return m_state;
 }
 
 } // namespace Path

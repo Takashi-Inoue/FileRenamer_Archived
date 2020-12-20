@@ -82,6 +82,15 @@ void MainWindow::dropEvent(QDropEvent *event)
     registerPaths(paths);
 }
 
+void MainWindow::onPathsAdded()
+{
+    QHeaderView *header = ui->tableView->horizontalHeader();
+
+    m_pathModel->sort(header->sortIndicatorSection(), header->sortIndicatorOrder());
+
+    m_pathModel->startCreateNewNames(ui->formStringBuilderChain->builderChain());
+}
+
 void MainWindow::registerPaths(const QVector<QString> &paths)
 {
     PathsAnalyzer analyzer;
@@ -91,6 +100,7 @@ void MainWindow::registerPaths(const QVector<QString> &paths)
     if (!analyzer.isAllDir()) {
         m_pathModel->addPathsAsDirs(analyzer.dirs());
         m_pathModel->addPathsAsFiles(analyzer.files());
+        onPathsAdded();
 
         return;
     }
@@ -102,6 +112,7 @@ void MainWindow::registerPaths(const QVector<QString> &paths)
 
     if (dlg.isRegisterDroppedDir()) {
         m_pathModel->addPathsAsDirs(analyzer.dirs());
+        onPathsAdded();
 
         return;
     }
@@ -113,7 +124,5 @@ void MainWindow::registerPaths(const QVector<QString> &paths)
     m_pathModel->addPathsAsDirs(searchInDirs.dirs());
     m_pathModel->addPathsAsFiles(searchInDirs.files());
 
-    QHeaderView *header = ui->tableView->horizontalHeader();
-
-    m_pathModel->sort(header->sortIndicatorSection(), header->sortIndicatorOrder());
+    onPathsAdded();
 }

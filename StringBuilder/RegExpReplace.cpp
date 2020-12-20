@@ -28,7 +28,6 @@ RegExpReplace::RegExpReplace(QStringView regexp, QStringView after, bool isCaseS
                                                   : QRegularExpression::CaseInsensitiveOption)
     , m_after(after.toString())
 {
-    Q_ASSERT(!regexp.isEmpty());
 }
 
 void RegExpReplace::build(QString &result)

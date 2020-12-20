@@ -22,6 +22,7 @@
 
 #include <QCryptographicHash>
 #include <QFileInfo>
+#include <QIcon>
 #include <QReadWriteLock>
 #include <QSharedPointer>
 #include <QString>
@@ -52,15 +53,29 @@ public:
     void setHashHex(QCryptographicHash::Algorithm algorithm, QStringView hashHex);
     void setNewName(QStringView newName);
 
+    bool checkForNewNameCollisions(QSharedPointer<PathEntity> other);
+
+    QIcon stateIcon() const;
+    QIcon typeIcon() const;
+
 private:
+    enum class State : int {
+        initial, ready, hasCollision, success, failure
+    };
+
+    void setState(State state);
+    State state() const;
+
     mutable QReadWriteLock m_lock;
 
     const bool m_isDir;
 
+    State m_state = State::initial;
+
     QWeakPointer<ParentDir> m_parent;
     QString m_name;
     QString m_newName;
-    QHash<QCryptographicHash::Algorithm, QString> m_hashs;
+    QHash<QCryptographicHash::Algorithm, QString> m_fileHashs;
 };
 
 } // namespace Path

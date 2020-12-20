@@ -27,6 +27,7 @@
 
 namespace Path {
 class PathRoot;
+class PathEntity;
 }
 
 namespace StringBuilderOnFile {
@@ -44,6 +45,8 @@ public:
 
 signals:
     void newNameCreated(int index);
+    void newNameCollisionDetected(QPair<int, int> indices);
+    void newNameCollisionNotDetected();
 
 protected:
     void run() override;
@@ -51,6 +54,13 @@ protected:
     bool isStopRequested() const;
 
 private:
+    using EntityToIndex = QPair<QSharedPointer<Path::PathEntity>, int>;
+    using HashToCheckEntities = QHash<quintptr, QList<EntityToIndex>>;
+
+    bool checkNewNames(HashToCheckEntities &hashToCheckNames);
+    bool createNewNames(HashToCheckEntities &hashToCheckNames);
+    void createOneNewName(EntityToIndex entityToIndex, HashToCheckEntities &hashToCheckNames);
+
     mutable QReadWriteLock m_lock;
 
     bool m_isStopRequested = false;

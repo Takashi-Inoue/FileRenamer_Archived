@@ -13,5 +13,8 @@
         <file>res/icons/text-x-preview.ico</file>
         <file>res/images/rename_old.svg</file>
         <file>res/images/rename_new.svg</file>
+        <file>res/images/collision.svg</file>
+        <file>res/images/circlegreen.svg</file>
+        <file>res/images/circlegray.svg</file>
     </qresource>
 </RCC>

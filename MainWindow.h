@@ -42,6 +42,7 @@ protected:
     void dropEvent(QDropEvent *event) override;
 
 private:
+    void onPathsAdded();
     void registerPaths(const QVector<QString> &paths);
 
     Ui::MainWindow *ui;
