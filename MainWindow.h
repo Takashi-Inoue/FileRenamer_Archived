@@ -38,18 +38,27 @@ public:
     ~MainWindow() override;
 
 protected:
+    void closeEvent(QCloseEvent *event) override;
     void dragEnterEvent(QDragEnterEvent *event) override;
     void dropEvent(QDropEvent *event) override;
 
 private slots:
     void onPathsDataChanged();
+    void adaptorToChangeState();
 
 private:
+    enum State : int {
+        initial, changingSettings, ready, renaming, stopped, undoing, finishedRenaming
+    };
+
+    void setState(State state);
+
     void onPathsAdded();
     void registerPaths(const QStringList &paths);
 
     Ui::MainWindow *ui;
 
+    State m_state = State::initial;
     PathModel *m_pathModel;
 };
 #endif // MAINWINDOW_H

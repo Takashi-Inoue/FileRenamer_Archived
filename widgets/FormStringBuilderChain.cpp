@@ -21,7 +21,6 @@
 #include "ui_FormStringBuilderChain.h"
 
 #include "FormStringBuilder.h"
-#include "StringBuilderOnFile/BuilderChainOnFile.h"
 
 #include <QApplication>
 #include <QTimer>
@@ -38,11 +37,25 @@ FormStringBuilderChain::FormStringBuilderChain(QWidget *parent)
 
     createNewSetting();
 
-    connect(m_timer, &QTimer::timeout, this, &FormStringBuilderChain::settingsChanged);
+    connect(m_timer, &QTimer::timeout, this, [this]() {
+        emit settingsChanged(builderChain());
+    });
 }
 
 FormStringBuilderChain::~FormStringBuilderChain()
 {
+    int count = ui->vLayout->count();
+
+    for (int i = 0; i < count; ++i) {
+        QLayoutItem *item = ui->vLayout->itemAt(i);
+        auto widget = qobject_cast<FormStringBuilder *>(item->widget());
+
+        if (widget != nullptr) {
+            disconnect(widget, &FormStringBuilder::destroyed
+                     , this, &FormStringBuilderChain::startTimer);
+        }
+    }
+
     delete ui;
 }
 
@@ -69,10 +82,17 @@ void FormStringBuilderChain::createNewSetting()
 
     widget->setAttribute(Qt::WA_DeleteOnClose, true);
 
-    connect(widget, &FormStringBuilder::changeStarted, m_timer, qOverload<>(&QTimer::start));
-    connect(widget, &FormStringBuilder::destroyed, m_timer, qOverload<>(&QTimer::start));
+    connect(widget, &FormStringBuilder::changeStarted, this, &FormStringBuilderChain::startTimer);
+    connect(widget, &FormStringBuilder::destroyed,     this, &FormStringBuilderChain::startTimer);
 
     ui->vLayout->insertWidget(ui->vLayout->count() - 2, widget);
 
+    startTimer();
+}
+
+void FormStringBuilderChain::startTimer()
+{
     m_timer->start();
+
+    emit changeStarted();
 }

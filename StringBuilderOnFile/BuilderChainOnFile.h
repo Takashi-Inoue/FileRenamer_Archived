@@ -47,4 +47,6 @@ private:
 
 } // namespace StringBuilderOnFile
 
+Q_DECLARE_METATYPE(QSharedPointer<StringBuilderOnFile::BuilderChainOnFile>)
+
 #endif // BUILDERCHAINONFILE_H

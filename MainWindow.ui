@@ -109,9 +109,8 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actionRename"/>
-   <addaction name="actionPause"/>
-   <addaction name="actionCancel"/>
-   <addaction name="actionRedo"/>
+   <addaction name="actionStop"/>
+   <addaction name="actionUndo"/>
    <addaction name="actionExit"/>
   </widget>
   <action name="actionRename">
@@ -126,40 +125,28 @@
     <string>Start renaming</string>
    </property>
   </action>
-  <action name="actionPause">
-   <property name="icon">
-    <iconset resource="images.qrc">
-     <normaloff>:/res/images/pause.png</normaloff>:/res/images/pause.png</iconset>
-   </property>
-   <property name="text">
-    <string>Pause/Resume</string>
-   </property>
-   <property name="toolTip">
-    <string>Pause/Resume</string>
-   </property>
-  </action>
-  <action name="actionCancel">
+  <action name="actionStop">
    <property name="icon">
     <iconset resource="images.qrc">
      <normaloff>:/res/images/stop.png</normaloff>:/res/images/stop.png</iconset>
    </property>
    <property name="text">
-    <string>Cancel</string>
+    <string>Stop</string>
    </property>
    <property name="toolTip">
-    <string>Cancel renaming</string>
+    <string>Stop renaming</string>
    </property>
   </action>
-  <action name="actionRedo">
+  <action name="actionUndo">
    <property name="icon">
     <iconset resource="images.qrc">
      <normaloff>:/res/images/backward.png</normaloff>:/res/images/backward.png</iconset>
    </property>
    <property name="text">
-    <string>Redo</string>
+    <string>Undo</string>
    </property>
    <property name="toolTip">
-    <string>Redo renaming</string>
+    <string>Undo renaming</string>
    </property>
   </action>
   <action name="actionExit">

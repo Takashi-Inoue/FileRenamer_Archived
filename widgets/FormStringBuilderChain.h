@@ -22,14 +22,12 @@
 
 #include <QWidget>
 
+#include "StringBuilderOnFile/BuilderChainOnFile.h"
+
 class QTimer;
 
 namespace Ui {
 class FormStringBuilderChain;
-}
-
-namespace StringBuilderOnFile {
-class BuilderChainOnFile;
 }
 
 class FormStringBuilderChain : public QWidget
@@ -43,10 +41,14 @@ public:
     QSharedPointer<StringBuilderOnFile::BuilderChainOnFile> builderChain() const;
 
 signals:
-    void settingsChanged();
+    void changeStarted();
+    void settingsChanged(QSharedPointer<StringBuilderOnFile::BuilderChainOnFile>);
 
 public slots:
     void createNewSetting();
+
+private slots:
+    void startTimer();
 
 private:
     Ui::FormStringBuilderChain *ui;

@@ -30,6 +30,7 @@ SOURCES += \
     StringBuilderOnFile/OriginalName.cpp \
     ThreadCreateNewNames.cpp \
     ThreadRename.cpp \
+    ThreadUndoRenaming.cpp \
     main.cpp \
     MainWindow.cpp \
     widgets/DialogDroppedDir.cpp \
@@ -70,6 +71,7 @@ HEADERS += \
     StringBuilderOnFile/OriginalName.h \
     ThreadCreateNewNames.h \
     ThreadRename.h \
+    ThreadUndoRenaming.h \
     widgets/AbstractStringBuilderWidget.h \
     widgets/DialogDroppedDir.h \
     widgets/FormStringBuilder.h \

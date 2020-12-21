@@ -17,26 +17,26 @@
  * along with APPNAME.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ThreadRename.h"
+#include "ThreadUndoRenaming.h"
 
 #include "Path/PathRoot.h"
 #include "Path/PathEntity.h"
 
-ThreadRename::ThreadRename(QWeakPointer<Path::PathRoot> pathRoot, QObject *parent)
+ThreadUndoRenaming::ThreadUndoRenaming(QWeakPointer<Path::PathRoot> pathRoot, QObject *parent)
     : QThread(parent)
     , m_pathRoot(pathRoot)
 {
     Q_ASSERT(m_pathRoot != nullptr);
 }
 
-void ThreadRename::stop()
+void ThreadUndoRenaming::stop()
 {
     QWriteLocker locker(&m_lock);
 
     m_isStopRequested = true;
 }
 
-void ThreadRename::run()
+void ThreadUndoRenaming::run()
 {
     m_lock.lockForWrite();
     m_isStopRequested = false;
@@ -54,15 +54,8 @@ void ThreadRename::run()
                         : files << EntityToIndex(entity, i);
     }
 
-    renameEntities(files);
-
-    if (isStopRequested()) {
-        emit stopped();
-        return;
-    }
-
     std::sort(dirs.begin(), dirs.end(), [](const EntityToIndex &lhs, const EntityToIndex &rhs) {
-        return lhs.first->fullPath().count('/') > rhs.first->fullPath().count('/');
+        return lhs.first->fullPath().count('/') < rhs.first->fullPath().count('/');
     });
 
     renameEntities(dirs);
@@ -72,20 +65,27 @@ void ThreadRename::run()
         return;
     }
 
+    renameEntities(files);
+
+    if (isStopRequested()) {
+        emit stopped();
+        return;
+    }
+
     emit completed();
 }
 
-bool ThreadRename::isStopRequested() const
+bool ThreadUndoRenaming::isStopRequested() const
 {
     QReadLocker locker(&m_lock);
 
     return m_isStopRequested;
 }
 
-void ThreadRename::renameEntities(const QList<EntityToIndex> &entityToIndexList)
+void ThreadUndoRenaming::renameEntities(const QList<EntityToIndex> &entityToIndexList)
 {
     for (const EntityToIndex &entityToIndex : entityToIndexList) {
-        entityToIndex.first->rename();
+        entityToIndex.first->undoRename();
 
         emit renamed(entityToIndex.second);
 

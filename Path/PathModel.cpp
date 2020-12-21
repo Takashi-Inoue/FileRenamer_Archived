@@ -22,6 +22,7 @@
 #include "PathEntity.h"
 #include "ThreadCreateNewNames.h"
 #include "ThreadRename.h"
+#include "ThreadUndoRenaming.h"
 
 #include <QIcon>
 
@@ -30,6 +31,7 @@ PathModel::PathModel(QObject *parent)
     , m_dataRoot(QSharedPointer<Path::PathRoot>::create())
     , m_threadCreateNewNames(new ThreadCreateNewNames(m_dataRoot, this))
     , m_threadRename(new ThreadRename(m_dataRoot, this))
+    , m_threadUndoRenaming(new ThreadUndoRenaming(m_dataRoot, this))
 {
     connect(m_threadCreateNewNames, &ThreadCreateNewNames::newNameCreated
           , this, &PathModel::onNewNameCreated);
@@ -39,7 +41,13 @@ PathModel::PathModel(QObject *parent)
 
     connect(m_threadCreateNewNames, &QThread::finished, this, &PathModel::onCreateNameCompleted);
 
-    connect(m_threadRename, &ThreadRename::renamed, this, &PathModel::onStateChanged);
+    connect(m_threadRename, &ThreadRename::renamed, this, &PathModel::onNewNameStateChanged);
+    connect(m_threadRename, &ThreadRename::stopped, this, &PathModel::renameStopped);
+    connect(m_threadRename, &ThreadRename::completed, this, &PathModel::renameFinished);
+
+    connect(m_threadUndoRenaming, &ThreadUndoRenaming::renamed, this, &PathModel::onNewNameStateChanged);
+    connect(m_threadUndoRenaming, &ThreadUndoRenaming::stopped, this, &PathModel::renameStopped);
+    connect(m_threadUndoRenaming, &ThreadUndoRenaming::completed, this, &PathModel::readyToRename);
 }
 
 QVariant PathModel::headerData(int section, Qt::Orientation orientation, int role) const
@@ -165,7 +173,7 @@ void PathModel::copyOriginalNameToClipboard(int row) const
     m_dataRoot->entity(row)->copyOriginalNameToClipboard();
 }
 
-// Start threads
+// Start/Stop threads
 void PathModel::startCreateNewNames(QSharedPointer<StringBuilderOnFile::BuilderChainOnFile> builderChain)
 {
     m_threadCreateNewNames->stop();
@@ -176,7 +184,27 @@ void PathModel::startCreateNewNames(QSharedPointer<StringBuilderOnFile::BuilderC
 
 void PathModel::startRename()
 {
+    emit renameStarted();
     m_threadRename->start();
+}
+
+void PathModel::stopRename()
+{
+    if (m_threadRename->isRunning()) {
+        m_threadRename->stop();
+        m_threadRename->wait();
+    }
+
+    if (m_threadUndoRenaming->isRunning()) {
+        m_threadUndoRenaming->stop();
+        m_threadUndoRenaming->wait();
+    }
+}
+
+void PathModel::undoRename()
+{
+    emit undoStarted();
+    m_threadUndoRenaming->start();
 }
 
 // private slots //
@@ -186,6 +214,7 @@ void PathModel::onCreateNameCompleted()
     QModelIndex br = index(int(m_dataRoot->entityCount()), int(HSection::newName));
 
     emit dataChanged(tl, br, {Qt::DecorationRole});
+    emit readyToRename();
 }
 
 void PathModel::onNewNameCollisionDetected(QPair<int, int> indices)
@@ -204,7 +233,7 @@ void PathModel::onNewNameCreated(int row)
     emit dataChanged(modelIndex, modelIndex, {Qt::DisplayRole});
 }
 
-void PathModel::onStateChanged(int row)
+void PathModel::onNewNameStateChanged(int row)
 {
     QModelIndex modelIndex = index(row, int(HSection::newName));
 

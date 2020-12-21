@@ -34,6 +34,7 @@ class BuilderChainOnFile;
 
 class ThreadCreateNewNames;
 class ThreadRename;
+class ThreadUndoRenaming;
 
 class PathModel : public QAbstractTableModel
 {
@@ -61,18 +62,26 @@ public:
 
     void copyOriginalNameToClipboard(int row) const;
 
-    // Start threads
+public slots:
+    // Start/Stop threads
     void startCreateNewNames(QSharedPointer<StringBuilderOnFile::BuilderChainOnFile> builderChain);
     void startRename();
+    void stopRename();
+    void undoRename();
 
 signals:
     void internalDataChanged();
+    void readyToRename();
+    void renameStarted();
+    void renameStopped();
+    void renameFinished();
+    void undoStarted();
 
 private slots:
     void onCreateNameCompleted();
     void onNewNameCollisionDetected(QPair<int, int> indices);
     void onNewNameCreated(int row);
-    void onStateChanged(int row);
+    void onNewNameStateChanged(int row);
 
 private:
     enum class HSection : int {
@@ -84,6 +93,7 @@ private:
     QSharedPointer<Path::PathRoot> m_dataRoot;
     ThreadCreateNewNames *m_threadCreateNewNames;
     ThreadRename *m_threadRename;
+    ThreadUndoRenaming *m_threadUndoRenaming;
 };
 
 #endif // PATHMODEL_H

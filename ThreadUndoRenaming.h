@@ -17,8 +17,8 @@
  * along with APPNAME.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef THREADRENAME_H
-#define THREADRENAME_H
+#ifndef THREADUNDORENAMING_H
+#define THREADUNDORENAMING_H
 
 #include <QThread>
 
@@ -30,11 +30,11 @@ class PathRoot;
 class PathEntity;
 }
 
-class ThreadRename : public QThread
+class ThreadUndoRenaming : public QThread
 {
     Q_OBJECT
 public:
-    ThreadRename(QWeakPointer<Path::PathRoot> pathRoot, QObject *parent = nullptr);
+    ThreadUndoRenaming(QWeakPointer<Path::PathRoot> pathRoot, QObject *parent = nullptr);
 
     void stop();
 
@@ -60,4 +60,4 @@ private:
     QWeakPointer<Path::PathRoot> m_pathRoot;
 };
 
-#endif // THREADRENAME_H
+#endif // THREADUNDORENAMING_H

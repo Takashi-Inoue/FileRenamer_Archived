@@ -37,6 +37,8 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
+    setState(State::initial);
+
     ui->splitter->setSizes({350, 450});
 
     QStringList paths = QApplication::arguments();
@@ -48,12 +50,22 @@ MainWindow::MainWindow(QWidget *parent)
     ui->tableView->setHorizontalHeader(new PathHeaderView(ui->tableView));
     ui->tableView->setModel(m_pathModel);
 
-    connect(ui->formStringBuilderChain, &FormStringBuilderChain::settingsChanged, this, [this]() {
-        m_pathModel->startCreateNewNames(ui->formStringBuilderChain->builderChain());
-    });
+    connect(ui->formStringBuilderChain, &FormStringBuilderChain::settingsChanged
+          , m_pathModel, &PathModel::startCreateNewNames);
+
+    connect(ui->formStringBuilderChain, &FormStringBuilderChain::changeStarted
+          , this, &MainWindow::adaptorToChangeState);
+    connect(m_pathModel, &PathModel::readyToRename,  this, &MainWindow::adaptorToChangeState);
+    connect(m_pathModel, &PathModel::renameStarted,  this, &MainWindow::adaptorToChangeState);
+    connect(m_pathModel, &PathModel::renameStopped,  this, &MainWindow::adaptorToChangeState);
+    connect(m_pathModel, &PathModel::renameFinished, this, &MainWindow::adaptorToChangeState);
+    connect(m_pathModel, &PathModel::undoStarted,    this, &MainWindow::adaptorToChangeState);
 
     connect(m_pathModel, &PathModel::internalDataChanged, this, &MainWindow::onPathsDataChanged);
+
     connect(ui->actionRename, &QAction::triggered, m_pathModel, &PathModel::startRename);
+    connect(ui->actionStop, &QAction::triggered, m_pathModel, &PathModel::stopRename);
+    connect(ui->actionUndo, &QAction::triggered, m_pathModel, &PathModel::undoRename);
 
     m_pathModel->startCreateNewNames(ui->formStringBuilderChain->builderChain());
 }
@@ -61,6 +73,11 @@ MainWindow::MainWindow(QWidget *parent)
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    event->setAccepted(ui->actionExit->isEnabled());
 }
 
 void MainWindow::dragEnterEvent(QDragEnterEvent *event)
@@ -88,6 +105,48 @@ void MainWindow::dropEvent(QDropEvent *event)
 void MainWindow::onPathsDataChanged()
 {
     m_pathModel->startCreateNewNames(ui->formStringBuilderChain->builderChain());
+}
+
+void MainWindow::adaptorToChangeState()
+{
+    static const QHash<int, State> hashSignalToState = {
+        {ui->formStringBuilderChain->metaObject()->indexOfSignal("changeStarted()")
+       , State::changingSettings},
+        {m_pathModel->metaObject()->indexOfSignal("readyToRename()"),  State::ready},
+        {m_pathModel->metaObject()->indexOfSignal("renameStarted()"),  State::renaming},
+        {m_pathModel->metaObject()->indexOfSignal("renameStopped()"),  State::stopped},
+        {m_pathModel->metaObject()->indexOfSignal("renameFinished()"), State::finishedRenaming},
+        {m_pathModel->metaObject()->indexOfSignal("undoStarted()"),    State::undoing},
+    };
+
+    auto itr = hashSignalToState.find(senderSignalIndex());
+
+    if (itr == hashSignalToState.end())
+        return;
+
+    setState(itr.value());
+}
+
+void MainWindow::setState(MainWindow::State state)
+{
+    m_state = state;
+
+    QHash<int, QList<bool>> hashForUI = {
+        {int(State::initial),          {false, false, false, true}},
+        {int(State::changingSettings), {false, false, false, true}},
+        {int(State::ready),            {true,  false, false, true}},
+        {int(State::renaming),         {false, true,  false, false}},
+        {int(State::stopped),          {true,  false, true,  true}},
+        {int(State::undoing),          {false, true,  false, false}},
+        {int(State::finishedRenaming), {false, false, true,  true}},
+    };
+
+    enum Actions {rename, stop, undo, exit};
+
+    ui->actionRename->setEnabled(hashForUI[int(state)][rename]);
+    ui->actionStop->setEnabled(hashForUI[int(state)][stop]);
+    ui->actionUndo->setEnabled(hashForUI[int(state)][undo]);
+    ui->actionExit->setEnabled(hashForUI[int(state)][exit]);
 }
 
 void MainWindow::onPathsAdded()

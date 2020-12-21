@@ -59,6 +59,7 @@ public:
     QIcon typeIcon() const;
 
     bool rename();
+    bool undoRename();
 
 private:
     enum class State : int {

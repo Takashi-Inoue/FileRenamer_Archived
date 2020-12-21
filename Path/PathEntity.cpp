@@ -149,6 +149,9 @@ QIcon PathEntity::typeIcon() const
 
 bool PathEntity::rename()
 {
+    if (state() == State::success)
+        return true;
+
     if (state() != State::ready)
         return false;
 
@@ -167,6 +170,30 @@ bool PathEntity::rename()
 
     isOk ? setState(State::success)
          : setState(State::failure);
+
+    return isOk;
+}
+
+bool PathEntity::undoRename()
+{
+    if (state() != State::success)
+        return false;
+
+    m_lock.lockForRead();
+
+    QDir dir(m_parent.lock()->path());
+
+    bool isOk = dir.rename(m_newName, m_name);
+
+    QString log = isOk ? "undo SUCCEEDED : "
+                       : "undo ---FAILED : ";
+
+//    Log::log(log + dir.absolutePath() + "/" + m_newName + " > " + m_name);
+
+    m_lock.unlock();
+
+    isOk ? setState(State::ready)
+         : setState(State::success);
 
     return isOk;
 }
