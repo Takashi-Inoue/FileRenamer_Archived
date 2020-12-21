@@ -22,7 +22,7 @@
 
 #include <QObject>
 #include <QSharedPointer>
-#include <QVector>
+#include <QList>
 
 namespace StringBuilder {
 
@@ -39,7 +39,7 @@ public:
     bool isEmpty() const;
 
 protected:
-    QVector<QSharedPointer<AbstractStringBuilder>> m_builders;
+    QList<QSharedPointer<AbstractStringBuilder>> m_builders;
 };
 
 } // namespace StringBuilder

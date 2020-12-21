@@ -22,7 +22,6 @@
 
 #include <QAbstractTableModel>
 #include <QSharedPointer>
-#include "QStringVector.h"
 
 namespace Path {
 //class ParentDir;
@@ -34,13 +33,14 @@ class BuilderChainOnFile;
 }
 
 class ThreadCreateNewNames;
+class ThreadRename;
 
 class PathModel : public QAbstractTableModel
 {
     Q_OBJECT
 
 public:
-    using ParentChildrenPair = QPair<QString, QStringVector>;
+    using ParentChildrenPair = QPair<QString, QStringList>;
 
     explicit PathModel(QObject *parent = nullptr);
 
@@ -55,29 +55,35 @@ public:
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
     void sort(int column, Qt::SortOrder order = Qt::AscendingOrder) override;
 
-    // Remove data:
-    bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex()) override;
-    void removeSpecifiedRows(QVector<int> rows);
-
-    // Add data:
-    void addPathsAsDirs(QVector<ParentChildrenPair> dirs);
-    void addPathsAsFiles(QVector<ParentChildrenPair> files);
+    // Add/Remove data:
+    void addPaths(QList<ParentChildrenPair> dirs, QList<ParentChildrenPair> files);
+    void removeSpecifiedRows(QList<int> rows);
 
     void copyOriginalNameToClipboard(int row) const;
+
+    // Start threads
     void startCreateNewNames(QSharedPointer<StringBuilderOnFile::BuilderChainOnFile> builderChain);
+    void startRename();
+
+signals:
+    void internalDataChanged();
 
 private slots:
     void onCreateNameCompleted();
     void onNewNameCollisionDetected(QPair<int, int> indices);
     void onNewNameCreated(int row);
+    void onStateChanged(int row);
 
 private:
     enum class HSection : int {
         originalName, newName, path
     };
 
+    void stopThreadToCreateNames();
+
     QSharedPointer<Path::PathRoot> m_dataRoot;
     ThreadCreateNewNames *m_threadCreateNewNames;
+    ThreadRename *m_threadRename;
 };
 
 #endif // PATHMODEL_H

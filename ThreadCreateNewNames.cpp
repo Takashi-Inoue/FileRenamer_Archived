@@ -87,7 +87,12 @@ bool ThreadCreateNewNames::checkNewNames(HashToCheckEntities &hashToCheckNames)
             return lhs.first->newName() < rhs.first->newName();
         });
 
-        for (qsizetype i = 0, count = entityToIndexList.size(); i < count - 1; ++i) {
+        const qsizetype count = entityToIndexList.size();
+
+        if (count == 1)
+            entityToIndexList[0].first->notNeedToCheckNewName();
+
+        for (qsizetype i = 0; i < count - 1; ++i) {
             EntityToIndex &lhs = entityToIndexList[i];
             EntityToIndex &rhs = entityToIndexList[i + 1];
 

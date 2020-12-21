@@ -21,14 +21,15 @@
 #include "PathRoot.h"
 #include "PathEntity.h"
 #include "ThreadCreateNewNames.h"
+#include "ThreadRename.h"
 
-#include <QFileIconProvider>
 #include <QIcon>
 
 PathModel::PathModel(QObject *parent)
     : QAbstractTableModel(parent)
     , m_dataRoot(QSharedPointer<Path::PathRoot>::create())
     , m_threadCreateNewNames(new ThreadCreateNewNames(m_dataRoot, this))
+    , m_threadRename(new ThreadRename(m_dataRoot, this))
 {
     connect(m_threadCreateNewNames, &ThreadCreateNewNames::newNameCreated
           , this, &PathModel::onNewNameCreated);
@@ -37,6 +38,8 @@ PathModel::PathModel(QObject *parent)
           , this, &PathModel::onNewNameCollisionDetected);
 
     connect(m_threadCreateNewNames, &QThread::finished, this, &PathModel::onCreateNameCompleted);
+
+    connect(m_threadRename, &ThreadRename::renamed, this, &PathModel::onStateChanged);
 }
 
 QVariant PathModel::headerData(int section, Qt::Orientation orientation, int role) const
@@ -116,44 +119,45 @@ QVariant PathModel::data(const QModelIndex &index, int role) const
 
 void PathModel::sort(int column, Qt::SortOrder order)
 {
+    stopThreadToCreateNames();
+
     beginResetModel();
 
     column == int(HSection::originalName) ? m_dataRoot->sortByEntityName(order)
                                           : m_dataRoot->sortByParentDir(order);
 
     endResetModel();
+
+    emit internalDataChanged();
 }
 
-bool PathModel::removeRows(int row, int count, const QModelIndex &parent)
+void PathModel::addPaths(QList<PathModel::ParentChildrenPair> dirs
+                       , QList<PathModel::ParentChildrenPair> files)
 {
-    Q_ASSERT(uint(count) > 0);
+    if (dirs.isEmpty() && files.isEmpty())
+        return;
 
-    beginRemoveRows(parent, row, row + count - 1);
-    m_dataRoot->remove(row, count);
-    endRemoveRows();
+    stopThreadToCreateNames();
 
-    return true;
+    beginResetModel();
+
+    m_dataRoot->addPathsAsDirs(dirs);
+    m_dataRoot->addPathsAsFiles(files);
+
+    endResetModel();
+
+    emit internalDataChanged();
 }
 
-void PathModel::removeSpecifiedRows(QVector<int> rows)
+void PathModel::removeSpecifiedRows(QList<int> rows)
 {
+    stopThreadToCreateNames();
+
     beginResetModel();
     m_dataRoot->removeSpecifiedRows(rows);
     endResetModel();
-}
 
-void PathModel::addPathsAsDirs(QVector<ParentChildrenPair> dirs)
-{
-    beginResetModel();
-    m_dataRoot->addPathsAsDirs(dirs);
-    endResetModel();
-}
-
-void PathModel::addPathsAsFiles(QVector<ParentChildrenPair> files)
-{
-    beginResetModel();
-    m_dataRoot->addPathsAsFiles(files);
-    endResetModel();
+    emit internalDataChanged();
 }
 
 void PathModel::copyOriginalNameToClipboard(int row) const
@@ -161,12 +165,18 @@ void PathModel::copyOriginalNameToClipboard(int row) const
     m_dataRoot->entity(row)->copyOriginalNameToClipboard();
 }
 
+// Start threads
 void PathModel::startCreateNewNames(QSharedPointer<StringBuilderOnFile::BuilderChainOnFile> builderChain)
 {
     m_threadCreateNewNames->stop();
     m_threadCreateNewNames->wait();
     m_threadCreateNewNames->setStringBuilderOnFile(builderChain);
     m_threadCreateNewNames->start();
+}
+
+void PathModel::startRename()
+{
+    m_threadRename->start();
 }
 
 // private slots //
@@ -192,4 +202,18 @@ void PathModel::onNewNameCreated(int row)
     QModelIndex modelIndex = index(row, int(HSection::newName));
 
     emit dataChanged(modelIndex, modelIndex, {Qt::DisplayRole});
+}
+
+void PathModel::onStateChanged(int row)
+{
+    QModelIndex modelIndex = index(row, int(HSection::newName));
+
+    emit dataChanged(modelIndex, modelIndex, {Qt::DecorationRole});
+}
+
+// private //
+void PathModel::stopThreadToCreateNames()
+{
+    m_threadCreateNewNames->stop();
+    m_threadCreateNewNames->wait();
 }

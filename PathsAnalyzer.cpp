@@ -21,7 +21,7 @@
 
 #include <QFileInfo>
 
-void PathsAnalyzer::analyze(const QStringVector &paths)
+void PathsAnalyzer::analyze(const QStringList &paths)
 {
     m_dirs.clear();
     m_files.clear();
@@ -35,7 +35,7 @@ void PathsAnalyzer::analyze(const QStringVector &paths)
         if (fileInfo.isRoot() || fileInfo.isRelative() || !fileInfo.exists())
             continue;
 
-        QVector<ParentChildrenPair> &paths = fileInfo.isDir() ? m_dirs : m_files;
+        QList<ParentChildrenPair> &paths = fileInfo.isDir() ? m_dirs : m_files;
         QString parentDir = fileInfo.absolutePath();
 
         if (!parentDir.endsWith('/'))
@@ -46,18 +46,18 @@ void PathsAnalyzer::analyze(const QStringVector &paths)
         });
 
         if (itr == paths.end())
-            itr = paths.insert(itr, ParentChildrenPair(parentDir, QStringVector()));
+            itr = paths.insert(itr, ParentChildrenPair(parentDir, QStringList()));
 
         itr->second << fileInfo.fileName();
     }
 }
 
-QVector<PathsAnalyzer::ParentChildrenPair> PathsAnalyzer::dirs() const
+QList<PathsAnalyzer::ParentChildrenPair> PathsAnalyzer::dirs() const
 {
     return m_dirs;
 }
 
-QVector<PathsAnalyzer::ParentChildrenPair> PathsAnalyzer::files() const
+QList<PathsAnalyzer::ParentChildrenPair> PathsAnalyzer::files() const
 {
     return m_files;
 }

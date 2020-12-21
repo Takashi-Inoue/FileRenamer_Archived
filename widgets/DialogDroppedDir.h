@@ -23,7 +23,6 @@
 #include "Settings/SearchSettings.h"
 
 #include <QDialog>
-#include "QStringVector.h"
 
 namespace Ui {
 class DialogDroppedDir;
@@ -34,10 +33,10 @@ class DialogDroppedDir : public QDialog
     Q_OBJECT
 
 public:
-    using ParentChildrenPair = QPair<QString, QStringVector>;
+    using ParentChildrenPair = QPair<QString, QStringList>;
 
-    explicit DialogDroppedDir(const QVector<ParentChildrenPair> &dirs, QWidget *parent = nullptr);
-    ~DialogDroppedDir();
+    explicit DialogDroppedDir(const QList<ParentChildrenPair> &dirs, QWidget *parent = nullptr);
+    ~DialogDroppedDir() override;
 
     bool isRegisterDroppedDir() const;
     const SearchSettings &searchSettings() const;

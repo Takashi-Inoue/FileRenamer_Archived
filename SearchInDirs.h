@@ -23,30 +23,29 @@
 #include "Settings/SearchSettings.h"
 
 #include <QDir>
-#include "QStringVector.h"
 
 class SearchInDirs
 {
 public:
-    using ParentChildrenPair = QPair<QString, QStringVector>;
+    using ParentChildrenPair = QPair<QString, QStringList>;
 
     SearchInDirs(const SearchSettings &settings);
 
-    QVector<ParentChildrenPair> dirs() const;
-    QVector<ParentChildrenPair> files() const;
+    QList<ParentChildrenPair> dirs() const;
+    QList<ParentChildrenPair> files() const;
 
-    void exec(QVector<ParentChildrenPair> targetDirs);
+    void exec(QList<ParentChildrenPair> targetDirs);
 
 private:
-    void searchForDirs(const QDir &parentDir, QVector<ParentChildrenPair> &targetDirs);
+    void searchForDirs(const QDir &parentDir, QList<ParentChildrenPair> &targetDirs);
     void searchForFiles(const QDir &parentDir);
-    void searchOneLayer(QVector<ParentChildrenPair> &targetDirs, const QStringList &nameFilters);
+    void searchOneLayer(QList<ParentChildrenPair> &targetDirs, const QStringList &nameFilters);
     QString addSeparator(QStringView dirPath);
 
     const SearchSettings m_settings;
 
-    QVector<ParentChildrenPair> m_dirs;
-    QVector<ParentChildrenPair> m_files;
+    QList<ParentChildrenPair> m_dirs;
+    QList<ParentChildrenPair> m_files;
 };
 
 #endif // SEARCHINDIRS_H

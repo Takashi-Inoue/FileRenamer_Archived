@@ -16,5 +16,7 @@
         <file>res/images/collision.svg</file>
         <file>res/images/circlegreen.svg</file>
         <file>res/images/circlegray.svg</file>
+        <file>res/images/success.svg</file>
+        <file>res/images/failure.svg</file>
     </qresource>
 </RCC>

@@ -29,6 +29,7 @@ SOURCES += \
     StringBuilderOnFile/CryptographicHash.cpp \
     StringBuilderOnFile/OriginalName.cpp \
     ThreadCreateNewNames.cpp \
+    ThreadRename.cpp \
     main.cpp \
     MainWindow.cpp \
     widgets/DialogDroppedDir.cpp \
@@ -53,7 +54,6 @@ HEADERS += \
     Path/PathRoot.h \
     Path/PathTableView.h \
     PathsAnalyzer.h \
-    QStringVector.h \
     SearchInDirs.h \
     Settings/SearchSettings.h \
     StringBuilder/AbstractInsertString.h \
@@ -69,6 +69,7 @@ HEADERS += \
     StringBuilderOnFile/IFileInfo.h \
     StringBuilderOnFile/OriginalName.h \
     ThreadCreateNewNames.h \
+    ThreadRename.h \
     widgets/AbstractStringBuilderWidget.h \
     widgets/DialogDroppedDir.h \
     widgets/FormStringBuilder.h \

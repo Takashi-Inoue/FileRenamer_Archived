@@ -30,7 +30,7 @@ class PathTableView : public QTableView
 public:
     PathTableView(QWidget *parent = nullptr);
 
-    QVector<QAction *> actionsToChangeItem() const;
+    QList<QAction *> actionsToChangeItem() const;
 
 protected:
     void contextMenuEvent(QContextMenuEvent *event) override;

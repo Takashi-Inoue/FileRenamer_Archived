@@ -41,9 +41,12 @@ protected:
     void dragEnterEvent(QDragEnterEvent *event) override;
     void dropEvent(QDropEvent *event) override;
 
+private slots:
+    void onPathsDataChanged();
+
 private:
     void onPathsAdded();
-    void registerPaths(const QVector<QString> &paths);
+    void registerPaths(const QStringList &paths);
 
     Ui::MainWindow *ui;
 

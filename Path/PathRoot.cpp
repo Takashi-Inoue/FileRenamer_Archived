@@ -33,12 +33,12 @@ void PathRoot::addDir(QSharedPointer<ParentDir> dir)
     m_dirs << dir;
 }
 
-void PathRoot::addPathsAsDirs(QVector<PathRoot::ParentChildrenPair> dirs)
+void PathRoot::addPathsAsDirs(QList<PathRoot::ParentChildrenPair> dirs)
 {
     addPaths(dirs, EntityType::dirs);
 }
 
-void PathRoot::addPathsAsFiles(QVector<PathRoot::ParentChildrenPair> files)
+void PathRoot::addPathsAsFiles(QList<PathRoot::ParentChildrenPair> files)
 {
     addPaths(files, EntityType::files);
 }
@@ -54,7 +54,7 @@ void PathRoot::remove(int index, int count)
     }
 }
 
-void PathRoot::removeSpecifiedRows(QVector<int> rows)
+void PathRoot::removeSpecifiedRows(QList<int> rows)
 {
     std::sort(rows.begin(), rows.end(), std::greater<int>());
 
@@ -79,7 +79,7 @@ QSharedPointer<ParentDir> PathRoot::dir(QStringView path) const
     return *itr;
 }
 
-QSharedPointer<PathEntity> PathRoot::entity(int index) const
+QSharedPointer<PathEntity> PathRoot::entity(qsizetype index) const
 {
     Q_ASSERT(uint(index) < uint(m_entities.size()));
 
@@ -127,7 +127,7 @@ void PathRoot::sortByParentDir(Qt::SortOrder order)
         m_entities << dir->allEntities();
 }
 
-void PathRoot::addPaths(const QVector<ParentChildrenPair> &paths, EntityType entityType)
+void PathRoot::addPaths(const QList<ParentChildrenPair> &paths, EntityType entityType)
 {
     for (const ParentChildrenPair &path : paths) {
         QSharedPointer<ParentDir> parentDir = dir(path.first);

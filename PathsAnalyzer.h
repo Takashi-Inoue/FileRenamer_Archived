@@ -21,26 +21,25 @@
 #define PATHSANALYZER_H
 
 #include <QMap>
-#include "QStringVector.h"
 
 class PathsAnalyzer
 {
 public:
-    using ParentChildrenPair = QPair<QString, QStringVector>;
+    using ParentChildrenPair = QPair<QString, QStringList>;
 
     PathsAnalyzer() = default;
     ~PathsAnalyzer() = default;
 
-    void analyze(const QStringVector &paths);
+    void analyze(const QStringList &paths);
 
-    QVector<ParentChildrenPair> dirs() const;
-    QVector<ParentChildrenPair> files() const;
+    QList<ParentChildrenPair> dirs() const;
+    QList<ParentChildrenPair> files() const;
 
     bool isAllDir() const;
 
 private:
-    QVector<ParentChildrenPair> m_dirs;
-    QVector<ParentChildrenPair> m_files;
+    QList<ParentChildrenPair> m_dirs;
+    QList<ParentChildrenPair> m_files;
 };
 
 #endif // PATHSANALYZER_H

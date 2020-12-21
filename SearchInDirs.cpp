@@ -27,17 +27,17 @@ SearchInDirs::SearchInDirs(const SearchSettings &settings)
 {
 }
 
-QVector<SearchInDirs::ParentChildrenPair> SearchInDirs::dirs() const
+QList<SearchInDirs::ParentChildrenPair> SearchInDirs::dirs() const
 {
     return m_dirs;
 }
 
-QVector<SearchInDirs::ParentChildrenPair> SearchInDirs::files() const
+QList<SearchInDirs::ParentChildrenPair> SearchInDirs::files() const
 {
     return m_files;
 }
 
-void SearchInDirs::exec(QVector<ParentChildrenPair> targetDirs)
+void SearchInDirs::exec(QList<ParentChildrenPair> targetDirs)
 {
     m_dirs.clear();
     m_files.clear();
@@ -54,7 +54,7 @@ void SearchInDirs::exec(QVector<ParentChildrenPair> targetDirs)
 }
 
 void SearchInDirs::searchForDirs(const QDir &parentDir
-                               , QVector<SearchInDirs::ParentChildrenPair> &targetDirs)
+                               , QList<SearchInDirs::ParentChildrenPair> &targetDirs)
 {
     QStringList childrenNames = parentDir.entryList(QDir::AllDirs | QDir::NoDotAndDotDot | QDir::Hidden);
 
@@ -85,7 +85,7 @@ void SearchInDirs::searchForDirs(const QDir &parentDir
         return;
 
     m_dirs << ParentChildrenPair(addSeparator(parentDir.path())
-                               , QStringVector(childrenNames.begin(), childrenNames.end()));
+                               , QStringList(childrenNames.begin(), childrenNames.end()));
 }
 
 void SearchInDirs::searchForFiles(const QDir &parentDir)
@@ -99,10 +99,10 @@ void SearchInDirs::searchForFiles(const QDir &parentDir)
         return;
 
     m_files << ParentChildrenPair(addSeparator(parentDir.path())
-                                , QStringVector(childrenNames.begin(), childrenNames.end()));
+                                , QStringList(childrenNames.begin(), childrenNames.end()));
 }
 
-void SearchInDirs::searchOneLayer(QVector<ParentChildrenPair> &targetDirs
+void SearchInDirs::searchOneLayer(QList<ParentChildrenPair> &targetDirs
                                 , const QStringList &nameFilters)
 {
     for (int i = 0, count = int(targetDirs.size()); i < count; ++i) {

@@ -44,7 +44,7 @@ PathTableView::PathTableView(QWidget *parent)
     connect(m_actionDeleteItem, &QAction::triggered, this, &PathTableView::onActionDeleteTriggered);
 }
 
-QVector<QAction *> PathTableView::actionsToChangeItem() const
+QList<QAction *> PathTableView::actionsToChangeItem() const
 {
     return {m_actionCopyName, m_actionDeleteItem};
 }
@@ -89,7 +89,7 @@ void PathTableView::onActionDeleteTriggered()
     if (pathModel == nullptr)
         return;
 
-    QVector<int> rows;
+    QList<int> rows;
 
     for (const QModelIndex &modelIndex: selectionModel()->selectedRows())
         rows << modelIndex.row();

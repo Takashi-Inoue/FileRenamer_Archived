@@ -39,7 +39,6 @@ public:
     void copyOriginalNameToClipboard() const;
 
     bool isDir() const;
-    QFileInfo fileInfo() const;
     QString fullPath() const;
     QString parentPath() const;
 
@@ -54,9 +53,12 @@ public:
     void setNewName(QStringView newName);
 
     bool checkForNewNameCollisions(QSharedPointer<PathEntity> other);
+    void notNeedToCheckNewName();
 
     QIcon stateIcon() const;
     QIcon typeIcon() const;
+
+    bool rename();
 
 private:
     enum class State : int {

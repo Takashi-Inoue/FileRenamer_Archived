@@ -21,6 +21,7 @@
 #include "ParentDir.h"
 
 #include <QClipboard>
+#include <QDir>
 #include <QFileIconProvider>
 #include <QGuiApplication>
 
@@ -47,11 +48,6 @@ bool PathEntity::isDir() const
     return m_isDir;
 }
 
-QFileInfo PathEntity::fileInfo() const
-{
-    return QFileInfo(fullPath());
-}
-
 QString PathEntity::fullPath() const
 {
     QReadLocker locker(&m_lock);
@@ -61,7 +57,7 @@ QString PathEntity::fullPath() const
 
 QString PathEntity::parentPath() const
 {
-    return m_parent.lock()->path().toString();
+    return m_parent.lock()->path();
 }
 
 QString PathEntity::name() const
@@ -121,14 +117,19 @@ bool PathEntity::checkForNewNameCollisions(QSharedPointer<PathEntity> other)
     return true;
 }
 
+void PathEntity::notNeedToCheckNewName()
+{
+    setState(State::ready);
+}
+
 QIcon PathEntity::stateIcon() const
 {
     static const QHash<int, QIcon> icons = {
-        {int(State::initial),      QIcon(":/res/images/circlegray.svg")},
-        {int(State::ready),        QIcon(":/res/images/circlegreen.svg")},
-        {int(State::hasCollision), QIcon(":/res/images/collision.svg")},
-        {int(State::success), QIcon()},
-        {int(State::failure), QIcon()},
+        {int(State::initial),      QIcon(QStringLiteral(":/res/images/circlegray.svg"))},
+        {int(State::ready),        QIcon(QStringLiteral(":/res/images/circlegreen.svg"))},
+        {int(State::hasCollision), QIcon(QStringLiteral(":/res/images/collision.svg"))},
+        {int(State::success),      QIcon(QStringLiteral(":/res/images/success.svg"))},
+        {int(State::failure),      QIcon(QStringLiteral(":/res/images/failure.svg"))},
     };
 
     QReadLocker locker(&m_lock);
@@ -144,6 +145,30 @@ QIcon PathEntity::typeIcon() const
     };
 
     return icons[m_isDir];
+}
+
+bool PathEntity::rename()
+{
+    if (state() != State::ready)
+        return false;
+
+    m_lock.lockForRead();
+
+    QDir dir(m_parent.lock()->path());
+
+    bool isOk = dir.rename(m_name, m_newName);
+
+    QString log = isOk ? "rename SUCCEEDED : "
+                       : "rename ---FAILED : ";
+
+//    Log::log(log + dir.absolutePath() + "/" + m_name + " > " + m_newName);
+
+    m_lock.unlock();
+
+    isOk ? setState(State::success)
+         : setState(State::failure);
+
+    return isOk;
 }
 
 void PathEntity::setState(PathEntity::State state)

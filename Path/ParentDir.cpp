@@ -44,7 +44,7 @@ void ParentDir::removeEntity(QWeakPointer<PathEntity> entity)
     m_children.removeOne(entity);
 }
 
-const QVector<QSharedPointer<PathEntity>> &ParentDir::allEntities() const
+const QList<QSharedPointer<PathEntity>> &ParentDir::allEntities() const
 {
     return m_children;
 }
@@ -56,12 +56,12 @@ QSharedPointer<PathEntity> ParentDir::entity(int index) const
     return m_children[index];
 }
 
-int ParentDir::entityCount() const
+qsizetype ParentDir::entityCount() const
 {
     return m_children.size();
 }
 
-QStringView ParentDir::path() const
+QString ParentDir::path() const
 {
     return m_path;
 }

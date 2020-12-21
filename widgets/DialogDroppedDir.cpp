@@ -20,7 +20,7 @@
 #include "DialogDroppedDir.h"
 #include "ui_DialogDroppedDir.h"
 
-DialogDroppedDir::DialogDroppedDir(const QVector<ParentChildrenPair> &dirs, QWidget *parent)
+DialogDroppedDir::DialogDroppedDir(const QList<ParentChildrenPair> &dirs, QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::DialogDroppedDir)
 {

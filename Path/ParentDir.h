@@ -22,7 +22,7 @@
 
 #include <QReadWriteLock>
 #include <QSharedPointer>
-#include <QVector>
+#include <QList>
 
 namespace Path {
 
@@ -37,17 +37,17 @@ public:
     void addEntity(QSharedPointer<PathEntity> entity);
     void removeEntity(QWeakPointer<PathEntity> entity);
 
-    const QVector<QSharedPointer<PathEntity>> &allEntities() const;
+    const QList<QSharedPointer<PathEntity>> &allEntities() const;
     QSharedPointer<PathEntity> entity(int index) const;
-    int entityCount() const;
-    QStringView path() const;
+    qsizetype entityCount() const;
+    QString path() const;
     void sort(QCollator &collator, Qt::SortOrder order);
 
 private:
     mutable QReadWriteLock m_lock;
 
     const QString m_path;
-    QVector<QSharedPointer<PathEntity>> m_children;
+    QList<QSharedPointer<PathEntity>> m_children;
 };
 
 } // namespace Path
