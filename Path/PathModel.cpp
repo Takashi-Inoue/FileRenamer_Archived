@@ -177,6 +177,17 @@ void PathModel::copyOriginalNameToClipboard(int row) const
     m_dataRoot->entity(row)->copyOriginalNameToClipboard();
 }
 
+void PathModel::clear()
+{
+    stopThreadToCreateNames();
+
+    beginResetModel();
+    m_dataRoot->clear();
+    endResetModel();
+
+    emit itemCleared();
+}
+
 // Start/Stop threads
 void PathModel::startCreateNewNames(QSharedPointer<StringBuilderOnFile::BuilderChainOnFile> builderChain)
 {

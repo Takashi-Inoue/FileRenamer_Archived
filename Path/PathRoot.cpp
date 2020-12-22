@@ -43,6 +43,16 @@ void PathRoot::addPathsAsFiles(QList<PathRoot::ParentChildrenPair> files)
     addPaths(files, EntityType::files);
 }
 
+void PathRoot::clear()
+{
+    QWriteLocker locker(&m_lock);
+
+    for (const QSharedPointer<ParentDir> &dir : m_dirs)
+        dir->clear();
+
+    m_entities.clear();
+}
+
 void PathRoot::remove(int index, int count)
 {
     QWriteLocker locker(&m_lock);

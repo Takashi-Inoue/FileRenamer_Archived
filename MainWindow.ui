@@ -50,7 +50,7 @@
              <x>0</x>
              <y>0</y>
              <width>274</width>
-             <height>461</height>
+             <height>488</height>
             </rect>
            </property>
           </widget>
@@ -82,7 +82,6 @@
     </item>
    </layout>
   </widget>
-  <widget class="QStatusBar" name="statusbar"/>
   <widget class="QToolBar" name="toolBar">
    <property name="windowTitle">
     <string>toolBar</string>
@@ -112,6 +111,7 @@
    <addaction name="actionStop"/>
    <addaction name="actionUndo"/>
    <addaction name="actionExit"/>
+   <addaction name="actionClearItems"/>
    <addaction name="actionViewLogs"/>
   </widget>
   <widget class="QDockWidget" name="dockWidgetLogs">
@@ -180,10 +180,22 @@
      <normaloff>:/res/icons/text-x-preview.ico</normaloff>:/res/icons/text-x-preview.ico</iconset>
    </property>
    <property name="text">
-    <string>View logs</string>
+    <string>Log</string>
    </property>
    <property name="toolTip">
     <string>View rename logs</string>
+   </property>
+  </action>
+  <action name="actionClearItems">
+   <property name="icon">
+    <iconset resource="images.qrc">
+     <normaloff>:/res/images/clear.svg</normaloff>:/res/images/clear.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Clear</string>
+   </property>
+   <property name="toolTip">
+    <string>Clear list</string>
    </property>
   </action>
  </widget>

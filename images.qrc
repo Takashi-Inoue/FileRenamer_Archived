@@ -1,10 +1,8 @@
 <RCC>
     <qresource prefix="/">
         <file>res/images/backward.png</file>
-        <file>res/images/exit.png</file>
         <file>res/images/exit2.png</file>
         <file>res/images/forward.png</file>
-        <file>res/images/pause.png</file>
         <file>res/images/stop.png</file>
         <file>res/images/reset.svg</file>
         <file>res/images/x.svg</file>
@@ -18,5 +16,6 @@
         <file>res/images/circlegray.svg</file>
         <file>res/images/success.svg</file>
         <file>res/images/failure.svg</file>
+        <file>res/images/clear.svg</file>
     </qresource>
 </RCC>

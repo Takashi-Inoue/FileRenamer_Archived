@@ -45,6 +45,7 @@ public:
     void addDir(QSharedPointer<ParentDir> dir);
     void addPathsAsDirs(QList<ParentChildrenPair> dirs);
     void addPathsAsFiles(QList<ParentChildrenPair> files);
+    void clear();
     void remove(int index, int count = 1);
     void removeSpecifiedRows(QList<int> rows);
 

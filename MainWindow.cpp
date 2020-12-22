@@ -40,7 +40,7 @@ MainWindow::MainWindow(QWidget *parent)
     QWidget *hSpacer = new QWidget(this);
 
     hSpacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-    ui->toolBar->insertWidget(ui->actionViewLogs, hSpacer);
+    ui->toolBar->insertWidget(ui->actionClearItems, hSpacer);
 
     ui->dockWidgetLogs->setVisible(false);
     ui->splitter->setSizes({350, 450});
@@ -76,6 +76,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->actionRename, &QAction::triggered, m_pathModel, &PathModel::startRename);
     connect(ui->actionStop, &QAction::triggered, m_pathModel, &PathModel::stopRename);
     connect(ui->actionUndo, &QAction::triggered, m_pathModel, &PathModel::undoRename);
+    connect(ui->actionClearItems, &QAction::triggered, m_pathModel, &PathModel::clear);
 
     m_pathModel->startCreateNewNames(ui->formStringBuilderChain->builderChain());
 }
@@ -138,19 +139,20 @@ void MainWindow::adaptorToChangeState()
 void MainWindow::setState(MainWindow::State state)
 {
     static const QHash<State, QList<bool>> hashForUI = {
-        {State::initial,  {false, false, false, true,  true}},
-        {State::ready,    {true,  false, false, true,  true}},
-        {State::renaming, {false, true,  false, false, false}},
-        {State::stopped,  {true,  false, true,  true,  false}},
-        {State::finished, {false, false, true,  true,  false}},
+        {State::initial,  {false, false, false, true,  true,  true}},
+        {State::ready,    {true,  false, false, true,  true,  true}},
+        {State::renaming, {false, true,  false, false, false, false}},
+        {State::stopped,  {true,  false, true,  true,  false, true}},
+        {State::finished, {false, false, true,  true,  false, true}},
     };
 
-    enum Actions {rename, stop, undo, exit, changeSettigs};
+    enum Actions {rename, stop, undo, exit, changeSettigs, clearItems};
 
     ui->actionRename->setEnabled(hashForUI[state][rename]);
     ui->actionStop->setEnabled(hashForUI[state][stop]);
     ui->actionUndo->setEnabled(hashForUI[state][undo]);
     ui->actionExit->setEnabled(hashForUI[state][exit]);
+    ui->actionClearItems->setEnabled(hashForUI[state][clearItems]);
 
     const bool isEnableToChangeSettings = hashForUI[state][changeSettigs];
 

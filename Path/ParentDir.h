@@ -35,6 +35,7 @@ public:
 
     // Add / Remove entity;
     void addEntity(QSharedPointer<PathEntity> entity);
+    void clear();
     void removeEntity(QWeakPointer<PathEntity> entity);
 
     const QList<QSharedPointer<PathEntity>> &allEntities() const;

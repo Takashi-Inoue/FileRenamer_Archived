@@ -63,6 +63,7 @@ public:
     void copyOriginalNameToClipboard(int row) const;
 
 public slots:
+    void clear();
     // Start/Stop threads
     void startCreateNewNames(QSharedPointer<StringBuilderOnFile::BuilderChainOnFile> builderChain);
     void startRename();

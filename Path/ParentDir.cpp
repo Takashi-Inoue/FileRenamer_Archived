@@ -37,6 +37,13 @@ void ParentDir::addEntity(QSharedPointer<PathEntity> entity)
     m_children << entity;
 }
 
+void ParentDir::clear()
+{
+    QWriteLocker locker(&m_lock);
+
+    m_children.clear();
+}
+
 void ParentDir::removeEntity(QWeakPointer<PathEntity> entity)
 {
     QWriteLocker locker(&m_lock);
