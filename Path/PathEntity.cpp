@@ -1,24 +1,26 @@
 /*
- * Copyright YEAR Takashi Inoue
+ * Copyright 2020 Takashi Inoue
  *
- * This file is part of APPNAME.
+ * This file is part of FileRenamer.
  *
- * APPNAME is free software: you can redistribute it and/or modify
+ * FileRenamer is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * APPNAME is distributed in the hope that it will be useful,
+ * FileRenamer is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with APPNAME.  If not, see <http://www.gnu.org/licenses/>.
+ * along with FileRenamer.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "PathEntity.h"
 #include "ParentDir.h"
+
+#include "ApplicationLog.h"
 
 #include <QClipboard>
 #include <QDir>
@@ -52,7 +54,7 @@ QString PathEntity::fullPath() const
 {
     QReadLocker locker(&m_lock);
 
-    return QString("%1%2").arg(m_parent.lock()->path(), m_name);
+    return QStringLiteral("%1%2").arg(m_parent.lock()->path(), m_name);
 }
 
 QString PathEntity::parentPath() const
@@ -94,7 +96,7 @@ void PathEntity::setNewName(QStringView newName)
     QWriteLocker locker(&m_lock);
 
     m_newName = m_isDir ? newName.toString()
-                        : QString("%1%2").arg(newName, m_name.mid(m_name.indexOf('.')));
+                        : QStringLiteral("%1%2").arg(newName, m_name.mid(m_name.indexOf('.')));
 
     m_state = State::initial;
 }
@@ -161,10 +163,12 @@ bool PathEntity::rename()
 
     bool isOk = dir.rename(m_name, m_newName);
 
-    QString log = isOk ? "rename SUCCEEDED : "
-                       : "rename ---FAILED : ";
+    QString result = isOk ? QStringLiteral("SUCCEEDED")
+                          : QStringLiteral("---FAILED");
 
-//    Log::log(log + dir.absolutePath() + "/" + m_name + " > " + m_newName);
+    QString log = QStringLiteral("%1 - %2/%3 > %4").arg(result, dir.absolutePath(), m_name, m_newName);
+
+    ApplicationLog::instance().log(log, QStringLiteral("Rename"));
 
     m_lock.unlock();
 
@@ -185,10 +189,12 @@ bool PathEntity::undoRename()
 
     bool isOk = dir.rename(m_newName, m_name);
 
-    QString log = isOk ? "undo SUCCEEDED : "
-                       : "undo ---FAILED : ";
+    QString result = isOk ? QStringLiteral("SUCCEEDED")
+                          : QStringLiteral("---FAILED");
 
-//    Log::log(log + dir.absolutePath() + "/" + m_newName + " > " + m_name);
+    QString log = QStringLiteral("%1 - %2/%3 > %4").arg(result, dir.absolutePath(), m_newName, m_name);
+
+    ApplicationLog::instance().log(log, QStringLiteral("Undo"));
 
     m_lock.unlock();
 

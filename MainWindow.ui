@@ -50,7 +50,7 @@
              <x>0</x>
              <y>0</y>
              <width>274</width>
-             <height>500</height>
+             <height>461</height>
             </rect>
            </property>
           </widget>
@@ -112,6 +112,16 @@
    <addaction name="actionStop"/>
    <addaction name="actionUndo"/>
    <addaction name="actionExit"/>
+   <addaction name="actionViewLogs"/>
+  </widget>
+  <widget class="QDockWidget" name="dockWidgetLogs">
+   <property name="windowTitle">
+    <string>Logs</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>8</number>
+   </attribute>
+   <widget class="WidgetApplicationLogs" name="dockWidgetContents"/>
   </widget>
   <action name="actionRename">
    <property name="icon">
@@ -161,6 +171,21 @@
     <string>Exit application</string>
    </property>
   </action>
+  <action name="actionViewLogs">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="images.qrc">
+     <normaloff>:/res/icons/text-x-preview.ico</normaloff>:/res/icons/text-x-preview.ico</iconset>
+   </property>
+   <property name="text">
+    <string>View logs</string>
+   </property>
+   <property name="toolTip">
+    <string>View rename logs</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>
@@ -173,6 +198,12 @@
    <class>PathTableView</class>
    <extends>QTableView</extends>
    <header>Path/PathTableView.h</header>
+  </customwidget>
+  <customwidget>
+   <class>WidgetApplicationLogs</class>
+   <extends>QWidget</extends>
+   <header>widgets/WidgetApplicationLogs.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources>
@@ -192,6 +223,22 @@
     <hint type="destinationlabel">
      <x>439</x>
      <y>309</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionViewLogs</sender>
+   <signal>triggered(bool)</signal>
+   <receiver>dockWidgetLogs</receiver>
+   <slot>setVisible(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>439</x>
+     <y>573</y>
     </hint>
    </hints>
   </connection>

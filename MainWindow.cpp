@@ -1,20 +1,20 @@
 /*
- * Copyright YEAR Takashi Inoue
+ * Copyright 2020 Takashi Inoue
  *
- * This file is part of APPNAME.
+ * This file is part of FileRenamer.
  *
- * APPNAME is free software: you can redistribute it and/or modify
+ * FileRenamer is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * APPNAME is distributed in the hope that it will be useful,
+ * FileRenamer is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with APPNAME.  If not, see <http://www.gnu.org/licenses/>.
+ * along with FileRenamer.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "MainWindow.h"
@@ -37,9 +37,15 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
-    setState(State::initial);
+    QWidget *hSpacer = new QWidget(this);
 
+    hSpacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+    ui->toolBar->insertWidget(ui->actionViewLogs, hSpacer);
+
+    ui->dockWidgetLogs->setVisible(false);
     ui->splitter->setSizes({350, 450});
+
+    setState(State::initial);
 
     QStringList paths = QApplication::arguments();
 
@@ -55,6 +61,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(ui->formStringBuilderChain, &FormStringBuilderChain::changeStarted
           , this, &MainWindow::adaptorToChangeState);
+    connect(m_pathModel, &PathModel::itemCleared,    this, &MainWindow::adaptorToChangeState);
     connect(m_pathModel, &PathModel::readyToRename,  this, &MainWindow::adaptorToChangeState);
     connect(m_pathModel, &PathModel::renameStarted,  this, &MainWindow::adaptorToChangeState);
     connect(m_pathModel, &PathModel::renameStopped,  this, &MainWindow::adaptorToChangeState);
@@ -82,18 +89,12 @@ void MainWindow::closeEvent(QCloseEvent *event)
 
 void MainWindow::dragEnterEvent(QDragEnterEvent *event)
 {
-//    if (!renameManager->canChangeRenameSettings())
-//        return;
-
     if (event->mimeData()->hasFormat("text/uri-list"))
         event->acceptProposedAction();
 }
 
 void MainWindow::dropEvent(QDropEvent *event)
 {
-//    if (!renameManager->canChangeRenameSettings())
-//        return;
-
     QStringList paths;
 
     for (const QUrl &url : event->mimeData()->urls())
@@ -112,6 +113,7 @@ void MainWindow::adaptorToChangeState()
     static const QHash<int, State> hashSignalToState = {
         {ui->formStringBuilderChain->metaObject()->indexOfSignal("changeStarted()")
        , State::changingSettings},
+        {m_pathModel->metaObject()->indexOfSignal("itemCleared()"),    State::initial},
         {m_pathModel->metaObject()->indexOfSignal("readyToRename()"),  State::ready},
         {m_pathModel->metaObject()->indexOfSignal("renameStarted()"),  State::renaming},
         {m_pathModel->metaObject()->indexOfSignal("renameStopped()"),  State::stopped},
@@ -131,22 +133,33 @@ void MainWindow::setState(MainWindow::State state)
 {
     m_state = state;
 
-    QHash<int, QList<bool>> hashForUI = {
-        {int(State::initial),          {false, false, false, true}},
-        {int(State::changingSettings), {false, false, false, true}},
-        {int(State::ready),            {true,  false, false, true}},
-        {int(State::renaming),         {false, true,  false, false}},
-        {int(State::stopped),          {true,  false, true,  true}},
-        {int(State::undoing),          {false, true,  false, false}},
-        {int(State::finishedRenaming), {false, false, true,  true}},
+    static const QHash<State, QList<bool>> hashForUI = {
+        {State::initial,          {false, false, false, true,  true}},
+        {State::changingSettings, {false, false, false, true,  true}},
+        {State::ready,            {true,  false, false, true,  true}},
+        {State::renaming,         {false, true,  false, false, false}},
+        {State::stopped,          {true,  false, true,  true,  false}},
+        {State::undoing,          {false, true,  false, false, false}},
+        {State::finishedRenaming, {false, false, true,  true,  false}},
     };
 
-    enum Actions {rename, stop, undo, exit};
+    enum Actions {rename, stop, undo, exit, changeSettigs};
 
-    ui->actionRename->setEnabled(hashForUI[int(state)][rename]);
-    ui->actionStop->setEnabled(hashForUI[int(state)][stop]);
-    ui->actionUndo->setEnabled(hashForUI[int(state)][undo]);
-    ui->actionExit->setEnabled(hashForUI[int(state)][exit]);
+    ui->actionRename->setEnabled(hashForUI[state][rename]);
+    ui->actionStop->setEnabled(hashForUI[state][stop]);
+    ui->actionUndo->setEnabled(hashForUI[state][undo]);
+    ui->actionExit->setEnabled(hashForUI[state][exit]);
+
+    const bool isEnableToChangeSettings = hashForUI[state][changeSettigs];
+
+    setAcceptDrops(isEnableToChangeSettings);
+    ui->formStringBuilderChain->setEnabled(isEnableToChangeSettings);
+    ui->tableView->setEnableToChangeItems(isEnableToChangeSettings);
+
+    auto header = qobject_cast<PathHeaderView *>(ui->tableView->horizontalHeader());
+
+    if (header != nullptr)
+        header->setEnableToChangeItems(isEnableToChangeSettings);
 }
 
 void MainWindow::onPathsAdded()

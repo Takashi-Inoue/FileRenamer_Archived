@@ -10,6 +10,7 @@ CONFIG += c++17
 
 SOURCES += \
     AbstractSettings.cpp \
+    ApplicationLog.cpp \
     Path/ParentDir.cpp \
     Path/PathEntity.cpp \
     Path/PathEntityInfo.cpp \
@@ -36,6 +37,7 @@ SOURCES += \
     widgets/DialogDroppedDir.cpp \
     widgets/FormStringBuilder.cpp \
     widgets/FormStringBuilderChain.cpp \
+    widgets/WidgetApplicationLogs.cpp \
     widgets/WidgetFileHashSetting.cpp \
     widgets/WidgetInsertTextSetting.cpp \
     widgets/WidgetNumberSetting.cpp \
@@ -46,6 +48,7 @@ SOURCES += \
 
 HEADERS += \
     AbstractSettings.h \
+    ApplicationLog.h \
     MainWindow.h \
     Path/ParentDir.h \
     Path/PathEntity.h \
@@ -76,6 +79,7 @@ HEADERS += \
     widgets/DialogDroppedDir.h \
     widgets/FormStringBuilder.h \
     widgets/FormStringBuilderChain.h \
+    widgets/WidgetApplicationLogs.h \
     widgets/WidgetFileHashSetting.h \
     widgets/WidgetInsertTextSetting.h \
     widgets/WidgetNumberSetting.h \
@@ -89,6 +93,7 @@ FORMS += \
     widgets/DialogDroppedDir.ui \
     widgets/FormStringBuilder.ui \
     widgets/FormStringBuilderChain.ui \
+    widgets/WidgetApplicationLogs.ui \
     widgets/WidgetFileHashSetting.ui \
     widgets/WidgetInsertTextSetting.ui \
     widgets/WidgetNumberSetting.ui \
