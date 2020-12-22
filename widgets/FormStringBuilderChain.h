@@ -41,6 +41,7 @@ public:
     QSharedPointer<StringBuilderOnFile::BuilderChainOnFile> builderChain() const;
 
 signals:
+    void builderCleared();
     void changeStarted();
     void settingsChanged(QSharedPointer<StringBuilderOnFile::BuilderChainOnFile>);
 

@@ -51,6 +51,7 @@ public:
     QSharedPointer<ParentDir> dir(QStringView path) const;
     QSharedPointer<PathEntity> entity(qsizetype index) const;
     qsizetype entityCount() const;
+    bool isEmpty() const;
     void sortByEntityName(Qt::SortOrder order);
     void sortByParentDir(Qt::SortOrder order);
 

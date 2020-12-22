@@ -48,7 +48,7 @@ private slots:
 
 private:
     enum State : int {
-        initial, changingSettings, ready, renaming, stopped, undoing, finishedRenaming
+        initial, ready, renaming, stopped, finished
     };
 
     void setState(State state);
@@ -58,7 +58,6 @@ private:
 
     Ui::MainWindow *ui;
 
-    State m_state = State::initial;
     PathModel *m_pathModel;
 };
 #endif // MAINWINDOW_H

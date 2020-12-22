@@ -61,6 +61,9 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(ui->formStringBuilderChain, &FormStringBuilderChain::changeStarted
           , this, &MainWindow::adaptorToChangeState);
+    connect(ui->formStringBuilderChain, &FormStringBuilderChain::builderCleared
+          , this, &MainWindow::adaptorToChangeState);
+
     connect(m_pathModel, &PathModel::itemCleared,    this, &MainWindow::adaptorToChangeState);
     connect(m_pathModel, &PathModel::readyToRename,  this, &MainWindow::adaptorToChangeState);
     connect(m_pathModel, &PathModel::renameStarted,  this, &MainWindow::adaptorToChangeState);
@@ -111,14 +114,17 @@ void MainWindow::onPathsDataChanged()
 void MainWindow::adaptorToChangeState()
 {
     static const QHash<int, State> hashSignalToState = {
+        {ui->formStringBuilderChain->metaObject()->indexOfSignal("builderCleared()")
+       , State::initial},
         {ui->formStringBuilderChain->metaObject()->indexOfSignal("changeStarted()")
-       , State::changingSettings},
+       , State::initial},
+
         {m_pathModel->metaObject()->indexOfSignal("itemCleared()"),    State::initial},
         {m_pathModel->metaObject()->indexOfSignal("readyToRename()"),  State::ready},
         {m_pathModel->metaObject()->indexOfSignal("renameStarted()"),  State::renaming},
         {m_pathModel->metaObject()->indexOfSignal("renameStopped()"),  State::stopped},
-        {m_pathModel->metaObject()->indexOfSignal("renameFinished()"), State::finishedRenaming},
-        {m_pathModel->metaObject()->indexOfSignal("undoStarted()"),    State::undoing},
+        {m_pathModel->metaObject()->indexOfSignal("renameFinished()"), State::finished},
+        {m_pathModel->metaObject()->indexOfSignal("undoStarted()"),    State::renaming},
     };
 
     auto itr = hashSignalToState.find(senderSignalIndex());
@@ -131,16 +137,12 @@ void MainWindow::adaptorToChangeState()
 
 void MainWindow::setState(MainWindow::State state)
 {
-    m_state = state;
-
     static const QHash<State, QList<bool>> hashForUI = {
-        {State::initial,          {false, false, false, true,  true}},
-        {State::changingSettings, {false, false, false, true,  true}},
-        {State::ready,            {true,  false, false, true,  true}},
-        {State::renaming,         {false, true,  false, false, false}},
-        {State::stopped,          {true,  false, true,  true,  false}},
-        {State::undoing,          {false, true,  false, false, false}},
-        {State::finishedRenaming, {false, false, true,  true,  false}},
+        {State::initial,  {false, false, false, true,  true}},
+        {State::ready,    {true,  false, false, true,  true}},
+        {State::renaming, {false, true,  false, false, false}},
+        {State::stopped,  {true,  false, true,  true,  false}},
+        {State::finished, {false, false, true,  true,  false}},
     };
 
     enum Actions {rename, stop, undo, exit, changeSettigs};
@@ -153,6 +155,7 @@ void MainWindow::setState(MainWindow::State state)
     const bool isEnableToChangeSettings = hashForUI[state][changeSettigs];
 
     setAcceptDrops(isEnableToChangeSettings);
+
     ui->formStringBuilderChain->setEnabled(isEnableToChangeSettings);
     ui->tableView->setEnableToChangeItems(isEnableToChangeSettings);
 

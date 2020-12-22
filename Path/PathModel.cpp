@@ -127,7 +127,7 @@ QVariant PathModel::data(const QModelIndex &index, int role) const
 
 void PathModel::sort(int column, Qt::SortOrder order)
 {
-    if (m_dataRoot->entityCount() == 0)
+    if (m_dataRoot->isEmpty())
         return;
 
     stopThreadToCreateNames();
@@ -180,6 +180,9 @@ void PathModel::copyOriginalNameToClipboard(int row) const
 // Start/Stop threads
 void PathModel::startCreateNewNames(QSharedPointer<StringBuilderOnFile::BuilderChainOnFile> builderChain)
 {
+    if (m_dataRoot->isEmpty())
+        return;
+
     m_threadCreateNewNames->stop();
     m_threadCreateNewNames->wait();
     m_threadCreateNewNames->setStringBuilderOnFile(builderChain);
@@ -214,8 +217,11 @@ void PathModel::undoRename()
 // private slots //
 void PathModel::onCreateNameCompleted()
 {
+    if (m_dataRoot->isEmpty())
+        return;
+
     QModelIndex tl = index(0, int(HSection::newName));
-    QModelIndex br = index(int(m_dataRoot->entityCount()), int(HSection::newName));
+    QModelIndex br = index(int(m_dataRoot->entityCount() - 1), int(HSection::newName));
 
     emit dataChanged(tl, br, {Qt::DecorationRole});
     emit readyToRename();

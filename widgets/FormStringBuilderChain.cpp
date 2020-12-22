@@ -92,7 +92,11 @@ void FormStringBuilderChain::createNewSetting()
 
 void FormStringBuilderChain::startTimer()
 {
-    m_timer->start();
+    if (findChildren<FormStringBuilder *>().isEmpty()) {
+        emit builderCleared();
+        return;
+    }
 
+    m_timer->start();
     emit changeStarted();
 }

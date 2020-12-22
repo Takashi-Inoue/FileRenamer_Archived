@@ -91,6 +91,11 @@ qsizetype PathRoot::entityCount() const
     return m_entities.size();
 }
 
+bool PathRoot::isEmpty() const
+{
+    return m_entities.size() == 0;
+}
+
 void PathRoot::sortByEntityName(Qt::SortOrder order)
 {
     QWriteLocker locker(&m_lock);
