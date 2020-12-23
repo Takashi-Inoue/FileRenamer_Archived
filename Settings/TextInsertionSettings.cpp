@@ -17,29 +17,25 @@
  * along with FileRenamer.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef WIDGETFILEHASHSETTING_H
-#define WIDGETFILEHASHSETTING_H
+#include "TextInsertionSettings.h"
 
-#include "AbstractStringBuilderWidget.h"
-
-namespace Ui {
-class WidgetFileHashSetting;
+TextInsertionSettings::TextInsertionSettings()
+    : AbstractSettings(
+          QStringLiteral("TextInsertion")
+        , QHash<int, QPair<QString, QVariant>>
+          {
+              {textEntry,     {QStringLiteral("Text"),     QString("")}},
+              {positionEntry, {QStringLiteral("Position"), 0}},
+          })
+{
 }
 
-class WidgetFileHashSetting : public AbstractStringBuilderWidget
+QString TextInsertionSettings::text() const
 {
-    Q_OBJECT
+    return m_valuesHash[textEntry].second.toString();
+}
 
-public:
-    explicit WidgetFileHashSetting(QWidget *parent = nullptr);
-    ~WidgetFileHashSetting() override;
-
-    QSharedPointer<StringBuilder::AbstractStringBuilder> StringBuilder() const override;
-    void loadSettings() override;
-    void saveSettings() const override;
-
-private:
-    Ui::WidgetFileHashSetting *ui;
-};
-
-#endif // WIDGETFILEHASHSETTING_H
+int TextInsertionSettings::position() const
+{
+    return m_valuesHash[positionEntry].second.toInt();
+}

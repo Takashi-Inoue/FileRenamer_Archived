@@ -32,11 +32,12 @@ class WidgetOnlyPositionFixer : public AbstractStringBuilderWidget
 
 public:
     explicit WidgetOnlyPositionFixer(QWidget *parent = nullptr);
-    ~WidgetOnlyPositionFixer();
+    ~WidgetOnlyPositionFixer() override;
 
 protected:
+    int positionToInsert() const;
+    void setPositionToInsert(int pos);
     void setTitle(QStringView title);
-    int posToInsert() const;
 
 private:
     Ui::WidgetOnlyPositionFixer *ui;

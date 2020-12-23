@@ -39,6 +39,7 @@ public:
     ~FormStringBuilderChain() override;
 
     QSharedPointer<StringBuilderOnFile::BuilderChainOnFile> builderChain() const;
+    void saveCurrentBuilderSettings() const;
 
 signals:
     void builderCleared();
@@ -46,7 +47,7 @@ signals:
     void settingsChanged(QSharedPointer<StringBuilderOnFile::BuilderChainOnFile>);
 
 public slots:
-    void createNewSetting();
+    void createNewSetting(int builderIndex = 0);
 
 private slots:
     void startTimer();

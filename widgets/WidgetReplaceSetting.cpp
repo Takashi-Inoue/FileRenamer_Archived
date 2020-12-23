@@ -20,6 +20,7 @@
 #include "WidgetReplaceSetting.h"
 #include "ui_WidgetReplaceSetting.h"
 
+#include "Settings/TextReplaceSettings.h"
 #include "StringBuilder/RegExpReplace.h"
 #include "StringBuilder/ReplaceString.h"
 
@@ -28,6 +29,8 @@ WidgetReplaceSetting::WidgetReplaceSetting(QWidget *parent) :
     ui(new Ui::WidgetReplaceSetting)
 {
     ui->setupUi(this);
+
+    loadSettings();
 
     connect(ui->checkBoxCaseSensitive, &QCheckBox::clicked
           , this, &AbstractStringBuilderWidget::changeStarted);
@@ -57,4 +60,28 @@ QSharedPointer<StringBuilder::AbstractStringBuilder> WidgetReplaceSetting::Strin
         return QSharedPointer<StringBuilder::RegExpReplace>::create(before, after, isCaseSensitive);
 
     return QSharedPointer<StringBuilder::ReplaceString>::create(before, after, isCaseSensitive);
+}
+
+void WidgetReplaceSetting::loadSettings()
+{
+    TextReplaceSettings settings;
+
+    settings.read();
+
+    ui->lineEditBefore->setText(settings.before());
+    ui->lineEditAfter->setText(settings.after());
+    ui->checkBoxUseRegex->setChecked(settings.isUseRegexp());
+    ui->checkBoxCaseSensitive->setChecked(settings.isCaseSensitive());
+}
+
+void WidgetReplaceSetting::saveSettings() const
+{
+    TextReplaceSettings settings;
+
+    settings.setValue(TextReplaceSettings::beforeEntry,        ui->lineEditBefore->text());
+    settings.setValue(TextReplaceSettings::afterEntry,         ui->lineEditAfter->text());
+    settings.setValue(TextReplaceSettings::useRegexpEntry,     ui->checkBoxUseRegex->isChecked());
+    settings.setValue(TextReplaceSettings::caseSensitiveEntry, ui->checkBoxCaseSensitive->isChecked());
+
+    settings.write();
 }

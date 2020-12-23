@@ -17,29 +17,24 @@
  * along with FileRenamer.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef WIDGETFILEHASHSETTING_H
-#define WIDGETFILEHASHSETTING_H
+#ifndef CRYPTOGRAPHICHASHSETTINGS_H
+#define CRYPTOGRAPHICHASHSETTINGS_H
 
-#include "AbstractStringBuilderWidget.h"
+#include "AbstractSettings.h"
 
-namespace Ui {
-class WidgetFileHashSetting;
-}
+#include <QCryptographicHash>
 
-class WidgetFileHashSetting : public AbstractStringBuilderWidget
+class CryptographicHashSettings : public AbstractSettings
 {
-    Q_OBJECT
-
 public:
-    explicit WidgetFileHashSetting(QWidget *parent = nullptr);
-    ~WidgetFileHashSetting() override;
+    enum Entry {
+        algorithmEntry, positionEntity
+    };
 
-    QSharedPointer<StringBuilder::AbstractStringBuilder> StringBuilder() const override;
-    void loadSettings() override;
-    void saveSettings() const override;
+    CryptographicHashSettings();
 
-private:
-    Ui::WidgetFileHashSetting *ui;
+    QCryptographicHash::Algorithm algorithm() const;
+    int position() const;
 };
 
-#endif // WIDGETFILEHASHSETTING_H
+#endif // CRYPTOGRAPHICHASHSETTINGS_H

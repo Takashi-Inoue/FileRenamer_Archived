@@ -36,6 +36,11 @@ WidgetPositionFixer::~WidgetPositionFixer()
     delete ui;
 }
 
+void WidgetPositionFixer::setValue(int value)
+{
+    ui->spinBox->setValue(value);
+}
+
 int WidgetPositionFixer::value() const
 {
     return ui->spinBox->value();

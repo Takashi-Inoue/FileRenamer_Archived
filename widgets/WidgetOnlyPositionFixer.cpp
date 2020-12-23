@@ -37,12 +37,17 @@ WidgetOnlyPositionFixer::~WidgetOnlyPositionFixer()
     delete ui;
 }
 
+int WidgetOnlyPositionFixer::positionToInsert() const
+{
+    return ui->widgetPositionFixer->value();
+}
+
+void WidgetOnlyPositionFixer::setPositionToInsert(int pos)
+{
+    ui->widgetPositionFixer->setValue(pos);
+}
+
 void WidgetOnlyPositionFixer::setTitle(QStringView title)
 {
     ui->labelTitle->setText(title.toString());
-}
-
-int WidgetOnlyPositionFixer::posToInsert() const
-{
-    return ui->widgetPositionFixer->value();
 }

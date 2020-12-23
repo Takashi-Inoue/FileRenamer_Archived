@@ -17,29 +17,18 @@
  * along with FileRenamer.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef WIDGETFILEHASHSETTING_H
-#define WIDGETFILEHASHSETTING_H
+#include "BuilderChainSettings.h"
 
-#include "AbstractStringBuilderWidget.h"
-
-namespace Ui {
-class WidgetFileHashSetting;
+BuilderChainSettings::BuilderChainSettings()
+    : AbstractSettings(
+          QStringLiteral("StringBuilderChain")
+        , {
+              {indicesEntry, {QStringLiteral("Indices"), QVariant::fromValue<QList<int>>({0})}}
+          })
+{
 }
 
-class WidgetFileHashSetting : public AbstractStringBuilderWidget
+QList<int> BuilderChainSettings::indices() const
 {
-    Q_OBJECT
-
-public:
-    explicit WidgetFileHashSetting(QWidget *parent = nullptr);
-    ~WidgetFileHashSetting() override;
-
-    QSharedPointer<StringBuilder::AbstractStringBuilder> StringBuilder() const override;
-    void loadSettings() override;
-    void saveSettings() const override;
-
-private:
-    Ui::WidgetFileHashSetting *ui;
-};
-
-#endif // WIDGETFILEHASHSETTING_H
+    return m_valuesHash[indicesEntry].second.value<QList<int>>();
+}

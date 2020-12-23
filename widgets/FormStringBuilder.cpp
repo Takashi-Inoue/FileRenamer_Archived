@@ -62,6 +62,24 @@ QSharedPointer<StringBuilder::AbstractStringBuilder> FormStringBuilder::stringBu
     return widget->StringBuilder();
 }
 
+int FormStringBuilder::currentBuilderIndex() const
+{
+    return ui->comboBoxBuilders->currentIndex();
+}
+
+void FormStringBuilder::setCurrentBuilderIndex(int index)
+{
+    ui->comboBoxBuilders->setCurrentIndex(index);
+}
+
+void FormStringBuilder::saveCurrentBuilderSettings() const
+{
+    auto widget = qobject_cast<AbstractStringBuilderWidget *>(ui->stackedWidget->currentWidget());
+
+    if (widget != nullptr)
+        widget->saveSettings();
+}
+
 void FormStringBuilder::enterEvent(QEnterEvent *)
 {
     m_buttonClose->setVisible(true);

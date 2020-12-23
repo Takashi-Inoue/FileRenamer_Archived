@@ -17,11 +17,12 @@
  * along with FileRenamer.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ABSTRACTStringBuilderWIDGET_H
-#define ABSTRACTStringBuilderWIDGET_H
+#ifndef ABSTRACTSTRINGBUILDERWIDGET_H
+#define ABSTRACTSTRINGBUILDERWIDGET_H
 
 #include <QSharedPointer>
 #include <QWidget>
+#include <QDebug>
 
 namespace StringBuilder {class AbstractStringBuilder;}
 
@@ -32,9 +33,11 @@ public:
     using QWidget::QWidget;
 
     virtual QSharedPointer<StringBuilder::AbstractStringBuilder> StringBuilder() const = 0;
+    virtual void loadSettings() {}
+    virtual void saveSettings() const {}
 
 signals:
     void changeStarted();
 };
 
-#endif // ABSTRACTStringBuilderWIDGET_H
+#endif // ABSTRACTSTRINGBUILDERWIDGET_H

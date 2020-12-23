@@ -21,14 +21,16 @@
 
 
 SearchSettings::SearchSettings()
-    : AbstractSettings(QStringLiteral("Search")
-                     , QHash<int, QPair<QString, QVariant>>{
-                           {searchFiles,   {QStringLiteral("SearchFiles"),   true}}
-                         , {searchDirs,    {QStringLiteral("SearchDirs"),    false}}
-                         , {filter,        {QStringLiteral("Filter"),        QString("")}}
-                         , {filterHistory, {QStringLiteral("FilterHistory"), QStringList()}}
-                         , {hierarchy,     {QStringLiteral("Hierarchy"),     0}}
-                       })
+    : AbstractSettings(
+          QStringLiteral("Search")
+        , QHash<int, QPair<QString, QVariant>>
+          {
+              {searchFiles,   {QStringLiteral("SearchFiles"),   true}},
+              {searchDirs,    {QStringLiteral("SearchDirs"),    false}},
+              {filter,        {QStringLiteral("Filter"),        QString("")}},
+              {filterHistory, {QStringLiteral("FilterHistory"), QStringList()}},
+              {hierarchy,     {QStringLiteral("Hierarchy"),     0}},
+          })
 {
 }
 

@@ -20,6 +20,7 @@
 #include "WidgetNumberSetting.h"
 #include "ui_WidgetNumberSetting.h"
 
+#include "Settings/NumberSettings.h"
 #include "StringBuilder/Number.h"
 
 WidgetNumberSetting::WidgetNumberSetting(QWidget *parent) :
@@ -27,6 +28,8 @@ WidgetNumberSetting::WidgetNumberSetting(QWidget *parent) :
     ui(new Ui::WidgetNumberSetting)
 {
     ui->setupUi(this);
+
+    loadSettings();
 
     connect(ui->spinBoxStart, &QSpinBox::valueChanged
           , this, &AbstractStringBuilderWidget::changeStarted);
@@ -59,4 +62,32 @@ QSharedPointer<StringBuilder::AbstractStringBuilder> WidgetNumberSetting::String
               , ui->spinBoxStart->value(), ui->spinBoxStep->value(), ui->spinBoxDigit->value()
               , ui->lineEditPrefix->text(), ui->lineEditSuffix->text()
                 );
+}
+
+void WidgetNumberSetting::loadSettings()
+{
+    NumberSettings settings;
+
+    settings.read();
+
+    ui->spinBoxStart->setValue(settings.start());
+    ui->spinBoxStep->setValue(settings.step());
+    ui->spinBoxDigit->setValue(settings.digit());
+    ui->lineEditPrefix->setText(settings.prefix());
+    ui->lineEditSuffix->setText(settings.suffix());
+    ui->widgetPositionFixer->setValue(settings.position());
+}
+
+void WidgetNumberSetting::saveSettings() const
+{
+    NumberSettings settings;
+
+    settings.setValue(NumberSettings::startEntry,    ui->spinBoxStart->value());
+    settings.setValue(NumberSettings::stepEntry,     ui->spinBoxStep->value());
+    settings.setValue(NumberSettings::digitEntry,    ui->spinBoxDigit->value());
+    settings.setValue(NumberSettings::prefixEntry,   ui->lineEditPrefix->text());
+    settings.setValue(NumberSettings::suffixEntry,   ui->lineEditSuffix->text());
+    settings.setValue(NumberSettings::positionEntry, ui->widgetPositionFixer->value());
+
+    settings.write();
 }

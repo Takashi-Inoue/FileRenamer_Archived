@@ -91,6 +91,9 @@ MainWindow::~MainWindow()
 void MainWindow::closeEvent(QCloseEvent *event)
 {
     event->setAccepted(ui->actionExit->isEnabled());
+
+    if (event->isAccepted())
+        ui->formStringBuilderChain->saveCurrentBuilderSettings();
 }
 
 void MainWindow::dragEnterEvent(QDragEnterEvent *event)
@@ -124,10 +127,8 @@ void MainWindow::onSortingBroken()
 void MainWindow::adaptorToChangeState()
 {
     static const QHash<int, State> hashSignalToState = {
-        {ui->formStringBuilderChain->metaObject()->indexOfSignal("builderCleared()")
-       , State::initial},
-        {ui->formStringBuilderChain->metaObject()->indexOfSignal("changeStarted()")
-       , State::initial},
+        {ui->formStringBuilderChain->metaObject()->indexOfSignal("builderCleared()"), State::initial},
+        {ui->formStringBuilderChain->metaObject()->indexOfSignal("changeStarted()"), State::initial},
 
         {m_pathModel->metaObject()->indexOfSignal("itemCleared()"),    State::initial},
         {m_pathModel->metaObject()->indexOfSignal("readyToRename()"),  State::ready},

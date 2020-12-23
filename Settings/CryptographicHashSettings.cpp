@@ -17,29 +17,27 @@
  * along with FileRenamer.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef WIDGETFILEHASHSETTING_H
-#define WIDGETFILEHASHSETTING_H
+#include "CryptographicHashSettings.h"
 
-#include "AbstractStringBuilderWidget.h"
-
-namespace Ui {
-class WidgetFileHashSetting;
+CryptographicHashSettings::CryptographicHashSettings()
+    : AbstractSettings(
+          QStringLiteral("CryptographicHash")
+        , QHash<int, QPair<QString, QVariant>>
+          {
+              {algorithmEntry, {QStringLiteral("Algorithm"), QCryptographicHash::Algorithm::Sha224}},
+              {positionEntity, {QStringLiteral("Position"), 0}},
+          })
+{
 }
 
-class WidgetFileHashSetting : public AbstractStringBuilderWidget
+QCryptographicHash::Algorithm CryptographicHashSettings::algorithm() const
 {
-    Q_OBJECT
+    int algorithm = m_valuesHash[algorithmEntry].second.toInt();
 
-public:
-    explicit WidgetFileHashSetting(QWidget *parent = nullptr);
-    ~WidgetFileHashSetting() override;
+    return QCryptographicHash::Algorithm(algorithm);
+}
 
-    QSharedPointer<StringBuilder::AbstractStringBuilder> StringBuilder() const override;
-    void loadSettings() override;
-    void saveSettings() const override;
-
-private:
-    Ui::WidgetFileHashSetting *ui;
-};
-
-#endif // WIDGETFILEHASHSETTING_H
+int CryptographicHashSettings::position() const
+{
+    return m_valuesHash[positionEntity].second.toInt();
+}

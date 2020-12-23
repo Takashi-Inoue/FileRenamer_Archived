@@ -40,6 +40,9 @@ public:
     ~FormStringBuilder() override;
 
     QSharedPointer<StringBuilder::AbstractStringBuilder> stringBuilder() const;
+    int currentBuilderIndex() const;
+    void setCurrentBuilderIndex(int index);
+    void saveCurrentBuilderSettings() const;
 
 signals:
     void changeStarted();

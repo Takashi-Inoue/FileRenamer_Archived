@@ -35,6 +35,8 @@ public:
     ~WidgetReplaceSetting() override;
 
     QSharedPointer<StringBuilder::AbstractStringBuilder> StringBuilder() const override;
+    void loadSettings() override;
+    void saveSettings() const override;
 
 private:
     Ui::WidgetReplaceSetting *ui;

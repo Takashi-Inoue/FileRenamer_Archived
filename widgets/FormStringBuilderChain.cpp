@@ -21,6 +21,7 @@
 #include "ui_FormStringBuilderChain.h"
 
 #include "FormStringBuilder.h"
+#include "Settings/BuilderChainSettings.h"
 
 #include <QApplication>
 #include <QTimer>
@@ -35,7 +36,12 @@ FormStringBuilderChain::FormStringBuilderChain(QWidget *parent)
     m_timer->setSingleShot(true);
     m_timer->setInterval(QApplication::keyboardInputInterval());
 
-    createNewSetting();
+    BuilderChainSettings settings;
+
+    settings.read();
+
+    for (int builderIndex : settings.indices())
+        createNewSetting(builderIndex);
 
     connect(m_timer, &QTimer::timeout, this, [this]() {
         emit settingsChanged(builderChain());
@@ -76,10 +82,28 @@ QSharedPointer<StringBuilderOnFile::BuilderChainOnFile> FormStringBuilderChain::
     return builderChain;
 }
 
-void FormStringBuilderChain::createNewSetting()
+void FormStringBuilderChain::saveCurrentBuilderSettings() const
+{
+    QList<int> builderIndices;
+
+    for (auto formBuilder : findChildren<FormStringBuilder *>()) {
+        formBuilder->saveCurrentBuilderSettings();
+        builderIndices << formBuilder->currentBuilderIndex();
+    }
+
+    BuilderChainSettings settings;
+
+    settings.setValue(BuilderChainSettings::indicesEntry
+                    , QVariant::fromValue<QList<int>>(builderIndices));
+
+    settings.write();
+}
+
+void FormStringBuilderChain::createNewSetting(int builderIndex)
 {
     auto widget = new FormStringBuilder(this);
 
+    widget->setCurrentBuilderIndex(builderIndex);
     widget->setAttribute(Qt::WA_DeleteOnClose, true);
 
     connect(widget, &FormStringBuilder::changeStarted, this, &FormStringBuilderChain::startTimer);

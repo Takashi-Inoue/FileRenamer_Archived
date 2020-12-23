@@ -17,29 +17,22 @@
  * along with FileRenamer.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef WIDGETFILEHASHSETTING_H
-#define WIDGETFILEHASHSETTING_H
+#ifndef TEXTINSERTIONSETTINGS_H
+#define TEXTINSERTIONSETTINGS_H
 
-#include "AbstractStringBuilderWidget.h"
+#include "AbstractSettings.h"
 
-namespace Ui {
-class WidgetFileHashSetting;
-}
-
-class WidgetFileHashSetting : public AbstractStringBuilderWidget
+class TextInsertionSettings : public AbstractSettings
 {
-    Q_OBJECT
-
 public:
-    explicit WidgetFileHashSetting(QWidget *parent = nullptr);
-    ~WidgetFileHashSetting() override;
+    enum Entry {
+        textEntry, positionEntry
+    };
 
-    QSharedPointer<StringBuilder::AbstractStringBuilder> StringBuilder() const override;
-    void loadSettings() override;
-    void saveSettings() const override;
+    TextInsertionSettings();
 
-private:
-    Ui::WidgetFileHashSetting *ui;
+    QString text() const;
+    int position() const;
 };
 
-#endif // WIDGETFILEHASHSETTING_H
+#endif // TEXTINSERTIONSETTINGS_H

@@ -20,9 +20,8 @@
 #include "WidgetFileHashSetting.h"
 #include "ui_WidgetFileHashSetting.h"
 
+#include "Settings/CryptographicHashSettings.h"
 #include "StringBuilderOnFile/CryptographicHash.h"
-
-#include <QCryptographicHash>
 
 WidgetFileHashSetting::WidgetFileHashSetting(QWidget *parent)
     : AbstractStringBuilderWidget(parent)
@@ -40,6 +39,8 @@ WidgetFileHashSetting::WidgetFileHashSetting(QWidget *parent)
 //    ui->comboBoxHashType->addItem(QStringLiteral("SHA3-512"), Algorithm::Sha3_512);
     ui->comboBoxHashType->addItem(QStringLiteral("MD5"), Algorithm::Md5);
     ui->comboBoxHashType->addItem(QStringLiteral("SHA1"), Algorithm::Sha1);
+
+    loadSettings();
 
     connect(ui->comboBoxHashType, &QComboBox::currentIndexChanged
           , this, &AbstractStringBuilderWidget::changeStarted);
@@ -61,4 +62,28 @@ QSharedPointer<StringBuilder::AbstractStringBuilder> WidgetFileHashSetting::Stri
 
     return QSharedPointer<StringBuilderOnFile::CryptographicHash>::create(
                 algorithm, ui->widgetPositionFixer->value());
+}
+
+void WidgetFileHashSetting::loadSettings()
+{
+    CryptographicHashSettings settings;
+
+    settings.read();
+
+    int index = ui->comboBoxHashType->findData(settings.algorithm());
+
+    if (index != -1)
+        ui->comboBoxHashType->setCurrentIndex(index);
+
+    ui->widgetPositionFixer->setValue(settings.position());
+}
+
+void WidgetFileHashSetting::saveSettings() const
+{
+    CryptographicHashSettings settings;
+
+    settings.setValue(CryptographicHashSettings::algorithmEntry, ui->comboBoxHashType->currentData());
+    settings.setValue(CryptographicHashSettings::positionEntity, ui->widgetPositionFixer->value());
+
+    settings.write();
 }

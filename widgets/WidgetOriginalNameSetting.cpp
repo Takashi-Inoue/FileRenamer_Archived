@@ -19,6 +19,7 @@
 
 #include "WidgetOriginalNameSetting.h"
 
+#include "Settings/OriginalNameSettings.h"
 #include "StringBuilderOnFile/OriginalName.h"
 
 WidgetOriginalNameSetting::WidgetOriginalNameSetting(QWidget *parent)
@@ -29,5 +30,23 @@ WidgetOriginalNameSetting::WidgetOriginalNameSetting(QWidget *parent)
 
 QSharedPointer<StringBuilder::AbstractStringBuilder> WidgetOriginalNameSetting::StringBuilder() const
 {
-    return QSharedPointer<StringBuilderOnFile::OriginalName>::create(posToInsert());
+    return QSharedPointer<StringBuilderOnFile::OriginalName>::create(positionToInsert());
+}
+
+void WidgetOriginalNameSetting::loadSettings()
+{
+    OriginalNameSettings settings;
+
+    settings.read();
+
+    setPositionToInsert(settings.position());
+}
+
+void WidgetOriginalNameSetting::saveSettings() const
+{
+    OriginalNameSettings settings;
+
+    settings.setValue(OriginalNameSettings::positionEntry, positionToInsert());
+
+    settings.write();
 }

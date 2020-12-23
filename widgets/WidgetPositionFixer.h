@@ -34,6 +34,7 @@ public:
     explicit WidgetPositionFixer(QWidget *parent = nullptr);
     ~WidgetPositionFixer() override;
 
+    void setValue(int value);
     int value() const;
 
 signals:

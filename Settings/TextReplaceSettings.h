@@ -17,29 +17,24 @@
  * along with FileRenamer.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef WIDGETFILEHASHSETTING_H
-#define WIDGETFILEHASHSETTING_H
+#ifndef TEXTREPLACESETTINGS_H
+#define TEXTREPLACESETTINGS_H
 
-#include "AbstractStringBuilderWidget.h"
+#include "AbstractSettings.h"
 
-namespace Ui {
-class WidgetFileHashSetting;
-}
-
-class WidgetFileHashSetting : public AbstractStringBuilderWidget
+class TextReplaceSettings : public AbstractSettings
 {
-    Q_OBJECT
-
 public:
-    explicit WidgetFileHashSetting(QWidget *parent = nullptr);
-    ~WidgetFileHashSetting() override;
+    enum Entry {
+        beforeEntry, afterEntry, useRegexpEntry, caseSensitiveEntry
+    };
 
-    QSharedPointer<StringBuilder::AbstractStringBuilder> StringBuilder() const override;
-    void loadSettings() override;
-    void saveSettings() const override;
+    TextReplaceSettings();
 
-private:
-    Ui::WidgetFileHashSetting *ui;
+    QString before() const;
+    QString after() const;
+    bool isUseRegexp() const;
+    bool isCaseSensitive() const;
 };
 
-#endif // WIDGETFILEHASHSETTING_H
+#endif // TEXTREPLACESETTINGS_H
