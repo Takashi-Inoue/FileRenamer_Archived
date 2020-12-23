@@ -126,16 +126,37 @@ void MainWindow::onSortingBroken()
 
 void MainWindow::adaptorToChangeState()
 {
-    static const QHash<int, State> hashSignalToState = {
-        {ui->formStringBuilderChain->metaObject()->indexOfSignal("builderCleared()"), State::initial},
-        {ui->formStringBuilderChain->metaObject()->indexOfSignal("changeStarted()"), State::initial},
+    static const int builderCleared = ui->formStringBuilderChain->metaObject()->indexOfSignal("builderCleared()");
+    static const int changeStarted  = ui->formStringBuilderChain->metaObject()->indexOfSignal("changeStarted()");
+    static const int itemCleared    = m_pathModel->metaObject()->indexOfSignal("itemCleared()");
+    static const int readyToRename  = m_pathModel->metaObject()->indexOfSignal("readyToRename()");
+    static const int renameStarted  = m_pathModel->metaObject()->indexOfSignal("renameStarted()");
+    static const int renameStopped  = m_pathModel->metaObject()->indexOfSignal("renameStopped()");
+    static const int renameFinished = m_pathModel->metaObject()->indexOfSignal("renameFinished()");
+    static const int undoStarted    = m_pathModel->metaObject()->indexOfSignal("undoStarted()");
 
-        {m_pathModel->metaObject()->indexOfSignal("itemCleared()"),    State::initial},
-        {m_pathModel->metaObject()->indexOfSignal("readyToRename()"),  State::ready},
-        {m_pathModel->metaObject()->indexOfSignal("renameStarted()"),  State::renaming},
-        {m_pathModel->metaObject()->indexOfSignal("renameStopped()"),  State::stopped},
-        {m_pathModel->metaObject()->indexOfSignal("renameFinished()"), State::finished},
-        {m_pathModel->metaObject()->indexOfSignal("undoStarted()"),    State::renaming},
+    static const QHash<int, QString> hashIndexToSignalName = { // for debug msg
+        {builderCleared, QStringLiteral("builderCleared()")},
+        {changeStarted,  QStringLiteral("changeStarted()")},
+        {itemCleared,    QStringLiteral("itemCleared()")},
+        {readyToRename,  QStringLiteral("readyToRename()")},
+        {renameStarted,  QStringLiteral("renameStarted()")},
+        {renameStopped,  QStringLiteral("renameStopped()")},
+        {renameFinished, QStringLiteral("renameFinished()")},
+        {undoStarted,    QStringLiteral("undoStarted()")},
+    };
+
+    qDebug() << "change state from Signal:" << hashIndexToSignalName[senderSignalIndex()];
+
+    static const QHash<int, State> hashSignalToState = {
+        {builderCleared, State::initial},
+        {changeStarted,  State::initial},
+        {itemCleared,    State::initial},
+        {readyToRename,  State::ready},
+        {renameStarted,  State::renaming},
+        {renameStopped,  State::stopped},
+        {renameFinished, State::finished},
+        {undoStarted,    State::renaming},
     };
 
     auto itr = hashSignalToState.find(senderSignalIndex());
@@ -179,6 +200,8 @@ void MainWindow::setState(MainWindow::State state)
 
 void MainWindow::registerPaths(const QStringList &paths)
 {
+    qInfo() << QStringLiteral("Start registering paths.");
+
     auto sorting = qScopeGuard([this]() {
         QHeaderView *header = ui->tableView->horizontalHeader();
 
@@ -191,6 +214,7 @@ void MainWindow::registerPaths(const QStringList &paths)
     analyzer.analyze(paths);
 
     if (!analyzer.isAllDir()) {
+        qInfo() << QStringLiteral("Register dropped paths.");
         m_pathModel->addPaths(analyzer.dirs(), analyzer.files());
         return;
     }
@@ -201,6 +225,7 @@ void MainWindow::registerPaths(const QStringList &paths)
         return;
 
     if (dlg.isRegisterDroppedDir()) {
+        qInfo() << QStringLiteral("Register dropped directories.");
         m_pathModel->addPaths(analyzer.dirs(), {});
         return;
     }

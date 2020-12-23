@@ -67,6 +67,11 @@ void ThreadCreateNewNames::run()
 
     if (!checkNewNames(hashToCheckNames))
         return;
+
+    if (m_builderChain->isEmpty())
+        return;
+
+    emit completed();
 }
 
 bool ThreadCreateNewNames::isStopRequested() const

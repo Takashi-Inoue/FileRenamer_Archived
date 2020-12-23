@@ -116,10 +116,8 @@ void FormStringBuilderChain::createNewSetting(int builderIndex)
 
 void FormStringBuilderChain::startTimer()
 {
-    if (findChildren<FormStringBuilder *>().isEmpty()) {
+    if (findChildren<FormStringBuilder *>().isEmpty())
         emit builderCleared();
-        return;
-    }
 
     m_timer->start();
     emit changeStarted();

@@ -29,7 +29,7 @@
 class AbstractSettings
 {
 public:
-    AbstractSettings(QStringView settingsName, QHash<int, QPair<QString, QVariant>> &&hash);
+    AbstractSettings(QStringView settingsName, QHash<int, QPair<QString, QVariant>> hash);
     virtual ~AbstractSettings() = default;
 
     void read();

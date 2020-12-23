@@ -20,6 +20,7 @@
 #include "PathsAnalyzer.h"
 
 #include <QFileInfo>
+#include <QDebug>
 
 void PathsAnalyzer::analyze(const QStringList &paths)
 {
@@ -29,11 +30,18 @@ void PathsAnalyzer::analyze(const QStringList &paths)
     if (paths.size() == 0)
         return;
 
+    qInfo() << QStringLiteral("PathsAnalyzer: start analyzing.");
+
     for (const QString &path : paths) {
+        qInfo() << QStringLiteral("Analyzing...[%1]").arg(path);
+
         QFileInfo fileInfo(path);
 
         if (fileInfo.isRoot() || fileInfo.isRelative() || !fileInfo.exists())
             continue;
+
+        qDebug() << (fileInfo.isDir() ? QStringLiteral("[%1] is dir.").arg(path)
+                                      : QStringLiteral("[%1] is file.").arg(path));
 
         QList<ParentChildrenPair> &paths = fileInfo.isDir() ? m_dirs : m_files;
         QString parentDir = fileInfo.absolutePath();
@@ -50,6 +58,9 @@ void PathsAnalyzer::analyze(const QStringList &paths)
 
         itr->second << fileInfo.fileName();
     }
+
+    qDebug() << m_dirs << m_files;
+    qInfo() << QStringLiteral("PathsAnalyzer: finished analyzing.");
 }
 
 QList<PathsAnalyzer::ParentChildrenPair> PathsAnalyzer::dirs() const

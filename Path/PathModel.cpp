@@ -40,7 +40,8 @@ PathModel::PathModel(QObject *parent)
     connect(m_threadCreateNewNames, &ThreadCreateNewNames::newNameCollisionDetected
           , this, &PathModel::onNewNameCollisionDetected);
 
-    connect(m_threadCreateNewNames, &QThread::finished, this, &PathModel::onCreateNameCompleted);
+    connect(m_threadCreateNewNames, &ThreadCreateNewNames::completed
+          , this, &PathModel::onCreateNameCompleted);
 
     connect(m_threadRename, &ThreadRename::renamed, this, &PathModel::onNewNameStateChanged);
     connect(m_threadRename, &ThreadRename::stopped, this, &PathModel::renameStopped);

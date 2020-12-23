@@ -44,6 +44,7 @@ public:
     void stop();
 
 signals:
+    void completed();
     void newNameCreated(int index);
     void newNameCollisionDetected(QPair<int, int> indices);
     void newNameCollisionNotDetected();

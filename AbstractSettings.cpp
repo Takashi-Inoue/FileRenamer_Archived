@@ -23,7 +23,7 @@
 #include <QSettings>
 
 AbstractSettings::AbstractSettings(QStringView settingsName
-                                 , QHash<int, QPair<QString, QVariant>> &&hash)
+                                 , QHash<int, QPair<QString, QVariant>> hash)
     : m_iniPath(QApplication::applicationFilePath().replace(".exe", ".ini"))
     , m_settingsName(settingsName.toString())
     , m_valuesHash(hash)
@@ -32,7 +32,7 @@ AbstractSettings::AbstractSettings(QStringView settingsName
 
 void AbstractSettings::read()
 {
-    qDebug() << "Settings:" << m_settingsName << "read from ini.";
+    qInfo() << "Settings:" << m_settingsName << "read from ini.";
 
     QSettings settings(m_iniPath, QSettings::IniFormat);
 
@@ -48,7 +48,7 @@ void AbstractSettings::read()
 
 void AbstractSettings::write() const
 {
-    qDebug() << "Settings:" << m_settingsName << "write to ini.";
+    qInfo() << "Settings:" << m_settingsName << "write to ini.";
 
     QSettings settings(m_iniPath, QSettings::IniFormat);
 
