@@ -44,6 +44,7 @@ protected:
 
 private slots:
     void onPathsDataChanged();
+    void onSortingBroken();
     void adaptorToChangeState();
 
 private:
@@ -52,8 +53,6 @@ private:
     };
 
     void setState(State state);
-
-    void onPathsAdded();
     void registerPaths(const QStringList &paths);
 
     Ui::MainWindow *ui;

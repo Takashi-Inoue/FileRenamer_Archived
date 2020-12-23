@@ -25,6 +25,7 @@
 #include "ThreadUndoRenaming.h"
 
 #include <QIcon>
+#include <QMimeData>
 
 PathModel::PathModel(QObject *parent)
     : QAbstractTableModel(parent)
@@ -140,6 +141,57 @@ void PathModel::sort(int column, Qt::SortOrder order)
     endResetModel();
 
     emit internalDataChanged();
+}
+
+// drag & drop
+Qt::ItemFlags PathModel::flags(const QModelIndex &index) const
+{
+    Qt::ItemFlags defaultFlags = QAbstractTableModel::flags(index);
+
+    if (index.isValid())
+        return Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled | defaultFlags;
+
+    return Qt::ItemIsDropEnabled | defaultFlags;
+}
+
+Qt::DropActions PathModel::supportedDropActions() const
+{
+    return Qt::MoveAction;
+}
+
+bool PathModel::canDropMimeData(const QMimeData *data, Qt::DropAction /*action*/
+                              , int /*row*/, int /*column*/, const QModelIndex &parent) const
+{
+    const int targetRow = parent.row();
+
+    if ((targetRow == -1) || !data->hasFormat(m_mimeTypeModelDataList))
+        return false;
+
+    const QWeakPointer<Path::ParentDir> targetParent = m_dataRoot->entity(targetRow)->parent();
+
+    for (int sourceRow : rowsFromMimeData(data)) {
+        if (m_dataRoot->entity(sourceRow)->parent() != targetParent)
+            return false;
+    }
+
+    return true;
+}
+
+bool PathModel::dropMimeData(const QMimeData *data, Qt::DropAction /*action*/
+                           , int /*row*/, int /*column*/, const QModelIndex &parent)
+{
+    stopThreadToCreateNames();
+
+    beginResetModel();
+
+    m_dataRoot->move(rowsFromMimeData(data), parent.row());
+
+    endResetModel();
+
+    emit internalDataChanged();
+    emit sortingBroken();
+
+    return true;
 }
 
 void PathModel::addPaths(QList<PathModel::ParentChildrenPair> dirs
@@ -259,6 +311,30 @@ void PathModel::onNewNameStateChanged(int row)
     QModelIndex modelIndex = index(row, int(HSection::newName));
 
     emit dataChanged(modelIndex, modelIndex, {Qt::DecorationRole});
+}
+
+// drag & drop
+QList<int> PathModel::rowsFromMimeData(const QMimeData *data) const
+{
+    if (!data->hasFormat(m_mimeTypeModelDataList))
+        return QList<int>();
+
+    QList<int> rows;
+    QByteArray encodedData = data->data(m_mimeTypeModelDataList);
+    QDataStream stream(&encodedData, QIODevice::ReadOnly);
+
+    while (!stream.atEnd()) {
+        int row;
+        int col;
+        QMap<int, QVariant> roleDataMap;
+
+        stream >> row >> col >> roleDataMap;
+
+        if (col == 0)
+            rows << row;
+    }
+
+    return rows;
 }
 
 // private //

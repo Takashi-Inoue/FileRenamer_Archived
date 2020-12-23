@@ -28,6 +28,7 @@
 
 #include <QDropEvent>
 #include <QMimeData>
+#include <QScopeGuard>
 #include <QDebug>
 
 MainWindow::MainWindow(QWidget *parent)
@@ -72,10 +73,11 @@ MainWindow::MainWindow(QWidget *parent)
     connect(m_pathModel, &PathModel::undoStarted,    this, &MainWindow::adaptorToChangeState);
 
     connect(m_pathModel, &PathModel::internalDataChanged, this, &MainWindow::onPathsDataChanged);
+    connect(m_pathModel, &PathModel::sortingBroken,       this, &MainWindow::onSortingBroken);
 
-    connect(ui->actionRename, &QAction::triggered, m_pathModel, &PathModel::startRename);
-    connect(ui->actionStop, &QAction::triggered, m_pathModel, &PathModel::stopRename);
-    connect(ui->actionUndo, &QAction::triggered, m_pathModel, &PathModel::undoRename);
+    connect(ui->actionRename,     &QAction::triggered, m_pathModel, &PathModel::startRename);
+    connect(ui->actionStop,       &QAction::triggered, m_pathModel, &PathModel::stopRename);
+    connect(ui->actionUndo,       &QAction::triggered, m_pathModel, &PathModel::undoRename);
     connect(ui->actionClearItems, &QAction::triggered, m_pathModel, &PathModel::clear);
 
     m_pathModel->startCreateNewNames(ui->formStringBuilderChain->builderChain());
@@ -93,7 +95,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
 
 void MainWindow::dragEnterEvent(QDragEnterEvent *event)
 {
-    if (event->mimeData()->hasFormat("text/uri-list"))
+    if (event->mimeData()->hasFormat(QStringLiteral("text/uri-list")))
         event->acceptProposedAction();
 }
 
@@ -110,6 +112,13 @@ void MainWindow::dropEvent(QDropEvent *event)
 void MainWindow::onPathsDataChanged()
 {
     m_pathModel->startCreateNewNames(ui->formStringBuilderChain->builderChain());
+}
+
+void MainWindow::onSortingBroken()
+{
+    QHeaderView *header = ui->tableView->horizontalHeader();
+
+    header->setSortIndicatorShown(false);
 }
 
 void MainWindow::adaptorToChangeState()
@@ -167,23 +176,21 @@ void MainWindow::setState(MainWindow::State state)
         header->setEnableToChangeItems(isEnableToChangeSettings);
 }
 
-void MainWindow::onPathsAdded()
-{
-    QHeaderView *header = ui->tableView->horizontalHeader();
-
-    m_pathModel->sort(header->sortIndicatorSection(), header->sortIndicatorOrder());
-}
-
 void MainWindow::registerPaths(const QStringList &paths)
 {
+    auto sorting = qScopeGuard([this]() {
+        QHeaderView *header = ui->tableView->horizontalHeader();
+
+        if (header->isSortIndicatorShown())
+            m_pathModel->sort(header->sortIndicatorSection(), header->sortIndicatorOrder());
+    });
+
     PathsAnalyzer analyzer;
 
     analyzer.analyze(paths);
 
     if (!analyzer.isAllDir()) {
         m_pathModel->addPaths(analyzer.dirs(), analyzer.files());
-        onPathsAdded();
-
         return;
     }
 
@@ -194,8 +201,6 @@ void MainWindow::registerPaths(const QStringList &paths)
 
     if (dlg.isRegisterDroppedDir()) {
         m_pathModel->addPaths(analyzer.dirs(), {});
-        onPathsAdded();
-
         return;
     }
 
@@ -204,6 +209,4 @@ void MainWindow::registerPaths(const QStringList &paths)
     searchInDirs.exec(analyzer.dirs());
 
     m_pathModel->addPaths(searchInDirs.dirs(), searchInDirs.files());
-
-    onPathsAdded();
 }

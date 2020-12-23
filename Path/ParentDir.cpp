@@ -51,6 +51,15 @@ void ParentDir::removeEntity(QWeakPointer<PathEntity> entity)
     m_children.removeOne(entity);
 }
 
+void ParentDir::replaceEntities(const QList<QSharedPointer<PathEntity>> &entities)
+{
+    QWriteLocker locker(&m_lock);
+
+    Q_ASSERT(m_children.size() == entities.size());
+
+    m_children = entities;
+}
+
 const QList<QSharedPointer<PathEntity>> &ParentDir::allEntities() const
 {
     return m_children;

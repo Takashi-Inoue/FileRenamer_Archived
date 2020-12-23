@@ -37,6 +37,7 @@ public:
     void addEntity(QSharedPointer<PathEntity> entity);
     void clear();
     void removeEntity(QWeakPointer<PathEntity> entity);
+    void replaceEntities(const QList<QSharedPointer<PathEntity>> &entities);
 
     const QList<QSharedPointer<PathEntity>> &allEntities() const;
     QSharedPointer<PathEntity> entity(int index) const;

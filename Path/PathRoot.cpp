@@ -53,6 +53,43 @@ void PathRoot::clear()
     m_entities.clear();
 }
 
+void PathRoot::move(QList<int> sourceRows, int targetRow)
+{
+    QWriteLocker locker(&m_lock);
+
+    std::sort(sourceRows.begin(), sourceRows.end());
+
+    int diff = 0;
+
+    if (sourceRows.first() < targetRow) {
+        auto itr = std::lower_bound(sourceRows.begin(), sourceRows.end(), targetRow);
+        diff = -int(std::distance(sourceRows.begin(), itr));
+    }
+
+    QList<QSharedPointer<PathEntity>> entities;
+
+    for (auto ritr = sourceRows.rbegin(), rend = sourceRows.rend(); ritr != rend; ++ritr)
+        entities << m_entities.takeAt(*ritr);
+
+    for (QSharedPointer<PathEntity> entity : entities)
+        m_entities.insert(targetRow + diff, entity);
+
+    auto itrFirst = m_entities.begin();
+
+    for (QSharedPointer<ParentDir> dir : m_dirs) {
+        if (m_entities[targetRow]->parent() != dir) {
+            itrFirst += dir->entityCount();
+        } else {
+            entities.resize(dir->entityCount());
+            std::copy_n(itrFirst, entities.size(), entities.begin());
+
+            dir->replaceEntities(entities);
+
+            return;
+        }
+    }
+}
+
 void PathRoot::remove(int index, int count)
 {
     QWriteLocker locker(&m_lock);

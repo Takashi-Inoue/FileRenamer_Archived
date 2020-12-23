@@ -41,11 +41,12 @@ public:
     PathRoot() = default;
     ~PathRoot() = default;
 
-    // Add / Remove Data
+    // Add / Remove / Move Data
     void addDir(QSharedPointer<ParentDir> dir);
     void addPathsAsDirs(QList<ParentChildrenPair> dirs);
     void addPathsAsFiles(QList<ParentChildrenPair> files);
     void clear();
+    void move(QList<int> sourceRows, int targetRow);
     void remove(int index, int count = 1);
     void removeSpecifiedRows(QList<int> rows);
 

@@ -24,7 +24,6 @@
 #include <QSharedPointer>
 
 namespace Path {
-//class ParentDir;
 class PathRoot;
 }
 
@@ -56,6 +55,14 @@ public:
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
     void sort(int column, Qt::SortOrder order = Qt::AscendingOrder) override;
 
+    // drag & drop
+    Qt::ItemFlags flags(const QModelIndex &index) const override;
+    Qt::DropActions supportedDropActions() const override;
+    bool canDropMimeData(const QMimeData *data, Qt::DropAction action
+                       , int row, int column, const QModelIndex &parent) const override;
+    bool dropMimeData(const QMimeData *data, Qt::DropAction action
+                    , int row, int column, const QModelIndex &parent) override;
+
     // Add/Remove data:
     void addPaths(QList<ParentChildrenPair> dirs, QList<ParentChildrenPair> files);
     void removeSpecifiedRows(QList<int> rows);
@@ -78,6 +85,7 @@ signals:
     void renameStopped();
     void renameFinished();
     void undoStarted();
+    void sortingBroken();
 
 private slots:
     void onCreateNameCompleted();
@@ -90,6 +98,10 @@ private:
         originalName, newName, path
     };
 
+    static const inline QString m_mimeTypeModelDataList
+        = QStringLiteral("application/x-qabstractitemmodeldatalist");
+
+    QList<int> rowsFromMimeData(const QMimeData *data) const;
     void stopThreadToCreateNames();
 
     QSharedPointer<Path::PathRoot> m_dataRoot;

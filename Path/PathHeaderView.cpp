@@ -27,6 +27,10 @@ PathHeaderView::PathHeaderView(QWidget *parent)
     setDefaultSectionSize(150);
     setStretchLastSection(true);
     setSortIndicatorShown(true);
+
+    connect(this, &QHeaderView::sectionClicked, this, [this]() {
+        setSortIndicatorShown(true);
+    });
 }
 
 void PathHeaderView::setEnableToChangeItems(bool isEnable)
