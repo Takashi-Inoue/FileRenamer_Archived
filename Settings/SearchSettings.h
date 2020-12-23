@@ -26,11 +26,12 @@ class SearchSettings : public AbstractSettings
 {
 public:
     enum Entry {
-        searchDirs, searchFiles, filter, hierarchy
+        searchDirs, searchFiles, filter, filterHistory, hierarchy
     };
 
     SearchSettings();
 
+    QStringList filtersHistory() const;
     QStringList filters() const;
     int searchHierarchy() const;
     bool isSearchDirs() const;

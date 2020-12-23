@@ -65,9 +65,14 @@ DialogDroppedDir::DialogDroppedDir(const QList<ParentChildrenPair> &dirs, QWidge
 
     m_settings.read();
 
+    QStringList filtersHistory = m_settings.value(SearchSettings::filterHistory, QStringList());
+
+    for (const QString &filtersString : filtersHistory)
+        ui->comboBoxFilter->addItem(filtersString);
+
     ui->checkBoxDirs->setChecked(m_settings.value(SearchSettings::searchDirs, false));
     ui->checkBoxFiles->setChecked(m_settings.value(SearchSettings::searchFiles, true));
-    ui->lineEditFilter->setText(m_settings.value(SearchSettings::filter, QString("")));
+    ui->comboBoxFilter->setCurrentText(m_settings.value(SearchSettings::filter, QString("")));
     ui->spinBoxHierarchy->setValue(m_settings.value(SearchSettings::hierarchy, 0));
 }
 
@@ -96,20 +101,24 @@ void DialogDroppedDir::on_pushButtonBack_clicked()
 
 void DialogDroppedDir::on_pushButtonOk_clicked()
 {
-    QString filtersString = ui->lineEditFilter->text();
-    QStringList filters = filtersString.split(';', Qt::SkipEmptyParts);
+    QString filtersString = ui->comboBoxFilter->currentText();
 
-    for (QString &filter : filters) {
-        if (!filter.contains('*') && !filter.contains('?'))
-            filter = QString("*%1*").arg(filter);
-    }
-
-    filtersString = filters.join(';');
+    filtersString = fixFiltersString(filtersString);
 
     m_settings.setValue(SearchSettings::searchDirs, ui->checkBoxDirs->isChecked());
     m_settings.setValue(SearchSettings::searchFiles, ui->checkBoxFiles->isChecked());
     m_settings.setValue(SearchSettings::filter, filtersString);
     m_settings.setValue(SearchSettings::hierarchy, ui->spinBoxHierarchy->value());
+
+    QStringList filtersList;
+
+    for (int i = 0, count = ui->comboBoxFilter->count(); i < count; ++i)
+        filtersList << fixFiltersString(ui->comboBoxFilter->itemText(i));
+
+    filtersList.prepend(filtersString);
+    filtersList.removeDuplicates();
+
+    m_settings.setValue(SearchSettings::filterHistory, filtersList);
 
     m_settings.write();
 
@@ -131,4 +140,22 @@ void DialogDroppedDir::on_pushButtonSearch_clicked()
 
     ui->pushButtonBack->setVisible(true);
     ui->pushButtonOk->setVisible(true);
+}
+
+QString DialogDroppedDir::fixFiltersString(QStringView filtersString)
+{
+    QStringList filters = filtersString.toString().split(';', Qt::SkipEmptyParts);
+
+    for (QString &filter : filters)
+        filter = fixOneFilter(filter);
+
+    return filters.join(';');
+}
+
+QString DialogDroppedDir::fixOneFilter(QStringView filter)
+{
+    if (!filter.contains('*') && !filter.contains('?'))
+        return QString("*%1*").arg(filter);
+
+    return filter.toString();
 }

@@ -48,6 +48,9 @@ private slots:
     void on_pushButtonSearch_clicked();
 
 private:
+    QString fixFiltersString(QStringView filtersString);
+    QString fixOneFilter(QStringView filter);
+
     Ui::DialogDroppedDir *ui;
 
     bool m_isRegisterDir = false;
