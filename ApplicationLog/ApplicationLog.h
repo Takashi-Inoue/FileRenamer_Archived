@@ -25,6 +25,8 @@
 #include <QReadWriteLock>
 #include <memory>
 
+class LogData;
+
 class ApplicationLog : public QAbstractTableModel
 {
     ApplicationLog(const ApplicationLog &) = delete;
@@ -42,7 +44,6 @@ public:
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
 
-    void init();
     void clear();
     bool isEmpty() const;
     void log(QStringView log, QStringView groupName = QStringLiteral("General"));
@@ -54,20 +55,12 @@ private:
     using QAbstractTableModel::QAbstractTableModel;
 
     QString logDir() const;
+    void removeOldestLogFile() const;
 
-    class LogData;
     using LogDataPtr = std::unique_ptr<LogData>;
 
-    void writeApplicationLog() const;
-    void writeDebugLog() const;
-
-    static void debugMessageHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg);
-    static QString outputMessage(const QString &msg);
-
-    static QReadWriteLock m_lock;
-
-    static std::vector<LogDataPtr> m_applicationLogs;
-    static std::vector<LogDataPtr> m_debugLogs;
+    mutable QReadWriteLock m_lock;
+    std::vector<LogDataPtr> m_applicationLogs;
 };
 
 #endif // APPLICATIONLOG_H

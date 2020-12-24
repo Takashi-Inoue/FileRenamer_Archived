@@ -18,7 +18,8 @@
  */
 
 #include "MainWindow.h"
-#include "ApplicationLog.h"
+#include "ApplicationLog/ApplicationLog.h"
+#include "ApplicationLog/DebugLog.h"
 
 #include <QApplication>
 
@@ -34,7 +35,7 @@ int main(int argc, char *argv[])
     QCoreApplication::setApplicationName("File Renamer");
     QCoreApplication::setApplicationVersion("0.1.0.0");
 
-    ApplicationLog::instance().init();
+    DebugLog::init();
 
     MainWindow w;
     w.show();
@@ -42,6 +43,7 @@ int main(int argc, char *argv[])
     int result = a.exec();
 
     ApplicationLog::instance().writeFile();
+    DebugLog::writeFile();
 
     return result;
 }

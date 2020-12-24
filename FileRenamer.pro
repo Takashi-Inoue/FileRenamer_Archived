@@ -10,7 +10,9 @@ CONFIG += c++17
 
 SOURCES += \
     AbstractSettings.cpp \
-    ApplicationLog.cpp \
+    ApplicationLog/ApplicationLog.cpp \
+    ApplicationLog/DebugLog.cpp \
+    ApplicationLog/LogData.cpp \
     Path/ParentDir.cpp \
     Path/PathEntity.cpp \
     Path/PathEntityInfo.cpp \
@@ -54,7 +56,9 @@ SOURCES += \
 
 HEADERS += \
     AbstractSettings.h \
-    ApplicationLog.h \
+    ApplicationLog/ApplicationLog.h \
+    ApplicationLog/DebugLog.h \
+    ApplicationLog/LogData.h \
     MainWindow.h \
     Path/ParentDir.h \
     Path/PathEntity.h \

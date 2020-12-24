@@ -20,7 +20,7 @@
 #include "PathEntity.h"
 #include "ParentDir.h"
 
-#include "ApplicationLog.h"
+#include "ApplicationLog/ApplicationLog.h"
 
 #include <QClipboard>
 #include <QDir>
