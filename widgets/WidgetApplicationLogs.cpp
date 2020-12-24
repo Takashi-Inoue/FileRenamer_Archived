@@ -20,7 +20,7 @@
 #include "WidgetApplicationLogs.h"
 #include "ui_WidgetApplicationLogs.h"
 
-#include "ApplicationLog.h"
+#include "ApplicationLog/ApplicationLog.h"
 
 WidgetApplicationLogs::WidgetApplicationLogs(QWidget *parent) :
     QWidget(parent),

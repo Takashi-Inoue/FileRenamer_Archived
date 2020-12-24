@@ -132,12 +132,15 @@ void ApplicationLog::writeFile() const
     QFile file(filePathName);
 
     if (!file.open(QIODevice::WriteOnly)) {
-        qDebug() << "failed to write log to" << file.fileName() << ":" << file.errorString();
+        qInfo() << QStringLiteral("Failed to write log to [%1]. Error: %2")
+                  .arg(filePathName, file.errorString());
         return;
     }
 
     for (const LogDataPtr &logData : m_applicationLogs)
         logData->write(file);
+
+    qInfo() << QStringLiteral("Wrote log to the file. [%1]").arg(filePathName);
 }
 
 void ApplicationLog::writeSpecifiedLogs(QStringView groupName) const
@@ -147,12 +150,20 @@ void ApplicationLog::writeSpecifiedLogs(QStringView groupName) const
     if (m_applicationLogs.size() == 0)
         return;
 
-    QDir().mkpath(logDir());
+    const QString logDirectory = logDir();
 
-    QFile file(logDir() + QStringLiteral("/%1.log").arg(groupName));
+    if (!QDir().mkpath(logDirectory)) {
+        qInfo() << "Failed to create log directory." << logDirectory;
+        return;
+    }
+
+    QString filePathName = QStringLiteral("%1/%2.log").arg(logDirectory, groupName);
+
+    QFile file(filePathName);
 
     if (!file.open(QIODevice::WriteOnly)) {
-        qDebug() << "failed to write log to" << file.fileName() << ":" << file.errorString();
+        qInfo() << QStringLiteral("Failed to write log to [%1]. Error: %2")
+                  .arg(filePathName, file.errorString());
         return;
     }
 
@@ -160,6 +171,8 @@ void ApplicationLog::writeSpecifiedLogs(QStringView groupName) const
         if (logData->group() == groupName)
             logData->write(file);
     }
+
+    qInfo() << QStringLiteral("Wrote log to the file. [%1]").arg(filePathName);
 }
 
 QString ApplicationLog::logDir() const
@@ -183,6 +196,6 @@ void ApplicationLog::removeOldestLogFile() const
     QString oldestFile = dir.absoluteFilePath(fileNames.first());
 
     QFile().remove(oldestFile)
-            ? qInfo() << QStringLiteral("Remove oldest log file. [%1]").arg(oldestFile)
+            ? qInfo() << QStringLiteral("Removed oldest log file. [%1]").arg(oldestFile)
             : qInfo() << QStringLiteral("Failed to remove oldest log file. [%1]").arg(oldestFile);
 }
