@@ -124,3 +124,8 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 RESOURCES += \
     images.qrc
+
+VERSION = 1.0.0.0
+RC_ICONS = res/images/icon.ico
+QMAKE_TARGET_PRODUCT = FileRenamer
+QMAKE_TARGET_COPYRIGHT = "Copyright 2020 Takashi Inoue"

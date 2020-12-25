@@ -32,7 +32,7 @@ int main(int argc, char *argv[])
 
     QApplication::setFont(font);
 
-    QCoreApplication::setApplicationName("File Renamer");
+    QCoreApplication::setApplicationName("FileRenamer");
     QCoreApplication::setApplicationVersion("0.1.0.0");
 
     DebugLog::init();
