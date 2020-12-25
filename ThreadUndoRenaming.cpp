@@ -33,11 +33,15 @@ void ThreadUndoRenaming::stop()
 {
     QWriteLocker locker(&m_lock);
 
+    qInfo() << QStringLiteral("Thread for undoing rename got request to stop.");
+
     m_isStopRequested = true;
 }
 
 void ThreadUndoRenaming::run()
 {
+    qInfo() << QStringLiteral("Start undoing rename.");
+
     m_lock.lockForWrite();
     m_isStopRequested = false;
     m_lock.unlock();
@@ -71,6 +75,8 @@ void ThreadUndoRenaming::run()
         emit stopped();
         return;
     }
+
+    qInfo() << QStringLiteral("Finished undoing rename.");
 
     emit completed();
 }

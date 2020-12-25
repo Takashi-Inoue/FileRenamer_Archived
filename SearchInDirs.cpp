@@ -45,6 +45,9 @@ void SearchInDirs::exec(QList<ParentChildrenPair> targetDirs)
     const QStringList nameFilters = m_settings.filters();
     int hierarchy = m_settings.searchHierarchy();
 
+    qInfo() << QStringLiteral("Start searching entities in directories. Filters=[%1], Hierarchy=[%2]")
+              .arg(nameFilters.join(';')).arg(hierarchy);
+
     while (!targetDirs.isEmpty()) {
         searchOneLayer(targetDirs, nameFilters);
 
@@ -61,13 +64,17 @@ void SearchInDirs::searchForDirs(const QDir &parentDir
     if (childrenNames.isEmpty())
         return;
 
-    targetDirs << ParentChildrenPair(addSeparator(parentDir.path())
-                                   , {childrenNames.begin(), childrenNames.end()});
+    targetDirs << ParentChildrenPair(addSeparator(parentDir.path()), childrenNames);
 
     if (!m_settings.isSearchDirs())
         return;
 
+    qInfo() << QStringLiteral("Search directories in [%1]").arg(parentDir.absolutePath());
+
     if (parentDir.nameFilters().isEmpty()) {
+        qInfo() << QStringLiteral("%1 directory(-ies) is/are found.").arg(childrenNames.size());
+        qDebug() << childrenNames;
+
         m_dirs << targetDirs.last();
         return;
     }
@@ -84,8 +91,10 @@ void SearchInDirs::searchForDirs(const QDir &parentDir
     if (childrenNames.isEmpty())
         return;
 
-    m_dirs << ParentChildrenPair(addSeparator(parentDir.path())
-                               , QStringList(childrenNames.begin(), childrenNames.end()));
+    qInfo() << QStringLiteral("%1 directory(-ies) is/are found.").arg(childrenNames.size());
+    qDebug() << childrenNames;
+
+    m_dirs << ParentChildrenPair(addSeparator(parentDir.path()), childrenNames);
 }
 
 void SearchInDirs::searchForFiles(const QDir &parentDir)
@@ -93,13 +102,17 @@ void SearchInDirs::searchForFiles(const QDir &parentDir)
     if (!m_settings.isSearchFiles())
         return;
 
+    qInfo() << QStringLiteral("Search files in [%1]").arg(parentDir.absolutePath());
+
     QStringList childrenNames = parentDir.entryList(QDir::Files | QDir::Hidden);
 
     if (childrenNames.isEmpty())
         return;
 
-    m_files << ParentChildrenPair(addSeparator(parentDir.path())
-                                , QStringList(childrenNames.begin(), childrenNames.end()));
+    qInfo() << QStringLiteral("%1 file(s) is/are found.").arg(childrenNames.size());
+    qDebug() << childrenNames;
+
+    m_files << ParentChildrenPair(addSeparator(parentDir.path()), childrenNames);
 }
 
 void SearchInDirs::searchOneLayer(QList<ParentChildrenPair> &targetDirs
@@ -109,7 +122,9 @@ void SearchInDirs::searchOneLayer(QList<ParentChildrenPair> &targetDirs
         const ParentChildrenPair &parentChildren = targetDirs.takeFirst();
 
         for (QStringView childName : parentChildren.second) {
-            QDir targetDir(QString("%1%2").arg(parentChildren.first, childName));
+            QString dirPath = QStringLiteral("%1%2").arg(parentChildren.first, childName);
+
+            QDir targetDir(dirPath);
 
             targetDir.setNameFilters(nameFilters);
 

@@ -20,6 +20,7 @@
 #include "FormStringBuilder.h"
 #include "ui_FormStringBuilder.h"
 
+#include <QAction>
 #include <QPushButton>
 #include <QResizeEvent>
 #include <QDebug>
@@ -33,11 +34,18 @@ FormStringBuilder::FormStringBuilder(QWidget *parent)
 
     m_buttonClose->setVisible(false);
     m_buttonClose->raise();
-    m_buttonClose->setToolTip(QStringLiteral("Remove this"));
+    m_buttonClose->setToolTip(QStringLiteral("Remove this (Ctrl+Shift+Del)"));
     m_buttonClose->setIconSize({12, 12});
     m_buttonClose->resize(20, 20);
 
-    connect(m_buttonClose, &QPushButton::clicked, this, &QWidget::close);
+    auto action = new QAction(QStringLiteral("Remove this"), this);
+    action->setShortcutContext(Qt::WidgetWithChildrenShortcut);
+    action->setShortcut(QKeySequence(QStringLiteral("Ctrl+Shift+Delete")));
+
+    addAction(action);
+
+    connect(action, &QAction::triggered, this, &QWidget::close);
+    connect(m_buttonClose, &QPushButton::clicked, action, &QAction::trigger);
 
     for (auto widget : findChildren<AbstractStringBuilderWidget *>()) {
         connect(widget, &AbstractStringBuilderWidget::changeStarted
