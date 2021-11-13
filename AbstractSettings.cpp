@@ -19,47 +19,43 @@
 
 #include "AbstractSettings.h"
 
-#include <QApplication>
-#include <QSettings>
+#include <QMetaEnum>
 
 AbstractSettings::AbstractSettings(QStringView settingsName
                                  , QHash<int, QPair<QString, QVariant>> hash)
-    : m_iniPath(QApplication::applicationFilePath().replace(".exe", ".ini"))
-    , m_settingsName(settingsName.toString())
+    :m_settingsName(settingsName.toString())
     , m_valuesHash(hash)
 {
 }
 
-void AbstractSettings::read()
+void AbstractSettings::read(QSharedPointer<QSettings> qSettings)
 {
-    qInfo() << "Settings:" << m_settingsName << "read from ini.";
+    qInfo() << "Settings:" << m_settingsName << "read using"
+            << QMetaEnum::fromType<QSettings::Format>().valueToKey(qSettings->format());
 
-    QSettings settings(m_iniPath, QSettings::IniFormat);
-
-    settings.beginGroup(m_settingsName);
+    qSettings->beginGroup(m_settingsName);
 
     for (QPair<QString, QVariant> &keyValue : m_valuesHash) {
-        keyValue.second = settings.value(keyValue.first, keyValue.second);
+        keyValue.second = qSettings->value(keyValue.first, keyValue.second);
         qDebug() << "read..." << keyValue.first << ":" << keyValue.second;
     }
 
-    settings.endGroup();
+    qSettings->endGroup();
 }
 
-void AbstractSettings::write() const
+void AbstractSettings::write(QSharedPointer<QSettings> qSettings) const
 {
-    qInfo() << "Settings:" << m_settingsName << "write to ini.";
+    qInfo() << "Settings:" << m_settingsName << "write using"
+            << QMetaEnum::fromType<QSettings::Format>().valueToKey(qSettings->format());
 
-    QSettings settings(m_iniPath, QSettings::IniFormat);
-
-    settings.beginGroup(m_settingsName);
+    qSettings->beginGroup(m_settingsName);
 
     for (const QPair<QString, QVariant> &keyValue : m_valuesHash) {
-        settings.setValue(keyValue.first, keyValue.second);
+        qSettings->setValue(keyValue.first, keyValue.second);
         qDebug() << "wrote..." << keyValue.first << ":" << keyValue.second;
     }
 
-    settings.endGroup();
+    qSettings->endGroup();
 }
 
 void AbstractSettings::setValue(int entry, QVariant value)

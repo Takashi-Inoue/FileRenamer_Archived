@@ -34,9 +34,10 @@ public:
     explicit WidgetFileHashSetting(QWidget *parent = nullptr);
     ~WidgetFileHashSetting() override;
 
+    // AbstractStringBuilderWidget interface
     QSharedPointer<StringBuilder::AbstractStringBuilder> StringBuilder() const override;
-    void loadSettings() override;
-    void saveSettings() const override;
+    void loadSettings(QSharedPointer<QSettings> qSettings) override;
+    void saveSettings(QSharedPointer<QSettings> qSettings) const override;
 
 private:
     Ui::WidgetFileHashSetting *ui;

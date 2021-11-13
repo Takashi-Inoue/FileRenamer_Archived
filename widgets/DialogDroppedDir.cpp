@@ -20,6 +20,8 @@
 #include "DialogDroppedDir.h"
 #include "ui_DialogDroppedDir.h"
 
+#include "Application.h"
+
 DialogDroppedDir::DialogDroppedDir(const QList<ParentChildrenPair> &dirs, QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::DialogDroppedDir)
@@ -63,7 +65,7 @@ DialogDroppedDir::DialogDroppedDir(const QList<ParentChildrenPair> &dirs, QWidge
     ui->pushButtonRegisterDir->setText(registerDirText[itemCount == 1]);
     ui->pushButtonSearch->setText(searchText[itemCount == 1]);
 
-    m_settings.read();
+    m_settings.read(Application::mainQSettings());
 
     QStringList filtersHistory = m_settings.value(SearchSettings::filterHistory, QStringList());
 
@@ -120,7 +122,7 @@ void DialogDroppedDir::on_pushButtonOk_clicked()
 
     m_settings.setValue(SearchSettings::filterHistory, filtersList);
 
-    m_settings.write();
+    m_settings.write(Application::mainQSettings());
 
     accept();
 }

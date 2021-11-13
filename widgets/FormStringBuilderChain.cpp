@@ -20,10 +20,10 @@
 #include "FormStringBuilderChain.h"
 #include "ui_FormStringBuilderChain.h"
 
+#include "Application.h"
 #include "FormStringBuilder.h"
 #include "Settings/BuilderChainSettings.h"
 
-#include <QApplication>
 #include <QTimer>
 
 FormStringBuilderChain::FormStringBuilderChain(QWidget *parent)
@@ -38,7 +38,7 @@ FormStringBuilderChain::FormStringBuilderChain(QWidget *parent)
 
     BuilderChainSettings settings;
 
-    settings.read();
+    settings.read(Application::mainQSettings());
 
     for (int builderIndex : settings.indices())
         createNewSetting(builderIndex);
@@ -82,12 +82,35 @@ QSharedPointer<StringBuilderOnFile::BuilderChainOnFile> FormStringBuilderChain::
     return builderChain;
 }
 
-void FormStringBuilderChain::saveCurrentBuilderSettings() const
+void FormStringBuilderChain::loadBuilderSettings(QSharedPointer<QSettings> qSettings)
+{
+    int count = ui->vLayout->count();
+
+    for (int i = 0; i < count; ++i) {
+        QLayoutItem *item = ui->vLayout->itemAt(i);
+        auto widget = qobject_cast<FormStringBuilder *>(item->widget());
+
+        if (widget != nullptr)
+            widget->close();
+    }
+
+    BuilderChainSettings settings;
+
+    settings.read(qSettings);
+
+    for (int builderIndex : settings.indices())
+        createNewSetting(builderIndex);
+
+    for (auto formBuilder : findChildren<FormStringBuilder *>())
+        formBuilder->loadBuilderSettings(qSettings);
+}
+
+void FormStringBuilderChain::saveCurrentBuilderSettings(QSharedPointer<QSettings> qSettings) const
 {
     QList<int> builderIndices;
 
     for (auto formBuilder : findChildren<FormStringBuilder *>()) {
-        formBuilder->saveCurrentBuilderSettings();
+        formBuilder->saveCurrentBuilderSettings(qSettings);
         builderIndices << formBuilder->currentBuilderIndex();
     }
 
@@ -96,7 +119,7 @@ void FormStringBuilderChain::saveCurrentBuilderSettings() const
     settings.setValue(BuilderChainSettings::indicesEntry
                     , QVariant::fromValue<QList<int>>(builderIndices));
 
-    settings.write();
+    settings.write(qSettings);
 }
 
 void FormStringBuilderChain::createNewSetting(int builderIndex)

@@ -23,6 +23,7 @@
 #include <QSharedPointer>
 #include <QWidget>
 #include <QDebug>
+#include <QSettings>
 
 namespace StringBuilder {class AbstractStringBuilder;}
 
@@ -33,8 +34,8 @@ public:
     using QWidget::QWidget;
 
     virtual QSharedPointer<StringBuilder::AbstractStringBuilder> StringBuilder() const = 0;
-    virtual void loadSettings() {}
-    virtual void saveSettings() const {}
+    virtual void loadSettings(QSharedPointer<QSettings>) {}
+    virtual void saveSettings(QSharedPointer<QSettings>) const {}
 
 signals:
     void changeStarted();

@@ -10,6 +10,7 @@ CONFIG += c++17
 
 SOURCES += \
     AbstractSettings.cpp \
+    Application.cpp \
     ApplicationLog/ApplicationLog.cpp \
     ApplicationLog/DebugLog.cpp \
     ApplicationLog/LogData.cpp \
@@ -43,8 +44,11 @@ SOURCES += \
     main.cpp \
     MainWindow.cpp \
     widgets/DialogDroppedDir.cpp \
+    widgets/DialogLoadRenameSettings.cpp \
+    widgets/DialogSaveRenameSettings.cpp \
     widgets/FormStringBuilder.cpp \
     widgets/FormStringBuilderChain.cpp \
+    widgets/SavedSettingsListWidget.cpp \
     widgets/WidgetApplicationLogs.cpp \
     widgets/WidgetFileHashSetting.cpp \
     widgets/WidgetInsertTextSetting.cpp \
@@ -56,6 +60,7 @@ SOURCES += \
 
 HEADERS += \
     AbstractSettings.h \
+    Application.h \
     ApplicationLog/ApplicationLog.h \
     ApplicationLog/DebugLog.h \
     ApplicationLog/LogData.h \
@@ -93,8 +98,11 @@ HEADERS += \
     ThreadUndoRenaming.h \
     widgets/AbstractStringBuilderWidget.h \
     widgets/DialogDroppedDir.h \
+    widgets/DialogLoadRenameSettings.h \
+    widgets/DialogSaveRenameSettings.h \
     widgets/FormStringBuilder.h \
     widgets/FormStringBuilderChain.h \
+    widgets/SavedSettingsListWidget.h \
     widgets/WidgetApplicationLogs.h \
     widgets/WidgetFileHashSetting.h \
     widgets/WidgetInsertTextSetting.h \
@@ -107,6 +115,8 @@ HEADERS += \
 FORMS += \
     MainWindow.ui \
     widgets/DialogDroppedDir.ui \
+    widgets/DialogLoadRenameSettings.ui \
+    widgets/DialogSaveRenameSettings.ui \
     widgets/FormStringBuilder.ui \
     widgets/FormStringBuilderChain.ui \
     widgets/WidgetApplicationLogs.ui \
@@ -125,7 +135,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 RESOURCES += \
     images.qrc
 
-VERSION = 1.0.0.0
-RC_ICONS = res/images/icon.ico
+VERSION = 1.1.0.0
+RC_ICONS = res/images/filerenamer.ico
 QMAKE_TARGET_PRODUCT = FileRenamer
-QMAKE_TARGET_COPYRIGHT = "Copyright 2020 Takashi Inoue"
+QMAKE_TARGET_COPYRIGHT = "Copyright 2020-2021 Takashi Inoue"

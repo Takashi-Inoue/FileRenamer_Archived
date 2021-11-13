@@ -21,6 +21,7 @@
 #define ABSTRACTSETTINGS_H
 
 #include <QHash>
+#include <QSettings>
 #include <QString>
 #include <QVariant>
 
@@ -32,8 +33,8 @@ public:
     AbstractSettings(QStringView settingsName, QHash<int, QPair<QString, QVariant>> hash);
     virtual ~AbstractSettings() = default;
 
-    void read();
-    void write() const;
+    void read(QSharedPointer<QSettings>);
+    void write(QSharedPointer<QSettings>) const;
 
     void setValue(int entry, QVariant value);
 
@@ -60,7 +61,6 @@ public:
     }
 
 protected:
-    const QString m_iniPath;
     const QString m_settingsName;
 
     QHash<int, QPair<QString, QVariant>> m_valuesHash;

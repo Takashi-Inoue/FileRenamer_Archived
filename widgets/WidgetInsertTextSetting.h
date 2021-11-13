@@ -35,8 +35,8 @@ public:
     ~WidgetInsertTextSetting() override;
 
     QSharedPointer<StringBuilder::AbstractStringBuilder> StringBuilder() const override;
-    void loadSettings() override;
-    void saveSettings() const override;
+    void loadSettings(QSharedPointer<QSettings>) override;
+    void saveSettings(QSharedPointer<QSettings>) const override;
 
 private:
     Ui::WidgetInsertTextSetting *ui;

@@ -17,5 +17,7 @@
         <file>res/images/success.svg</file>
         <file>res/images/failure.svg</file>
         <file>res/images/clear.svg</file>
+        <file>res/images/load.svg</file>
+        <file>res/images/save.svg</file>
     </qresource>
 </RCC>

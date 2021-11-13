@@ -80,12 +80,20 @@ void FormStringBuilder::setCurrentBuilderIndex(int index)
     ui->comboBoxBuilders->setCurrentIndex(index);
 }
 
-void FormStringBuilder::saveCurrentBuilderSettings() const
+void FormStringBuilder::loadBuilderSettings(QSharedPointer<QSettings> qSettings)
 {
     auto widget = qobject_cast<AbstractStringBuilderWidget *>(ui->stackedWidget->currentWidget());
 
     if (widget != nullptr)
-        widget->saveSettings();
+        widget->loadSettings(qSettings);
+}
+
+void FormStringBuilder::saveCurrentBuilderSettings(QSharedPointer<QSettings> qSettings) const
+{
+    auto widget = qobject_cast<AbstractStringBuilderWidget *>(ui->stackedWidget->currentWidget());
+
+    if (widget != nullptr)
+        widget->saveSettings(qSettings);
 }
 
 void FormStringBuilder::enterEvent(QEnterEvent *)

@@ -18,7 +18,6 @@
  */
 
 #include "ApplicationLog.h"
-#include "LogData.h"
 
 #include <QApplication>
 #include <QDateTime>

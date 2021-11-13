@@ -47,6 +47,9 @@ private slots:
     void onSortingBroken();
     void adaptorToChangeState();
 
+    void onButtonLoadSettingsClicked();
+    void onButtonSaveSettingsClicked();
+
 private:
     enum State : int {
         initial, ready, renaming, stopped, finished

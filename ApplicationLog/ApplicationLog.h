@@ -20,12 +20,12 @@
 #ifndef APPLICATIONLOG_H
 #define APPLICATIONLOG_H
 
+#include "LogData.h"
+
 #include <QAbstractTableModel>
 #include <QString>
 #include <QReadWriteLock>
 #include <memory>
-
-class LogData;
 
 class ApplicationLog : public QAbstractTableModel
 {

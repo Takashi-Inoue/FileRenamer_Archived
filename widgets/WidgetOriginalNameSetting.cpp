@@ -33,20 +33,20 @@ QSharedPointer<StringBuilder::AbstractStringBuilder> WidgetOriginalNameSetting::
     return QSharedPointer<StringBuilderOnFile::OriginalName>::create(positionToInsert());
 }
 
-void WidgetOriginalNameSetting::loadSettings()
+void WidgetOriginalNameSetting::loadSettings(QSharedPointer<QSettings> qSettings)
 {
     OriginalNameSettings settings;
 
-    settings.read();
+    settings.read(qSettings);
 
     setPositionToInsert(settings.position());
 }
 
-void WidgetOriginalNameSetting::saveSettings() const
+void WidgetOriginalNameSetting::saveSettings(QSharedPointer<QSettings> qSettings) const
 {
     OriginalNameSettings settings;
 
     settings.setValue(OriginalNameSettings::positionEntry, positionToInsert());
 
-    settings.write();
+    settings.write(qSettings);
 }

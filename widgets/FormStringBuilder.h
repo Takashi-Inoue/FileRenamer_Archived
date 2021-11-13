@@ -26,6 +26,7 @@
 namespace StringBuilder {class AbstractStringBuilder;}
 
 class QPushButton;
+class QSettings;
 
 namespace Ui {
 class FormStringBuilder;
@@ -42,7 +43,8 @@ public:
     QSharedPointer<StringBuilder::AbstractStringBuilder> stringBuilder() const;
     int currentBuilderIndex() const;
     void setCurrentBuilderIndex(int index);
-    void saveCurrentBuilderSettings() const;
+    void loadBuilderSettings(QSharedPointer<QSettings>);
+    void saveCurrentBuilderSettings(QSharedPointer<QSettings>) const;
 
 signals:
     void changeStarted();

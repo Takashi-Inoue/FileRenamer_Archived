@@ -17,7 +17,7 @@
    <string>FileRenamer</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QHBoxLayout" name="horizontalLayout">
+   <layout class="QVBoxLayout" name="verticalLayout_2">
     <item>
      <widget class="QSplitter" name="splitter">
       <property name="orientation">
@@ -26,18 +26,63 @@
       <widget class="QWidget" name="layoutWidget">
        <layout class="QVBoxLayout" name="verticalLayout">
         <item>
-         <widget class="QLabel" name="label">
-          <property name="font">
-           <font>
-            <pointsize>11</pointsize>
-            <weight>75</weight>
-            <bold>true</bold>
-           </font>
-          </property>
-          <property name="text">
-           <string>Rename settings</string>
-          </property>
-         </widget>
+         <layout class="QHBoxLayout" name="horizontalLayout">
+          <item>
+           <widget class="QLabel" name="label">
+            <property name="font">
+             <font>
+              <pointsize>11</pointsize>
+              <weight>75</weight>
+              <bold>true</bold>
+             </font>
+            </property>
+            <property name="text">
+             <string>Rename settings</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>24</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QPushButton" name="buttonSaveSettings">
+            <property name="toolTip">
+             <string>Save current rename settings</string>
+            </property>
+            <property name="text">
+             <string>Save</string>
+            </property>
+            <property name="icon">
+             <iconset resource="images.qrc">
+              <normaloff>:/res/images/save.svg</normaloff>:/res/images/save.svg</iconset>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="buttonLoadSettings">
+            <property name="toolTip">
+             <string>Load Rename settings</string>
+            </property>
+            <property name="text">
+             <string>Load</string>
+            </property>
+            <property name="icon">
+             <iconset resource="images.qrc">
+              <normaloff>:/res/images/load.svg</normaloff>:/res/images/load.svg</iconset>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </item>
         <item>
          <widget class="QScrollArea" name="scrollArea">
@@ -49,8 +94,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>274</width>
-             <height>488</height>
+             <width>477</width>
+             <height>475</height>
             </rect>
            </property>
           </widget>
@@ -289,9 +334,61 @@
     </hint>
     <hint type="destinationlabel">
      <x>439</x>
-     <y>573</y>
+     <y>619</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonSaveSettings</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>onButtonSaveSettingsClicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>382</x>
+     <y>69</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>875</x>
+     <y>267</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonLoadSettings</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>onButtonLoadSettingsClicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>455</x>
+     <y>70</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>875</x>
+     <y>85</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>dockWidgetLogs</sender>
+   <signal>visibilityChanged(bool)</signal>
+   <receiver>actionViewLogs</receiver>
+   <slot>setChecked(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>560</x>
+     <y>599</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-1</x>
+     <y>-1</y>
     </hint>
    </hints>
   </connection>
  </connections>
+ <slots>
+  <slot>onButtonSaveSettingsClicked()</slot>
+  <slot>onButtonLoadSettingsClicked()</slot>
+ </slots>
 </ui>

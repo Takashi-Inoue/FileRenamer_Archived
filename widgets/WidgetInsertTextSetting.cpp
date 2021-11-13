@@ -20,6 +20,7 @@
 #include "WidgetInsertTextSetting.h"
 #include "ui_WidgetInsertTextSetting.h"
 
+#include "Application.h"
 #include "Settings/TextInsertionSettings.h"
 #include "StringBuilder/InsertString.h"
 
@@ -29,7 +30,7 @@ WidgetInsertTextSetting::WidgetInsertTextSetting(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    loadSettings();
+    loadSettings(Application::mainQSettings());
 
     connect(ui->widgetPositionFixer, &WidgetPositionFixer::changeStarted
           , this, &AbstractStringBuilderWidget::changeStarted);
@@ -49,22 +50,22 @@ QSharedPointer<StringBuilder::AbstractStringBuilder> WidgetInsertTextSetting::St
                 ui->widgetPositionFixer->value(), ui->lineEdit->text());
 }
 
-void WidgetInsertTextSetting::loadSettings()
+void WidgetInsertTextSetting::loadSettings(QSharedPointer<QSettings> qSettings)
 {
     TextInsertionSettings settings;
 
-    settings.read();
+    settings.read(qSettings);
 
     ui->lineEdit->setText(settings.text());
     ui->widgetPositionFixer->setValue(settings.position());
 }
 
-void WidgetInsertTextSetting::saveSettings() const
+void WidgetInsertTextSetting::saveSettings(QSharedPointer<QSettings> qSettings) const
 {
     TextInsertionSettings settings;
 
     settings.setValue(TextInsertionSettings::textEntry, ui->lineEdit->text());
     settings.setValue(TextInsertionSettings::positionEntry, ui->widgetPositionFixer->value());
 
-    settings.write();
+    settings.write(qSettings);
 }

@@ -20,11 +20,14 @@
 #include "MainWindow.h"
 #include "ui_MainWindow.h"
 
+#include "Application.h"
 #include "PathsAnalyzer.h"
 #include "Path/PathHeaderView.h"
 #include "Path/PathModel.h"
 #include "SearchInDirs.h"
 #include "widgets/DialogDroppedDir.h"
+#include "widgets/DialogLoadRenameSettings.h"
+#include "widgets/DialogSaveRenameSettings.h"
 
 #include <QDropEvent>
 #include <QMimeData>
@@ -92,8 +95,13 @@ void MainWindow::closeEvent(QCloseEvent *event)
 {
     event->setAccepted(ui->actionExit->isEnabled());
 
-    if (event->isAccepted())
-        ui->formStringBuilderChain->saveCurrentBuilderSettings();
+    if (!event->isAccepted())
+        return;
+
+    auto qSettings = QSharedPointer<QSettings>::create(
+                         Application::mainSettingsFilePath(), QSettings::IniFormat);
+
+    ui->formStringBuilderChain->saveCurrentBuilderSettings(qSettings);
 }
 
 void MainWindow::dragEnterEvent(QDragEnterEvent *event)
@@ -236,3 +244,32 @@ void MainWindow::registerPaths(const QStringList &paths)
 
     m_pathModel->addPaths(searchInDirs.dirs(), searchInDirs.files());
 }
+
+void MainWindow::onButtonLoadSettingsClicked()
+{
+    DialogLoadRenameSettings dlg(this);
+
+    if (dlg.exec() != QDialog::Accepted)
+        return;
+
+    auto qSettings = QSharedPointer<QSettings>::create(dlg.settingFullPath(), QSettings::IniFormat);
+
+    ui->formStringBuilderChain->loadBuilderSettings(qSettings);
+}
+
+void MainWindow::onButtonSaveSettingsClicked()
+{
+    DialogSaveRenameSettings dlg(this);
+
+    if (dlg.exec() != QDialog::Accepted)
+        return;
+
+    const QString newSettingPath = dlg.newSettingFullpath();
+
+    auto qSettings = QSharedPointer<QSettings>::create(newSettingPath, QSettings::IniFormat);
+
+    qSettings->clear();
+
+    ui->formStringBuilderChain->saveCurrentBuilderSettings(qSettings);
+}
+

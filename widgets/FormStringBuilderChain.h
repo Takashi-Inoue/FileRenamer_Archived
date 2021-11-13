@@ -24,6 +24,7 @@
 
 #include "StringBuilderOnFile/BuilderChainOnFile.h"
 
+class QSettings;
 class QTimer;
 
 namespace Ui {
@@ -39,7 +40,8 @@ public:
     ~FormStringBuilderChain() override;
 
     QSharedPointer<StringBuilderOnFile::BuilderChainOnFile> builderChain() const;
-    void saveCurrentBuilderSettings() const;
+    void loadBuilderSettings(QSharedPointer<QSettings>);
+    void saveCurrentBuilderSettings(QSharedPointer<QSettings>) const;
 
 signals:
     void builderCleared();

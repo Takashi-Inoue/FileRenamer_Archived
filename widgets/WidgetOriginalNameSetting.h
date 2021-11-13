@@ -29,8 +29,8 @@ public:
     explicit WidgetOriginalNameSetting(QWidget *parent = nullptr);
 
     QSharedPointer<StringBuilder::AbstractStringBuilder> StringBuilder() const override;
-    void loadSettings() override;
-    void saveSettings() const override;
+    void loadSettings(QSharedPointer<QSettings>) override;
+    void saveSettings(QSharedPointer<QSettings>) const override;
 };
 
 #endif // WIDGETORIGINALNAMESETTING_H
