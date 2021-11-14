@@ -39,8 +39,10 @@ public:
     QString completeBaseName() const override;
     QString suffix() const override;
     QString hashHex(QCryptographicHash::Algorithm algorithm) const override;
+    QString imageHash() const override;
 
     void setHashHex(QCryptographicHash::Algorithm algorithm, QString hashHex) override;
+    void setImageHash(QString) override;
 
 private:
     QSharedPointer<PathEntity> m_entity;

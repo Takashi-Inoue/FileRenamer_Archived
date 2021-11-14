@@ -14,6 +14,7 @@ SOURCES += \
     ApplicationLog/ApplicationLog.cpp \
     ApplicationLog/DebugLog.cpp \
     ApplicationLog/LogData.cpp \
+    ImageHash/ImageHashCalculator.cpp \
     Path/ParentDir.cpp \
     Path/PathEntity.cpp \
     Path/PathEntityInfo.cpp \
@@ -25,6 +26,7 @@ SOURCES += \
     SearchInDirs.cpp \
     Settings/BuilderChainSettings.cpp \
     Settings/CryptographicHashSettings.cpp \
+    Settings/ImageHashSettings.cpp \
     Settings/NumberSettings.cpp \
     Settings/OriginalNameSettings.cpp \
     Settings/SearchSettings.cpp \
@@ -37,6 +39,7 @@ SOURCES += \
     StringBuilder/ReplaceString.cpp \
     StringBuilderOnFile/BuilderChainOnFile.cpp \
     StringBuilderOnFile/CryptographicHash.cpp \
+    StringBuilderOnFile/ImageHash.cpp \
     StringBuilderOnFile/OriginalName.cpp \
     ThreadCreateNewNames.cpp \
     ThreadRename.cpp \
@@ -51,6 +54,7 @@ SOURCES += \
     widgets/SavedSettingsListWidget.cpp \
     widgets/WidgetApplicationLogs.cpp \
     widgets/WidgetFileHashSetting.cpp \
+    widgets/WidgetImageHashSetting.cpp \
     widgets/WidgetInsertTextSetting.cpp \
     widgets/WidgetNumberSetting.cpp \
     widgets/WidgetOnlyPositionFixer.cpp \
@@ -64,6 +68,7 @@ HEADERS += \
     ApplicationLog/ApplicationLog.h \
     ApplicationLog/DebugLog.h \
     ApplicationLog/LogData.h \
+    ImageHash/ImageHashCalculator.h \
     MainWindow.h \
     Path/ParentDir.h \
     Path/PathEntity.h \
@@ -76,6 +81,7 @@ HEADERS += \
     SearchInDirs.h \
     Settings/BuilderChainSettings.h \
     Settings/CryptographicHashSettings.h \
+    Settings/ImageHashSettings.h \
     Settings/NumberSettings.h \
     Settings/OriginalNameSettings.h \
     Settings/SearchSettings.h \
@@ -92,6 +98,7 @@ HEADERS += \
     StringBuilderOnFile/BuilderChainOnFile.h \
     StringBuilderOnFile/CryptographicHash.h \
     StringBuilderOnFile/IFileInfo.h \
+    StringBuilderOnFile/ImageHash.h \
     StringBuilderOnFile/OriginalName.h \
     ThreadCreateNewNames.h \
     ThreadRename.h \
@@ -105,6 +112,7 @@ HEADERS += \
     widgets/SavedSettingsListWidget.h \
     widgets/WidgetApplicationLogs.h \
     widgets/WidgetFileHashSetting.h \
+    widgets/WidgetImageHashSetting.h \
     widgets/WidgetInsertTextSetting.h \
     widgets/WidgetNumberSetting.h \
     widgets/WidgetOnlyPositionFixer.h \
@@ -135,7 +143,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 RESOURCES += \
     images.qrc
 
-VERSION = 1.1.0.0
+VERSION = 1.2.0.0
 RC_ICONS = res/images/filerenamer.ico
 QMAKE_TARGET_PRODUCT = FileRenamer
 QMAKE_TARGET_COPYRIGHT = "Copyright 2020-2021 Takashi Inoue"

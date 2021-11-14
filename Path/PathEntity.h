@@ -48,8 +48,10 @@ public:
     QWeakPointer<ParentDir> parent() const;
 
     QString hashHex(QCryptographicHash::Algorithm algorithm) const;
+    QString imageHash() const;
 
     void setHashHex(QCryptographicHash::Algorithm algorithm, QStringView hashHex);
+    void setImageHash(QStringView imageHash);
     void setNewName(QStringView newName);
 
     bool checkForNewNameCollisions(QSharedPointer<PathEntity> other);
@@ -79,6 +81,7 @@ private:
     QString m_name;
     QString m_newName;
     QHash<QCryptographicHash::Algorithm, QString> m_fileHashs;
+    QString m_imageHash;
 };
 
 } // namespace Path

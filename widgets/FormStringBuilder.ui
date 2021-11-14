@@ -64,6 +64,11 @@
          <string>Cryptographic Hash</string>
         </property>
        </item>
+       <item>
+        <property name="text">
+         <string>Image Hash (Perceptual dHash)</string>
+        </property>
+       </item>
       </widget>
      </item>
      <item>
@@ -87,13 +92,14 @@
    <item>
     <widget class="QStackedWidget" name="stackedWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>4</number>
      </property>
      <widget class="WidgetOriginalNameSetting" name="page"/>
      <widget class="WidgetNumberSetting" name="page_2"/>
      <widget class="WidgetReplaceSetting" name="page_3"/>
      <widget class="WidgetInsertTextSetting" name="page_4"/>
      <widget class="WidgetFileHashSetting" name="page_5"/>
+     <widget class="WidgetImageHashSetting" name="page_6"/>
     </widget>
    </item>
   </layout>
@@ -127,6 +133,12 @@
    <class>WidgetFileHashSetting</class>
    <extends>QWidget</extends>
    <header>widgets/WidgetFileHashSetting.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>WidgetImageHashSetting</class>
+   <extends>QWidget</extends>
+   <header>widgets/WidgetImageHashSetting.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

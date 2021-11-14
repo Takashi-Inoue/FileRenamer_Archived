@@ -93,21 +93,21 @@ bool ThreadCreateNewNames::checkNewNames(HashToCheckEntities &hashToCheckNames)
 
     bool isOk = true;
 
-    for (QList<EntityToIndex> &entityToIndexList : hashToCheckNames.values()) {
-        std::sort(entityToIndexList.begin(), entityToIndexList.end()
+    for (auto itr = hashToCheckNames.begin(); itr != hashToCheckNames.end(); ++itr) {
+        std::sort(itr->begin(), itr->end()
                 , [](const EntityToIndex &lhs, const EntityToIndex &rhs)
         {
             return lhs.first->newName() < rhs.first->newName();
         });
 
-        const qsizetype count = entityToIndexList.size();
+        const qsizetype count = itr->size();
 
         if (count == 1)
-            entityToIndexList[0].first->notNeedToCheckNewName();
+            itr->first().first->notNeedToCheckNewName();
 
         for (qsizetype i = 0; i < count - 1; ++i) {
-            EntityToIndex &lhs = entityToIndexList[i];
-            EntityToIndex &rhs = entityToIndexList[i + 1];
+            const EntityToIndex &lhs = itr->at(i);
+            const EntityToIndex &rhs = itr->at(i + 1);
 
             if (!lhs.first->checkForNewNameCollisions(rhs.first)) {
                 isOk = false;

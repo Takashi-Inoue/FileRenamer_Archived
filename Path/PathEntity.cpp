@@ -86,9 +86,19 @@ QString PathEntity::hashHex(QCryptographicHash::Algorithm algorithm) const
     return m_fileHashs[algorithm];
 }
 
+QString PathEntity::imageHash() const
+{
+    return m_imageHash;
+}
+
 void PathEntity::setHashHex(QCryptographicHash::Algorithm algorithm, QStringView hashHex)
 {
     m_fileHashs[algorithm] = hashHex.toString();
+}
+
+void PathEntity::setImageHash(QStringView imageHash)
+{
+    m_imageHash = imageHash.toString();
 }
 
 void PathEntity::setNewName(QStringView newName)

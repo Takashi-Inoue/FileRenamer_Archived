@@ -17,32 +17,21 @@
  * along with FileRenamer.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef IFILEINFO_H
-#define IFILEINFO_H
+#ifndef IMAGEHASHSETTINGS_H
+#define IMAGEHASHSETTINGS_H
 
-#include <QCryptographicHash>
-#include <QString>
+#include "AbstractSettings.h"
 
-namespace StringBuilderOnFile {
-
-class IFileInfo
+class ImageHashSettings : public AbstractSettings
 {
 public:
-    IFileInfo() = default;
-    virtual ~IFileInfo() = default;
+    enum Entry {
+        positionEntry
+    };
 
-    virtual bool isDir() const = 0;
-    virtual QString fullPath() const = 0;
-    virtual QString fileName() const = 0;
-    virtual QString completeBaseName() const = 0;
-    virtual QString suffix() const = 0;
-    virtual QString hashHex(QCryptographicHash::Algorithm algorithm) const = 0;
-    virtual QString imageHash() const = 0;
+    ImageHashSettings();
 
-    virtual void setHashHex(QCryptographicHash::Algorithm algorithm, QString hashHex) = 0;
-    virtual void setImageHash(QString) = 0;
+    int position() const;
 };
 
-} // namespace StringBuilderOnFile
-
-#endif // IFILEINFO_H
+#endif // IMAGEHASHSETTINGS_H

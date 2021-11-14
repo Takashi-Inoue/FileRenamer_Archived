@@ -62,9 +62,19 @@ QString PathEntityInfo::hashHex(QCryptographicHash::Algorithm algorithm) const
     return m_entity->hashHex(algorithm);
 }
 
+QString PathEntityInfo::imageHash() const
+{
+    return m_entity->imageHash();
+}
+
 void PathEntityInfo::setHashHex(QCryptographicHash::Algorithm algorithm, QString hashHex)
 {
     m_entity->setHashHex(algorithm, hashHex);
+}
+
+void PathEntityInfo::setImageHash(QString imageHash)
+{
+    m_entity->setImageHash(imageHash);
 }
 
 } // namespace Path

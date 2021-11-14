@@ -17,32 +17,29 @@
  * along with FileRenamer.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef IFILEINFO_H
-#define IFILEINFO_H
+#include "ImageHash.h"
+#include "IFileInfo.h"
+#include "ImageHash/ImageHashCalculator.h"
 
-#include <QCryptographicHash>
-#include <QString>
+#include <QFile>
 
 namespace StringBuilderOnFile {
 
-class IFileInfo
+void ImageHash::build(QString &result)
 {
-public:
-    IFileInfo() = default;
-    virtual ~IFileInfo() = default;
+    emit needFileInfo(this);
 
-    virtual bool isDir() const = 0;
-    virtual QString fullPath() const = 0;
-    virtual QString fileName() const = 0;
-    virtual QString completeBaseName() const = 0;
-    virtual QString suffix() const = 0;
-    virtual QString hashHex(QCryptographicHash::Algorithm algorithm) const = 0;
-    virtual QString imageHash() const = 0;
+    QString imageHashString = m_fileInfo->imageHash();
 
-    virtual void setHashHex(QCryptographicHash::Algorithm algorithm, QString hashHex) = 0;
-    virtual void setImageHash(QString) = 0;
-};
+    if (imageHashString.isEmpty()) {
+        ImageHashCalculator imageHash(m_fileInfo->fullPath());
+
+        imageHashString = imageHash.resultString();
+
+        m_fileInfo->setImageHash(imageHashString);
+    }
+
+    result.insert(posToInsert(result.size()), imageHashString);
+}
 
 } // namespace StringBuilderOnFile
-
-#endif // IFILEINFO_H
