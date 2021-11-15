@@ -6,9 +6,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>880</width>
-    <height>620</height>
+    <width>1024</width>
+    <height>720</height>
    </rect>
+  </property>
+  <property name="focusPolicy">
+   <enum>Qt::StrongFocus</enum>
   </property>
   <property name="acceptDrops">
    <bool>true</bool>
@@ -94,8 +97,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>477</width>
-             <height>475</height>
+             <width>550</width>
+             <height>577</height>
             </rect>
            </property>
           </widget>

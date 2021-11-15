@@ -47,16 +47,16 @@ public:
     void saveCurrentBuilderSettings(QSharedPointer<QSettings>) const;
 
 signals:
+    void requestUp();
+    void requestDown();
     void changeStarted();
 
 protected:
-    void enterEvent(QEnterEvent *event) override;
-    void leaveEvent(QEvent *event) override;
-    void resizeEvent(QResizeEvent *event) override;
+//    void enterEvent(QEnterEvent *event) override;
+//    void leaveEvent(QEvent *event) override;
 
 private:
     Ui::FormStringBuilder *ui;
-    QPushButton *m_buttonClose;
 };
 
 #endif // FORMSTRINGBUILDER_H

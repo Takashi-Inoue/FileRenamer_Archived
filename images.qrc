@@ -19,5 +19,7 @@
         <file>res/images/clear.svg</file>
         <file>res/images/load.svg</file>
         <file>res/images/save.svg</file>
+        <file>res/images/up.png</file>
+        <file>res/images/down.png</file>
     </qresource>
 </RCC>

@@ -28,29 +28,18 @@
 FormStringBuilder::FormStringBuilder(QWidget *parent)
     : QFrame(parent)
     , ui(new Ui::FormStringBuilder)
-    , m_buttonClose(new QPushButton(QIcon(":/res/images/x.svg"), QString(), this))
 {
     ui->setupUi(this);
 
-    m_buttonClose->setVisible(false);
-    m_buttonClose->raise();
-    m_buttonClose->setToolTip(QStringLiteral("Remove this (Ctrl+Shift+Del)"));
-    m_buttonClose->setIconSize({12, 12});
-    m_buttonClose->resize(20, 20);
-
-    auto action = new QAction(QStringLiteral("Remove this"), this);
-    action->setShortcutContext(Qt::WidgetWithChildrenShortcut);
-    action->setShortcut(QKeySequence(QStringLiteral("Ctrl+Shift+Delete")));
-
-    addAction(action);
-
-    connect(action, &QAction::triggered, this, &QWidget::close);
-    connect(m_buttonClose, &QPushButton::clicked, action, &QAction::trigger);
+//    ui->widgetButtons->setVisible(false);
 
     for (auto widget : findChildren<AbstractStringBuilderWidget *>()) {
         connect(widget, &AbstractStringBuilderWidget::changeStarted
               , this, &FormStringBuilder::changeStarted);
     }
+
+    connect(ui->buttonDown, &QPushButton::clicked, this, &FormStringBuilder::requestDown);
+    connect(ui->buttonUp,   &QPushButton::clicked, this, &FormStringBuilder::requestUp);
 
     connect(ui->comboBoxBuilders, &QComboBox::currentIndexChanged
           , this, &FormStringBuilder::changeStarted);
@@ -96,17 +85,16 @@ void FormStringBuilder::saveCurrentBuilderSettings(QSharedPointer<QSettings> qSe
         widget->saveSettings(qSettings);
 }
 
-void FormStringBuilder::enterEvent(QEnterEvent *)
-{
-    m_buttonClose->setVisible(true);
-}
+//void FormStringBuilder::enterEvent(QEnterEvent *event)
+//{
+//    ui->widgetButtons->setVisible(true);
 
-void FormStringBuilder::leaveEvent(QEvent *)
-{
-    m_buttonClose->setVisible(false);
-}
+//    QFrame::enterEvent(event);
+//}
 
-void FormStringBuilder::resizeEvent(QResizeEvent *event)
-{
-    m_buttonClose->move(event->size().width() - 4 - 20, 2);
-}
+//void FormStringBuilder::leaveEvent(QEvent *event)
+//{
+//    ui->widgetButtons->setVisible(false);
+
+//    QFrame::leaveEvent(event);
+//}

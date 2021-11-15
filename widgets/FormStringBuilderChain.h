@@ -53,6 +53,8 @@ public slots:
 
 private slots:
     void startTimer();
+    void onBuilderRequestedDown();
+    void onBuilderRequestedUp();
 
 private:
     Ui::FormStringBuilderChain *ui;

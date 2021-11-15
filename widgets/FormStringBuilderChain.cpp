@@ -130,7 +130,9 @@ void FormStringBuilderChain::createNewSetting(int builderIndex)
     widget->setAttribute(Qt::WA_DeleteOnClose, true);
 
     connect(widget, &FormStringBuilder::changeStarted, this, &FormStringBuilderChain::startTimer);
-    connect(widget, &FormStringBuilder::destroyed,     this, &FormStringBuilderChain::startTimer);
+    connect(widget, &FormStringBuilder::destroyed, this, &FormStringBuilderChain::startTimer);
+    connect(widget, &FormStringBuilder::requestDown, this, &FormStringBuilderChain::onBuilderRequestedDown);
+    connect(widget, &FormStringBuilder::requestUp, this, &FormStringBuilderChain::onBuilderRequestedUp);
 
     ui->vLayout->insertWidget(ui->vLayout->count() - 2, widget);
 
@@ -144,4 +146,30 @@ void FormStringBuilderChain::startTimer()
 
     m_timer->start();
     emit changeStarted();
+}
+
+void FormStringBuilderChain::onBuilderRequestedDown()
+{
+    QWidget *widget = qobject_cast<QWidget *>(sender());
+
+    int layoutIndex = ui->vLayout->indexOf(widget);
+
+    if (layoutIndex >= ui->vLayout->count() - 3)
+        return;
+
+    ui->vLayout->removeWidget(widget);
+    ui->vLayout->insertWidget(layoutIndex + 1, widget);
+}
+
+void FormStringBuilderChain::onBuilderRequestedUp()
+{
+    QWidget *widget = qobject_cast<QWidget *>(sender());
+
+    int layoutIndex = ui->vLayout->indexOf(widget);
+
+    if (layoutIndex == 0)
+        return;
+
+    ui->vLayout->removeWidget(widget);
+    ui->vLayout->insertWidget(layoutIndex - 1, widget);
 }
