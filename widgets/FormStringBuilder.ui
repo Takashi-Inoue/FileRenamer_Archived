@@ -276,21 +276,5 @@
     </hint>
    </hints>
   </connection>
-  <connection>
-   <sender>buttonRemove</sender>
-   <signal>clicked()</signal>
-   <receiver>FormStringBuilder</receiver>
-   <slot>close()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>441</x>
-     <y>21</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>232</x>
-     <y>124</y>
-    </hint>
-   </hints>
-  </connection>
  </connections>
 </ui>

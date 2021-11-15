@@ -47,6 +47,7 @@ signals:
     void builderCleared();
     void changeStarted();
     void settingsChanged(QSharedPointer<StringBuilderOnFile::BuilderChainOnFile>);
+    void settingsIndicesChanged();
 
 public slots:
     void createNewSetting(int builderIndex = 0);
@@ -55,8 +56,12 @@ private slots:
     void startTimer();
     void onBuilderRequestedDown();
     void onBuilderRequestedUp();
+    void onBuilderRequestedRemove();
+    void onSettingsIndicesChanged();
 
 private:
+    int settingsCount() const;
+
     Ui::FormStringBuilderChain *ui;
     QTimer *m_timer;
 };

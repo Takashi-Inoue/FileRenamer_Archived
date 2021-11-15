@@ -20,6 +20,8 @@
 #include "FormStringBuilder.h"
 #include "ui_FormStringBuilder.h"
 
+#include "widgets/WidgetPositionFixer.h"
+
 #include <QAction>
 #include <QPushButton>
 #include <QResizeEvent>
@@ -37,6 +39,9 @@ FormStringBuilder::FormStringBuilder(QWidget *parent)
         connect(widget, &AbstractStringBuilderWidget::changeStarted
               , this, &FormStringBuilder::changeStarted);
     }
+
+    connect(ui->buttonRemove, &QPushButton::clicked, this, &FormStringBuilder::requestRemove);
+    connect(ui->buttonRemove, &QPushButton::clicked, this, &FormStringBuilder::close);
 
     connect(ui->buttonDown, &QPushButton::clicked, this, &FormStringBuilder::requestDown);
     connect(ui->buttonUp,   &QPushButton::clicked, this, &FormStringBuilder::requestUp);
@@ -85,6 +90,18 @@ void FormStringBuilder::saveCurrentBuilderSettings(QSharedPointer<QSettings> qSe
         widget->saveSettings(qSettings);
 }
 
+void FormStringBuilder::notifySettingIndexChanged(int index, int settingsCount)
+{
+    ui->buttonDown->setEnabled(index < settingsCount - 1);
+    ui->buttonUp->setEnabled(index != 0);
+
+    auto widget = qobject_cast<AbstractStringBuilderWidget *>(ui->stackedWidget->currentWidget());
+    auto positionFixer = widget->findChild<WidgetPositionFixer *>();
+
+    if (positionFixer != nullptr)
+        positionFixer->setEnabled(index != 0);
+}
+
 //void FormStringBuilder::enterEvent(QEnterEvent *event)
 //{
 //    ui->widgetButtons->setVisible(true);
@@ -97,4 +114,13 @@ void FormStringBuilder::saveCurrentBuilderSettings(QSharedPointer<QSettings> qSe
 //    ui->widgetButtons->setVisible(false);
 
 //    QFrame::leaveEvent(event);
+//}
+
+//void FormStringBuilder::moveEvent(QMoveEvent *event)
+//{
+//    QPoint cursorPos = mapToParent(mapFromGlobal(QCursor::pos()));
+
+//    ui->widgetButtons->setVisible(geometry().contains(cursorPos));
+
+//    QFrame::moveEvent(event);
 //}

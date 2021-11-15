@@ -41,19 +41,25 @@ public:
     ~FormStringBuilder() override;
 
     QSharedPointer<StringBuilder::AbstractStringBuilder> stringBuilder() const;
+
     int currentBuilderIndex() const;
     void setCurrentBuilderIndex(int index);
+
     void loadBuilderSettings(QSharedPointer<QSettings>);
     void saveCurrentBuilderSettings(QSharedPointer<QSettings>) const;
+
+    void notifySettingIndexChanged(int index, int settingsCount);
 
 signals:
     void requestUp();
     void requestDown();
+    void requestRemove();
     void changeStarted();
 
 protected:
 //    void enterEvent(QEnterEvent *event) override;
 //    void leaveEvent(QEvent *event) override;
+//    void moveEvent(QMoveEvent *event) override;
 
 private:
     Ui::FormStringBuilder *ui;

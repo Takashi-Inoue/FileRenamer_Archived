@@ -36,6 +36,9 @@ FormStringBuilderChain::FormStringBuilderChain(QWidget *parent)
     m_timer->setSingleShot(true);
     m_timer->setInterval(QApplication::keyboardInputInterval());
 
+    connect(this, &FormStringBuilderChain::settingsIndicesChanged
+          , this, &FormStringBuilderChain::onSettingsIndicesChanged);
+
     BuilderChainSettings settings;
 
     settings.read(Application::mainQSettings());
@@ -133,8 +136,13 @@ void FormStringBuilderChain::createNewSetting(int builderIndex)
     connect(widget, &FormStringBuilder::destroyed, this, &FormStringBuilderChain::startTimer);
     connect(widget, &FormStringBuilder::requestDown, this, &FormStringBuilderChain::onBuilderRequestedDown);
     connect(widget, &FormStringBuilder::requestUp, this, &FormStringBuilderChain::onBuilderRequestedUp);
+    connect(widget, &FormStringBuilder::requestRemove, this, &FormStringBuilderChain::onBuilderRequestedRemove);
 
-    ui->vLayout->insertWidget(ui->vLayout->count() - 2, widget);
+    int settingCount = settingsCount();
+
+    ui->vLayout->insertWidget(settingCount, widget);
+
+    emit settingsIndicesChanged();
 
     startTimer();
 }
@@ -159,6 +167,8 @@ void FormStringBuilderChain::onBuilderRequestedDown()
 
     ui->vLayout->removeWidget(widget);
     ui->vLayout->insertWidget(layoutIndex + 1, widget);
+
+    emit settingsIndicesChanged();
 }
 
 void FormStringBuilderChain::onBuilderRequestedUp()
@@ -172,4 +182,34 @@ void FormStringBuilderChain::onBuilderRequestedUp()
 
     ui->vLayout->removeWidget(widget);
     ui->vLayout->insertWidget(layoutIndex - 1, widget);
+
+    emit settingsIndicesChanged();
+}
+
+void FormStringBuilderChain::onBuilderRequestedRemove()
+{
+    auto widget = qobject_cast<QWidget *>(sender());
+
+    if (widget != nullptr)
+        ui->vLayout->removeWidget(widget);
+
+    emit settingsIndicesChanged();
+}
+
+void FormStringBuilderChain::onSettingsIndicesChanged()
+{
+    for (int i = 0, count = settingsCount(); i < count; ++i) {
+        QLayoutItem *item = ui->vLayout->itemAt(i);
+        auto widget = qobject_cast<FormStringBuilder *>(item->widget());
+
+        if (widget != nullptr)
+            widget->notifySettingIndexChanged(i, count);
+    }
+
+    startTimer();
+}
+
+int FormStringBuilderChain::settingsCount() const
+{
+    return ui->vLayout->count() - 2; // vLayout has "Plus" button and Spacer item.
 }
