@@ -41,10 +41,15 @@ signals:
     void changeStarted();
 
 private slots:
-    void on_pushButtonHead_clicked();
-    void on_pushButtonTail_clicked();
+    void onPushButtonClicked(bool);
 
 private:
+    enum PositionAlignment : int {
+        Leftmost, Rightmost, Specified
+    };
+
+    void setAlignmentUI(PositionAlignment alignment);
+
     Ui::WidgetPositionFixer *ui;
 };
 

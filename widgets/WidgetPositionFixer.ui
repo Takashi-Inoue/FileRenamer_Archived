@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>148</width>
+    <width>282</width>
     <height>35</height>
    </rect>
   </property>
@@ -22,7 +22,7 @@
   <property name="frameShadow">
    <enum>QFrame::Raised</enum>
   </property>
-  <layout class="QHBoxLayout" name="horizontalLayout">
+  <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,1,0,2,0">
    <property name="leftMargin">
     <number>4</number>
    </property>
@@ -54,61 +54,138 @@
     </widget>
    </item>
    <item>
-    <widget class="QPushButton" name="pushButtonHead">
+    <widget class="QPushButton" name="buttonLeftmost">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
-     <property name="maximumSize">
+     <property name="minimumSize">
       <size>
-       <width>16</width>
-       <height>16777215</height>
+       <width>24</width>
+       <height>0</height>
       </size>
      </property>
      <property name="toolTip">
-      <string>Set position to head.</string>
+      <string>Set position to leftmost.</string>
+     </property>
+     <property name="icon">
+      <iconset resource="../images.qrc">
+       <normaloff>:/res/images/leftmost.svg</normaloff>:/res/images/leftmost.svg</iconset>
+     </property>
+     <property name="checkable">
+      <bool>true</bool>
+     </property>
+     <property name="autoExclusive">
+      <bool>false</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="labelDisplay">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::Box</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Sunken</enum>
      </property>
      <property name="text">
-      <string>&lt;</string>
+      <string/>
      </property>
     </widget>
    </item>
    <item>
     <widget class="QSpinBox" name="spinBox">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="minimum">
-      <number>-99</number>
+      <number>-255</number>
      </property>
      <property name="maximum">
-      <number>99</number>
+      <number>255</number>
      </property>
     </widget>
    </item>
    <item>
-    <widget class="QPushButton" name="pushButtonTail">
+    <widget class="QPushButton" name="buttonRightmost">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
-     <property name="maximumSize">
+     <property name="minimumSize">
       <size>
-       <width>16</width>
-       <height>16777215</height>
+       <width>24</width>
+       <height>0</height>
       </size>
      </property>
      <property name="toolTip">
-      <string>Set position to tail.</string>
+      <string>Set position to rightmost.</string>
      </property>
-     <property name="text">
-      <string>&gt;</string>
+     <property name="icon">
+      <iconset resource="../images.qrc">
+       <normaloff>:/res/images/rightmost.svg</normaloff>:/res/images/rightmost.svg</iconset>
+     </property>
+     <property name="checkable">
+      <bool>true</bool>
+     </property>
+     <property name="autoExclusive">
+      <bool>false</bool>
      </property>
     </widget>
    </item>
   </layout>
  </widget>
- <resources/>
- <connections/>
+ <resources>
+  <include location="../images.qrc"/>
+ </resources>
+ <connections>
+  <connection>
+   <sender>buttonLeftmost</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>WidgetPositionFixer</receiver>
+   <slot>onPushButtonClicked(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>65</x>
+     <y>16</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>76</x>
+     <y>17</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonRightmost</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>WidgetPositionFixer</receiver>
+   <slot>onPushButtonClicked(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>139</x>
+     <y>16</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>76</x>
+     <y>17</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>onPushButtonClicked(bool)</slot>
+ </slots>
 </ui>

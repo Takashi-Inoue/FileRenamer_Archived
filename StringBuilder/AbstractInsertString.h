@@ -38,12 +38,14 @@ public:
 protected:
     qsizetype posToInsert(qsizetype targetLength)
     {
-        qsizetype pos = qMin<qsizetype>(m_pos, targetLength);
+        if (m_pos == INT_MIN)
+            return 0;
 
-        if (m_pos < 0)
-            pos = qMax<qsizetype>(0, targetLength + m_pos);
+        if (m_pos == INT_MAX)
+            return targetLength;
 
-        return pos;
+        return (m_pos < 0) ? qMax<qsizetype>(0, targetLength + m_pos)
+                           : qMin<qsizetype>(m_pos, targetLength);
     }
 
     const int m_pos;

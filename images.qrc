@@ -21,5 +21,7 @@
         <file>res/images/save.svg</file>
         <file>res/images/up.png</file>
         <file>res/images/down.png</file>
+        <file>res/images/leftmost.svg</file>
+        <file>res/images/rightmost.svg</file>
     </qresource>
 </RCC>

@@ -28,6 +28,8 @@ WidgetPositionFixer::WidgetPositionFixer(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    ui->labelDisplay->setVisible(false);
+
     connect(ui->spinBox, &QSpinBox::valueChanged, this, &WidgetPositionFixer::changeStarted);
 }
 
@@ -38,20 +40,61 @@ WidgetPositionFixer::~WidgetPositionFixer()
 
 void WidgetPositionFixer::setValue(int value)
 {
-    ui->spinBox->setValue(value);
+    if (value < ui->spinBox->minimum()) {
+        setAlignmentUI(PositionAlignment::Leftmost);
+    } else if (value > ui->spinBox->maximum()) {
+        setAlignmentUI(PositionAlignment::Rightmost);
+    } else {
+        setAlignmentUI(PositionAlignment::Specified);
+        ui->spinBox->setValue(value);
+    }
 }
 
 int WidgetPositionFixer::value() const
 {
+    if (ui->buttonLeftmost->isChecked())
+        return INT_MIN;
+
+    if (ui->buttonRightmost->isChecked())
+        return INT_MAX;
+
     return ui->spinBox->value();
 }
 
-void WidgetPositionFixer::on_pushButtonHead_clicked()
+void WidgetPositionFixer::onPushButtonClicked(bool checked)
 {
-    ui->spinBox->setValue(0);
+    if (checked) {
+        PositionAlignment alignment = sender() == ui->buttonLeftmost ? PositionAlignment::Leftmost
+                                                                     : PositionAlignment::Rightmost;
+        setAlignmentUI(alignment);
+    } else {
+        setAlignmentUI(PositionAlignment::Specified);
+    }
+
+    emit changeStarted();
 }
 
-void WidgetPositionFixer::on_pushButtonTail_clicked()
+void WidgetPositionFixer::setAlignmentUI(PositionAlignment alignment)
 {
-    ui->spinBox->setValue(ui->spinBox->maximum());
+    QHash<PositionAlignment, QList<bool>> uiSettings = {
+        {PositionAlignment::Leftmost,  { true, false, false}}
+      , {PositionAlignment::Rightmost, {false,  true, false}}
+      , {PositionAlignment::Specified, {false, false,  true}}
+    }; // leftmost button, rightmost button, spinbox
+
+    ui->buttonLeftmost->setChecked(uiSettings[alignment][int(PositionAlignment::Leftmost)]);
+    ui->buttonRightmost->setChecked(uiSettings[alignment][int(PositionAlignment::Rightmost)]);
+    ui->spinBox->setVisible(uiSettings[alignment][int(PositionAlignment::Specified)]);
+    ui->labelDisplay->setVisible(ui->spinBox->isHidden());
+
+    if (alignment == PositionAlignment::Specified)
+        return;
+
+    QHash<PositionAlignment, QPair<QString, Qt::Alignment>> labelSettings = {
+        {PositionAlignment::Leftmost,  qMakePair(QStringLiteral("Leftmost"),  Qt::AlignLeft)}
+      , {PositionAlignment::Rightmost, qMakePair(QStringLiteral("Rightmost"), Qt::AlignRight)}
+    };
+
+    ui->labelDisplay->setAlignment(labelSettings[alignment].second | Qt::AlignVCenter);
+    ui->labelDisplay->setText(labelSettings[alignment].first);
 }
