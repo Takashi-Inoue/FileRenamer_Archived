@@ -87,14 +87,10 @@ QSharedPointer<StringBuilderOnFile::BuilderChainOnFile> FormStringBuilderChain::
 
 void FormStringBuilderChain::loadBuilderSettings(QSharedPointer<QSettings> qSettings)
 {
-    int count = ui->vLayout->count();
-
-    for (int i = 0; i < count; ++i) {
-        QLayoutItem *item = ui->vLayout->itemAt(i);
-        auto widget = qobject_cast<FormStringBuilder *>(item->widget());
-
-        if (widget != nullptr)
-            widget->close();
+    for (int i = 0, count = settingsCount(); i < count; ++i) {
+        QLayoutItem *layoutItem = ui->vLayout->takeAt(0);
+        layoutItem->widget()->close();
+        delete layoutItem;
     }
 
     BuilderChainSettings settings;

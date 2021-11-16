@@ -95,11 +95,15 @@ void FormStringBuilder::notifySettingIndexChanged(int index, int settingsCount)
     ui->buttonDown->setEnabled(index < settingsCount - 1);
     ui->buttonUp->setEnabled(index != 0);
 
-    auto widget = qobject_cast<AbstractStringBuilderWidget *>(ui->stackedWidget->currentWidget());
-    auto positionFixer = widget->findChild<WidgetPositionFixer *>();
+    for (int i = 0, count = ui->stackedWidget->count(); i < count; ++i) {
+        auto widget = qobject_cast<AbstractStringBuilderWidget *>(ui->stackedWidget->widget(i));
+        auto positionFixer = widget->findChild<WidgetPositionFixer *>();
 
-    if (positionFixer != nullptr)
-        positionFixer->setEnabled(index != 0);
+        if (positionFixer != nullptr)
+            positionFixer->setEnabled(index != 0);
+    }
+
+    qDebug() << index << settingsCount;
 }
 
 //void FormStringBuilder::enterEvent(QEnterEvent *event)
