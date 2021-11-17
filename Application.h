@@ -34,11 +34,19 @@ public:
     using QApplication::QApplication;
 
     static void applyDarkPalette();
+    static void applyDefaultPalette();
+    static bool isDarkMode();
+
+    static void loadMainSettings();
+    static void saveMainSettings();
 
     static QString mainSettingsFilePath();
     static QString renameSettingsDirPath();
 
     static QSharedPointer<QSettings> mainQSettings();
+
+private:
+    static constexpr char propertyDarkMode[] = "DarkMode";
 };
 
 #endif // APPLICATION_H

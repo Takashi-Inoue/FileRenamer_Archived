@@ -21,6 +21,7 @@
 
 #include <QFile>
 #include <QPalette>
+#include <QStyle>
 
 void Application::applyDarkPalette()
 {
@@ -36,6 +37,36 @@ void Application::applyDarkPalette()
     stream >> pal;
 
     QApplication::setPalette(pal);
+
+    instance()->setProperty(propertyDarkMode, true);
+}
+
+void Application::applyDefaultPalette()
+{
+    QApplication::setPalette(style()->standardPalette());
+    instance()->setProperty(propertyDarkMode, false);
+}
+
+bool Application::isDarkMode()
+{
+    return instance()->property(propertyDarkMode).toBool();
+}
+
+void Application::loadMainSettings()
+{
+    QSharedPointer<QSettings> qSettings = mainQSettings();
+
+    bool isDarkMode = qSettings->value(QStringLiteral("Main/DarkMode"), false).toBool();
+
+    isDarkMode ? applyDarkPalette()
+               : applyDefaultPalette();
+}
+
+void Application::saveMainSettings()
+{
+    QSharedPointer<QSettings> qSettings = mainQSettings();
+
+    qSettings->setValue(QStringLiteral("Main/DarkMode"), instance()->property(propertyDarkMode));
 }
 
 QString Application::mainSettingsFilePath()

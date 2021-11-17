@@ -49,6 +49,8 @@ MainWindow::MainWindow(QWidget *parent)
     ui->dockWidgetLogs->setVisible(false);
     ui->splitter->setSizes({350, 450});
 
+    ui->actionDarkMode->setChecked(Application::isDarkMode());
+
     setState(State::initial);
 
     QStringList paths = QApplication::arguments();
@@ -103,8 +105,11 @@ void MainWindow::closeEvent(QCloseEvent *event)
     if (!event->isAccepted())
         return;
 
-    auto qSettings = QSharedPointer<QSettings>::create(
-                         Application::mainSettingsFilePath(), QSettings::IniFormat);
+    QSharedPointer<QSettings> qSettings = Application::mainQSettings();
+
+    qSettings->beginGroup(settingsGroupName);
+    qSettings->setValue(settingsKeyDarkMode, ui->actionDarkMode->isChecked());
+    qSettings->endGroup();
 
     ui->formStringBuilderChain->saveCurrentBuilderSettings(qSettings);
 }
@@ -278,9 +283,9 @@ void MainWindow::onButtonSaveSettingsClicked()
     ui->formStringBuilderChain->saveCurrentBuilderSettings(qSettings);
 }
 
-void MainWindow::onActionDarkModeToggled(bool checked)
+void MainWindow::onActionDarkModeTriggered(bool checked)
 {
     checked ? Application::applyDarkPalette()
-            : Application::setPalette(style()->standardPalette());
+            : Application::applyDefaultPalette();
 }
 

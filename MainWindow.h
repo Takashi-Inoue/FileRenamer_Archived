@@ -50,7 +50,7 @@ private slots:
     void onButtonLoadSettingsClicked();
     void onButtonSaveSettingsClicked();
 
-    void onActionDarkModeToggled(bool checked);
+    void onActionDarkModeTriggered(bool checked);
 
 private:
     enum State : int {
@@ -63,5 +63,8 @@ private:
     Ui::MainWindow *ui;
 
     PathModel *m_pathModel;
+
+    static constexpr char settingsGroupName[] = "Main";
+    static constexpr char settingsKeyDarkMode[] = "DarkMode";
 };
 #endif // MAINWINDOW_H

@@ -23,7 +23,6 @@
 #include "ApplicationLog/DebugLog.h"
 
 #include <QApplication>
-#include <QFile>
 #include <QStyleFactory>
 
 int main(int argc, char *argv[])
@@ -31,6 +30,8 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
 
     QApplication::setStyle(QStyleFactory::create("Fusion"));
+
+    Application::loadMainSettings();
 
     QFont font = QApplication::font("QMenu");
     font.setPointSize(10);
@@ -46,6 +47,8 @@ int main(int argc, char *argv[])
     w.show();
 
     int result = a.exec();
+
+    Application::saveMainSettings();
 
     ApplicationLog::instance().writeFile();
     DebugLog::writeFile();
