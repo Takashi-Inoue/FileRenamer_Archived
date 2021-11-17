@@ -50,6 +50,8 @@ private slots:
     void onButtonLoadSettingsClicked();
     void onButtonSaveSettingsClicked();
 
+    void onActionDarkModeToggled(bool checked);
+
 private:
     enum State : int {
         initial, ready, renaming, stopped, finished

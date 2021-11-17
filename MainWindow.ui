@@ -180,6 +180,8 @@
    <addaction name="actionStop"/>
    <addaction name="actionUndo"/>
    <addaction name="actionExit"/>
+   <addaction name="separator"/>
+   <addaction name="actionDarkMode"/>
    <addaction name="actionClearItems"/>
    <addaction name="actionViewLogs"/>
   </widget>
@@ -195,7 +197,7 @@
   <action name="actionRename">
    <property name="icon">
     <iconset resource="images.qrc">
-     <normaloff>:/res/images/forward.png</normaloff>:/res/images/forward.png</iconset>
+     <normaloff>:/res/images/forward.svg</normaloff>:/res/images/forward.svg</iconset>
    </property>
    <property name="text">
     <string>Rename</string>
@@ -210,7 +212,7 @@
   <action name="actionStop">
    <property name="icon">
     <iconset resource="images.qrc">
-     <normaloff>:/res/images/stop.png</normaloff>:/res/images/stop.png</iconset>
+     <normaloff>:/res/images/stop.svg</normaloff>:/res/images/stop.svg</iconset>
    </property>
    <property name="text">
     <string>Stop</string>
@@ -225,7 +227,7 @@
   <action name="actionUndo">
    <property name="icon">
     <iconset resource="images.qrc">
-     <normaloff>:/res/images/backward.png</normaloff>:/res/images/backward.png</iconset>
+     <normaloff>:/res/images/backward.svg</normaloff>:/res/images/backward.svg</iconset>
    </property>
    <property name="text">
     <string>Undo</string>
@@ -240,7 +242,7 @@
   <action name="actionExit">
    <property name="icon">
     <iconset resource="images.qrc">
-     <normaloff>:/res/images/exit2.png</normaloff>:/res/images/exit2.png</iconset>
+     <normaloff>:/res/images/exit.svg</normaloff>:/res/images/exit.svg</iconset>
    </property>
    <property name="text">
     <string>Exit</string>
@@ -283,6 +285,21 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+K, Ctrl+Del</string>
+   </property>
+  </action>
+  <action name="actionDarkMode">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="images.qrc">
+     <normaloff>:/res/images/darkmode.svg</normaloff>:/res/images/darkmode.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Dark mode</string>
+   </property>
+   <property name="toolTip">
+    <string>Dark mode</string>
    </property>
   </action>
  </widget>
@@ -389,9 +406,26 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>actionDarkMode</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>onActionDarkModeToggled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>511</x>
+     <y>359</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>onButtonSaveSettingsClicked()</slot>
   <slot>onButtonLoadSettingsClicked()</slot>
+  <slot>onActionDarkModeToggled(bool)</slot>
  </slots>
 </ui>

@@ -33,6 +33,8 @@ class Application : public QApplication
 public:
     using QApplication::QApplication;
 
+    static void applyDarkPalette();
+
     static QString mainSettingsFilePath();
     static QString renameSettingsDirPath();
 

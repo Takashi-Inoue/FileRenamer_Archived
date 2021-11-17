@@ -16,9 +16,6 @@
     <verstretch>0</verstretch>
    </sizepolicy>
   </property>
-  <property name="focusPolicy">
-   <enum>Qt::StrongFocus</enum>
-  </property>
   <property name="styleSheet">
    <string notr="true"/>
   </property>
@@ -161,7 +158,7 @@
         </property>
         <property name="icon">
          <iconset resource="../images.qrc">
-          <normaloff>:/res/images/up.png</normaloff>:/res/images/up.png</iconset>
+          <normaloff>:/res/images/up.svg</normaloff>:/res/images/up.svg</iconset>
         </property>
         <property name="iconSize">
          <size>
@@ -190,7 +187,7 @@
         </property>
         <property name="icon">
          <iconset resource="../images.qrc">
-          <normaloff>:/res/images/down.png</normaloff>:/res/images/down.png</iconset>
+          <normaloff>:/res/images/down.svg</normaloff>:/res/images/down.svg</iconset>
         </property>
         <property name="iconSize">
          <size>

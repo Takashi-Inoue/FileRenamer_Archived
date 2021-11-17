@@ -84,6 +84,11 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->actionClearItems, &QAction::triggered, m_pathModel, &PathModel::clear);
 
     m_pathModel->startCreateNewNames(ui->formStringBuilderChain->builderChain());
+
+//    QFile file("H:\\DL\\dark.pal");
+//    file.open(QIODevice::WriteOnly);
+//    QDataStream stream(&file);
+//    stream << palette();
 }
 
 MainWindow::~MainWindow()
@@ -271,5 +276,11 @@ void MainWindow::onButtonSaveSettingsClicked()
     qSettings->clear();
 
     ui->formStringBuilderChain->saveCurrentBuilderSettings(qSettings);
+}
+
+void MainWindow::onActionDarkModeToggled(bool checked)
+{
+    checked ? Application::applyDarkPalette()
+            : Application::setPalette(style()->standardPalette());
 }
 

@@ -18,14 +18,19 @@
  */
 
 #include "MainWindow.h"
+#include "Application.h"
 #include "ApplicationLog/ApplicationLog.h"
 #include "ApplicationLog/DebugLog.h"
 
 #include <QApplication>
+#include <QFile>
+#include <QStyleFactory>
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
+
+    QApplication::setStyle(QStyleFactory::create("Fusion"));
 
     QFont font = QApplication::font("QMenu");
     font.setPointSize(10);
@@ -33,7 +38,7 @@ int main(int argc, char *argv[])
     QApplication::setFont(font);
 
     QCoreApplication::setApplicationName("FileRenamer");
-    QCoreApplication::setApplicationVersion("0.1.0.0");
+    QCoreApplication::setApplicationVersion("1.2.1.1");
 
     DebugLog::init();
 

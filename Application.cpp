@@ -19,6 +19,25 @@
 
 #include "Application.h"
 
+#include <QFile>
+#include <QPalette>
+
+void Application::applyDarkPalette()
+{
+    QFile file(QApplication::applicationDirPath() + QStringLiteral("/pal/dark.pal"));
+
+    if (!file.open(QIODevice::ReadOnly))
+        return;
+
+    QDataStream stream(&file);
+
+    QPalette pal;
+
+    stream >> pal;
+
+    QApplication::setPalette(pal);
+}
+
 QString Application::mainSettingsFilePath()
 {
     return QApplication::applicationFilePath().replace(".exe", ".ini");
