@@ -22,6 +22,10 @@
 
 #include <QDebug>
 
+namespace {
+constexpr char settingsKeyPosition[] = "Position";
+}
+
 WidgetPositionFixer::WidgetPositionFixer(QWidget *parent) :
     QFrame(parent),
     ui(new Ui::WidgetPositionFixer)
@@ -36,6 +40,16 @@ WidgetPositionFixer::WidgetPositionFixer(QWidget *parent) :
 WidgetPositionFixer::~WidgetPositionFixer()
 {
     delete ui;
+}
+
+void WidgetPositionFixer::loadSettings(QSharedPointer<QSettings> qSettings)
+{
+    setValue(qSettings->value(settingsKeyPosition, 0).toInt());
+}
+
+void WidgetPositionFixer::saveSettings(QSharedPointer<QSettings> qSettings) const
+{
+    qSettings->setValue(settingsKeyPosition, value());
 }
 
 void WidgetPositionFixer::setValue(int value)

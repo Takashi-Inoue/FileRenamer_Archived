@@ -22,9 +22,12 @@
 
 #include "Application.h"
 #include "FormStringBuilder.h"
-#include "Settings/BuilderChainSettings.h"
 
 #include <QTimer>
+
+namespace {
+    constexpr char settingsKeyCount[] = "SettingsCount";
+}
 
 FormStringBuilderChain::FormStringBuilderChain(QWidget *parent)
     : QWidget(parent)
@@ -39,16 +42,11 @@ FormStringBuilderChain::FormStringBuilderChain(QWidget *parent)
     connect(this, &FormStringBuilderChain::settingsIndicesChanged
           , this, &FormStringBuilderChain::onSettingsIndicesChanged);
 
-    BuilderChainSettings settings;
-
-    settings.read(Application::mainQSettings());
-
-    for (int builderIndex : settings.indices())
-        createNewSetting(builderIndex);
-
     connect(m_timer, &QTimer::timeout, this, [this]() {
         emit settingsChanged(builderChain());
     });
+
+    loadBuilderSettings(Application::mainQSettings());
 }
 
 FormStringBuilderChain::~FormStringBuilderChain()
@@ -87,41 +85,38 @@ QSharedPointer<StringBuilderOnFile::BuilderChainOnFile> FormStringBuilderChain::
 
 void FormStringBuilderChain::loadBuilderSettings(QSharedPointer<QSettings> qSettings)
 {
-    for (int i = 0, count = settingsCount(); i < count; ++i) {
-        QLayoutItem *layoutItem = ui->vLayout->takeAt(0);
-        layoutItem->widget()->close();
-        delete layoutItem;
+    removeAllBuilderWidgets();
+
+    int count = qSettings->value(settingsKeyCount, 1).toInt();
+
+    for (int i = 0; i < count; ++i) {
+        qSettings->beginGroup(QString::number(i));
+        createNewSetting(0)->loadBuilderSettings(qSettings);
+        qSettings->endGroup();
     }
-
-    BuilderChainSettings settings;
-
-    settings.read(qSettings);
-
-    for (int builderIndex : settings.indices())
-        createNewSetting(builderIndex);
-
-    for (auto formBuilder : findChildren<FormStringBuilder *>())
-        formBuilder->loadBuilderSettings(qSettings);
 }
 
 void FormStringBuilderChain::saveCurrentBuilderSettings(QSharedPointer<QSettings> qSettings) const
 {
-    QList<int> builderIndices;
+    qSettings->clear();
 
-    for (auto formBuilder : findChildren<FormStringBuilder *>()) {
-        formBuilder->saveCurrentBuilderSettings(qSettings);
-        builderIndices << formBuilder->currentBuilderIndex();
+    QList<FormStringBuilder *> formsBuilder = findChildren<FormStringBuilder *>();
+
+    if (formsBuilder.isEmpty())
+        return;
+
+    qsizetype formsBuilderSize = formsBuilder.size();
+
+    qSettings->setValue(settingsKeyCount, formsBuilderSize);
+
+    for (qsizetype i = 0; i < formsBuilderSize; ++i) {
+        qSettings->beginGroup(QString::number(i));
+        formsBuilder[i]->saveCurrentBuilderSettings(qSettings);
+        qSettings->endGroup();
     }
-
-    BuilderChainSettings settings;
-
-    settings.setValue(BuilderChainSettings::indicesEntry
-                    , QVariant::fromValue<QList<int>>(builderIndices));
-
-    settings.write(qSettings);
 }
 
-void FormStringBuilderChain::createNewSetting(int builderIndex)
+FormStringBuilder *FormStringBuilderChain::createNewSetting(int builderIndex)
 {
     auto widget = new FormStringBuilder(this);
 
@@ -141,6 +136,8 @@ void FormStringBuilderChain::createNewSetting(int builderIndex)
     emit settingsIndicesChanged();
 
     startTimer();
+
+    return widget;
 }
 
 void FormStringBuilderChain::startTimer()
@@ -203,6 +200,15 @@ void FormStringBuilderChain::onSettingsIndicesChanged()
     }
 
     startTimer();
+}
+
+void FormStringBuilderChain::removeAllBuilderWidgets()
+{
+    for (int i = 0, count = settingsCount(); i < count; ++i) {
+        QLayoutItem *layoutItem = ui->vLayout->takeAt(0);
+        layoutItem->widget()->close();
+        delete layoutItem;
+    }
 }
 
 int FormStringBuilderChain::settingsCount() const

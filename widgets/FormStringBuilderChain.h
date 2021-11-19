@@ -24,6 +24,8 @@
 
 #include "StringBuilderOnFile/BuilderChainOnFile.h"
 
+class FormStringBuilder;
+
 class QSettings;
 class QTimer;
 
@@ -50,7 +52,7 @@ signals:
     void settingsIndicesChanged();
 
 public slots:
-    void createNewSetting(int builderIndex = 0);
+    FormStringBuilder *createNewSetting(int builderIndex = 0);
 
 private slots:
     void startTimer();
@@ -60,6 +62,7 @@ private slots:
     void onSettingsIndicesChanged();
 
 private:
+    void removeAllBuilderWidgets();
     int settingsCount() const;
 
     Ui::FormStringBuilderChain *ui;

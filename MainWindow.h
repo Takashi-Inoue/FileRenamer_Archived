@@ -59,12 +59,10 @@ private:
 
     void setState(State state);
     void registerPaths(const QStringList &paths);
+    int execConfirmRenameDirDlg(const QStringList &dirPaths);
 
     Ui::MainWindow *ui;
 
     PathModel *m_pathModel;
-
-    static constexpr char settingsGroupName[] = "Main";
-    static constexpr char settingsKeyDarkMode[] = "DarkMode";
 };
 #endif // MAINWINDOW_H

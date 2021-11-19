@@ -34,6 +34,9 @@ public:
     explicit WidgetOnlyPositionFixer(QWidget *parent = nullptr);
     ~WidgetOnlyPositionFixer() override;
 
+    void loadSettings(QSharedPointer<QSettings>) override;
+    void saveSettings(QSharedPointer<QSettings>) const override;
+
 protected:
     int positionToInsert() const;
     void setPositionToInsert(int pos);

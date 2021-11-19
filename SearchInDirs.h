@@ -20,8 +20,6 @@
 #ifndef SEARCHINDIRS_H
 #define SEARCHINDIRS_H
 
-#include "Settings/SearchSettings.h"
-
 #include <QDir>
 
 class SearchInDirs
@@ -29,7 +27,14 @@ class SearchInDirs
 public:
     using ParentChildrenPair = QPair<QString, QStringList>;
 
-    SearchInDirs(const SearchSettings &settings);
+    struct Settings {
+        bool isSearchDirs;
+        bool isSearchFiles;
+        int hierarchy;
+        QStringList filters;
+    };
+
+    SearchInDirs(const Settings &settings);
 
     QList<ParentChildrenPair> dirs() const;
     QList<ParentChildrenPair> files() const;
@@ -42,7 +47,7 @@ private:
     void searchOneLayer(QList<ParentChildrenPair> &targetDirs, const QStringList &nameFilters);
     QString addSeparator(QStringView dirPath);
 
-    const SearchSettings m_settings;
+    const Settings m_settings;
 
     QList<ParentChildrenPair> m_dirs;
     QList<ParentChildrenPair> m_files;

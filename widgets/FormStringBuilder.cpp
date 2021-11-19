@@ -76,6 +76,8 @@ void FormStringBuilder::setCurrentBuilderIndex(int index)
 
 void FormStringBuilder::loadBuilderSettings(QSharedPointer<QSettings> qSettings)
 {
+    ui->comboBoxBuilders->setCurrentIndex(qSettings->value(QStringLiteral("BuilderType"), 0).toInt());
+
     auto widget = qobject_cast<AbstractStringBuilderWidget *>(ui->stackedWidget->currentWidget());
 
     if (widget != nullptr)
@@ -84,6 +86,8 @@ void FormStringBuilder::loadBuilderSettings(QSharedPointer<QSettings> qSettings)
 
 void FormStringBuilder::saveCurrentBuilderSettings(QSharedPointer<QSettings> qSettings) const
 {
+    qSettings->setValue(QStringLiteral("BuilderType"), ui->comboBoxBuilders->currentIndex());
+
     auto widget = qobject_cast<AbstractStringBuilderWidget *>(ui->stackedWidget->currentWidget());
 
     if (widget != nullptr)

@@ -20,8 +20,6 @@
 #ifndef DIALOGDROPPEDDIR_H
 #define DIALOGDROPPEDDIR_H
 
-#include "Settings/SearchSettings.h"
-
 #include <QDialog>
 
 namespace Ui {
@@ -38,23 +36,23 @@ public:
     explicit DialogDroppedDir(const QList<ParentChildrenPair> &dirs, QWidget *parent = nullptr);
     ~DialogDroppedDir() override;
 
-    bool isRegisterDroppedDir() const;
-    const SearchSettings &searchSettings() const;
+    QList<ParentChildrenPair> dirsToRename() const;
+    QList<ParentChildrenPair> filesToRename() const;
 
 private slots:
-    void on_pushButtonBack_clicked();
-    void on_pushButtonOk_clicked();
-    void on_pushButtonRegisterDir_clicked();
-    void on_pushButtonSearch_clicked();
+    void onPushButtonOkClicked();
 
 private:
-    QString fixFiltersString(QStringView filtersString);
-    QString fixOneFilter(QStringView filter);
+    QString fixFiltersString(QStringView filtersString) const;
+    QString iniFilePath() const;
+    void loadSettings();
+    void saveSettings() const;
 
     Ui::DialogDroppedDir *ui;
 
-    bool m_isRegisterDir = false;
-    SearchSettings m_settings;
+    const QList<ParentChildrenPair> m_dirsToSearch;
+    QList<ParentChildrenPair> m_dirs;
+    QList<ParentChildrenPair> m_files;
 };
 
 #endif // DIALOGDROPPEDDIR_H

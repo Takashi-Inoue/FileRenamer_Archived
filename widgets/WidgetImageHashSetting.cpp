@@ -19,8 +19,11 @@
 
 #include "WidgetImageHashSetting.h"
 
-#include "Settings/ImageHashSettings.h"
 #include "StringBuilderOnFile/ImageHash.h"
+
+namespace {
+constexpr char settingsGroupName[] = "ImageHash";
+}
 
 WidgetImageHashSetting::WidgetImageHashSetting(QWidget *parent)
     : WidgetOnlyPositionFixer(parent)
@@ -35,18 +38,14 @@ QSharedPointer<StringBuilder::AbstractStringBuilder> WidgetImageHashSetting::Str
 
 void WidgetImageHashSetting::loadSettings(QSharedPointer<QSettings> qSettings)
 {
-    ImageHashSettings settings;
-
-    settings.read(qSettings);
-
-    setPositionToInsert(settings.position());
+    qSettings->beginGroup(settingsGroupName);
+    WidgetOnlyPositionFixer::loadSettings(qSettings);
+    qSettings->endGroup();
 }
 
 void WidgetImageHashSetting::saveSettings(QSharedPointer<QSettings> qSettings) const
 {
-    ImageHashSettings settings;
-
-    settings.setValue(ImageHashSettings::positionEntry, positionToInsert());
-
-    settings.write(qSettings);
+    qSettings->beginGroup(settingsGroupName);
+    WidgetOnlyPositionFixer::saveSettings(qSettings);
+    qSettings->endGroup();
 }

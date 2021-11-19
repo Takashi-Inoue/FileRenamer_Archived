@@ -20,18 +20,22 @@
 #include "WidgetReplaceSetting.h"
 #include "ui_WidgetReplaceSetting.h"
 
-#include "Application.h"
-#include "Settings/TextReplaceSettings.h"
 #include "StringBuilder/RegExpReplace.h"
 #include "StringBuilder/ReplaceString.h"
+
+namespace {
+    constexpr char settingsGroupName[] = "TextReplace";
+    constexpr char settingsKeyAfter[]  = "After";
+    constexpr char settingsKeyBefore[] = "Before";
+    constexpr char settingsKeyUserRegexp[] = "UseRegexp";
+    constexpr char settingsKeyCaseSensitive[] = "CaseSensitive";
+}
 
 WidgetReplaceSetting::WidgetReplaceSetting(QWidget *parent) :
     AbstractStringBuilderWidget(parent),
     ui(new Ui::WidgetReplaceSetting)
 {
     ui->setupUi(this);
-
-    WidgetReplaceSetting::loadSettings(Application::mainQSettings());
 
     connect(ui->checkBoxCaseSensitive, &QCheckBox::clicked
           , this, &AbstractStringBuilderWidget::changeStarted);
@@ -65,24 +69,24 @@ QSharedPointer<StringBuilder::AbstractStringBuilder> WidgetReplaceSetting::Strin
 
 void WidgetReplaceSetting::loadSettings(QSharedPointer<QSettings> qSettings)
 {
-    TextReplaceSettings settings;
+    qSettings->beginGroup(settingsGroupName);
 
-    settings.read(qSettings);
+    ui->lineEditAfter->setText(qSettings->value(settingsKeyAfter).toString());
+    ui->lineEditBefore->setText(qSettings->value(settingsKeyBefore).toString());
+    ui->checkBoxUseRegex->setChecked(qSettings->value(settingsKeyUserRegexp).toBool());
+    ui->checkBoxCaseSensitive->setChecked(qSettings->value(settingsKeyCaseSensitive, true).toBool());
 
-    ui->lineEditBefore->setText(settings.before());
-    ui->lineEditAfter->setText(settings.after());
-    ui->checkBoxUseRegex->setChecked(settings.isUseRegexp());
-    ui->checkBoxCaseSensitive->setChecked(settings.isCaseSensitive());
+    qSettings->endGroup();
 }
 
 void WidgetReplaceSetting::saveSettings(QSharedPointer<QSettings> qSettings) const
 {
-    TextReplaceSettings settings;
+    qSettings->beginGroup(settingsGroupName);
 
-    settings.setValue(TextReplaceSettings::beforeEntry,        ui->lineEditBefore->text());
-    settings.setValue(TextReplaceSettings::afterEntry,         ui->lineEditAfter->text());
-    settings.setValue(TextReplaceSettings::useRegexpEntry,     ui->checkBoxUseRegex->isChecked());
-    settings.setValue(TextReplaceSettings::caseSensitiveEntry, ui->checkBoxCaseSensitive->isChecked());
+    qSettings->setValue(settingsKeyAfter, ui->lineEditAfter->text());
+    qSettings->setValue(settingsKeyBefore, ui->lineEditBefore->text());
+    qSettings->setValue(settingsKeyUserRegexp, ui->checkBoxUseRegex->isChecked());
+    qSettings->setValue(settingsKeyCaseSensitive, ui->checkBoxCaseSensitive->isChecked());
 
-    settings.write(qSettings);
+    qSettings->endGroup();
 }

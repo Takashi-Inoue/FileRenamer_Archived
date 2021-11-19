@@ -301,6 +301,9 @@
    <property name="toolTip">
     <string>Dark mode</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+D</string>
+   </property>
   </action>
  </widget>
  <customwidgets>

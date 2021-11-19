@@ -20,17 +20,18 @@
 #include "WidgetInsertTextSetting.h"
 #include "ui_WidgetInsertTextSetting.h"
 
-#include "Application.h"
-#include "Settings/TextInsertionSettings.h"
 #include "StringBuilder/InsertString.h"
+
+namespace {
+constexpr char settingsGroupName[] = "TextInsertion";
+constexpr char settingsKeyText[] = "Text";
+}
 
 WidgetInsertTextSetting::WidgetInsertTextSetting(QWidget *parent) :
     AbstractStringBuilderWidget(parent),
     ui(new Ui::WidgetInsertTextSetting)
 {
     ui->setupUi(this);
-
-    loadSettings(Application::mainQSettings());
 
     connect(ui->widgetPositionFixer, &WidgetPositionFixer::changeStarted
           , this, &AbstractStringBuilderWidget::changeStarted);
@@ -52,20 +53,20 @@ QSharedPointer<StringBuilder::AbstractStringBuilder> WidgetInsertTextSetting::St
 
 void WidgetInsertTextSetting::loadSettings(QSharedPointer<QSettings> qSettings)
 {
-    TextInsertionSettings settings;
+    qSettings->beginGroup(settingsGroupName);
 
-    settings.read(qSettings);
+    ui->lineEdit->setText(qSettings->value(settingsKeyText).toString());
+    ui->widgetPositionFixer->loadSettings(qSettings);
 
-    ui->lineEdit->setText(settings.text());
-    ui->widgetPositionFixer->setValue(settings.position());
+    qSettings->endGroup();
 }
 
 void WidgetInsertTextSetting::saveSettings(QSharedPointer<QSettings> qSettings) const
 {
-    TextInsertionSettings settings;
+    qSettings->beginGroup(settingsGroupName);
 
-    settings.setValue(TextInsertionSettings::textEntry, ui->lineEdit->text());
-    settings.setValue(TextInsertionSettings::positionEntry, ui->widgetPositionFixer->value());
+    qSettings->setValue(settingsKeyText, ui->lineEdit->text());
+    ui->widgetPositionFixer->saveSettings(qSettings);
 
-    settings.write(qSettings);
+    qSettings->endGroup();
 }

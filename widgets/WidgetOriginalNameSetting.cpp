@@ -19,8 +19,11 @@
 
 #include "WidgetOriginalNameSetting.h"
 
-#include "Settings/OriginalNameSettings.h"
 #include "StringBuilderOnFile/OriginalName.h"
+
+namespace {
+constexpr char settingsGroupName[] = "OriginalName";
+}
 
 WidgetOriginalNameSetting::WidgetOriginalNameSetting(QWidget *parent)
     : WidgetOnlyPositionFixer(parent)
@@ -35,18 +38,14 @@ QSharedPointer<StringBuilder::AbstractStringBuilder> WidgetOriginalNameSetting::
 
 void WidgetOriginalNameSetting::loadSettings(QSharedPointer<QSettings> qSettings)
 {
-    OriginalNameSettings settings;
-
-    settings.read(qSettings);
-
-    setPositionToInsert(settings.position());
+    qSettings->beginGroup(settingsGroupName);
+    WidgetOnlyPositionFixer::loadSettings(qSettings);
+    qSettings->endGroup();
 }
 
 void WidgetOriginalNameSetting::saveSettings(QSharedPointer<QSettings> qSettings) const
 {
-    OriginalNameSettings settings;
-
-    settings.setValue(OriginalNameSettings::positionEntry, positionToInsert());
-
-    settings.write(qSettings);
+    qSettings->beginGroup(settingsGroupName);
+    WidgetOnlyPositionFixer::saveSettings(qSettings);
+    qSettings->endGroup();
 }

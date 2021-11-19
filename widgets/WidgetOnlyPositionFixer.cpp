@@ -37,6 +37,16 @@ WidgetOnlyPositionFixer::~WidgetOnlyPositionFixer()
     delete ui;
 }
 
+void WidgetOnlyPositionFixer::loadSettings(QSharedPointer<QSettings> qSettings)
+{
+    ui->widgetPositionFixer->loadSettings(qSettings);
+}
+
+void WidgetOnlyPositionFixer::saveSettings(QSharedPointer<QSettings> qSettings) const
+{
+    ui->widgetPositionFixer->saveSettings(qSettings);
+}
+
 int WidgetOnlyPositionFixer::positionToInsert() const
 {
     return ui->widgetPositionFixer->value();

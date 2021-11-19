@@ -22,7 +22,7 @@
 #include <QDir>
 #include <QRegularExpression>
 
-SearchInDirs::SearchInDirs(const SearchSettings &settings)
+SearchInDirs::SearchInDirs(const Settings &settings)
     : m_settings(settings)
 {
 }
@@ -42,8 +42,8 @@ void SearchInDirs::exec(QList<ParentChildrenPair> targetDirs)
     m_dirs.clear();
     m_files.clear();
 
-    const QStringList nameFilters = m_settings.filters();
-    int hierarchy = m_settings.searchHierarchy();
+    const QStringList nameFilters = m_settings.filters;
+    int hierarchy = m_settings.hierarchy;
 
     qInfo() << QStringLiteral("Start searching entities in directories. Filters=[%1], Hierarchy=[%2]")
               .arg(nameFilters.join(';')).arg(hierarchy);
@@ -66,7 +66,7 @@ void SearchInDirs::searchForDirs(const QDir &parentDir
 
     targetDirs << ParentChildrenPair(addSeparator(parentDir.path()), childrenNames);
 
-    if (!m_settings.isSearchDirs())
+    if (!m_settings.isSearchDirs)
         return;
 
     qInfo() << QStringLiteral("Search directories in [%1]").arg(parentDir.absolutePath());
@@ -99,7 +99,7 @@ void SearchInDirs::searchForDirs(const QDir &parentDir
 
 void SearchInDirs::searchForFiles(const QDir &parentDir)
 {
-    if (!m_settings.isSearchFiles())
+    if (!m_settings.isSearchFiles)
         return;
 
     qInfo() << QStringLiteral("Search files in [%1]").arg(parentDir.absolutePath());

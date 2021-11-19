@@ -13,270 +13,166 @@
   <property name="windowTitle">
    <string>Register / Search</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_4" stretch="1,0,0">
+  <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QTableWidget" name="tableWidget">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
+    <widget class="QTreeWidget" name="treeWidget">
+     <property name="columnCount">
+      <number>1</number>
      </property>
-     <property name="focusPolicy">
-      <enum>Qt::NoFocus</enum>
-     </property>
-     <property name="editTriggers">
-      <set>QAbstractItemView::NoEditTriggers</set>
-     </property>
-     <property name="selectionMode">
-      <enum>QAbstractItemView::NoSelection</enum>
-     </property>
-     <property name="selectionBehavior">
-      <enum>QAbstractItemView::SelectRows</enum>
-     </property>
-     <property name="horizontalScrollMode">
-      <enum>QAbstractItemView::ScrollPerPixel</enum>
-     </property>
-     <attribute name="horizontalHeaderStretchLastSection">
-      <bool>true</bool>
-     </attribute>
-     <attribute name="verticalHeaderVisible">
-      <bool>false</bool>
-     </attribute>
      <column>
       <property name="text">
-       <string>Directory name</string>
+       <string>Directory</string>
       </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Path</string>
+      <property name="icon">
+       <iconset resource="../images.qrc">
+        <normaloff>:/icons/folder</normaloff>:/icons/folder</iconset>
       </property>
      </column>
     </widget>
    </item>
    <item>
-    <widget class="QStackedWidget" name="stackedWidget">
-     <property name="currentIndex">
-      <number>0</number>
+    <widget class="QGroupBox" name="groupBox">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
      </property>
-     <widget class="QWidget" name="pageChooseOperation">
-      <layout class="QVBoxLayout" name="verticalLayout">
-       <item>
-        <widget class="QPushButton" name="pushButtonRegisterDir">
-         <property name="text">
-          <string>Register directories</string>
-         </property>
-         <property name="icon">
-          <iconset resource="../images.qrc">
-           <normaloff>:/res/icons/folder-3.ico</normaloff>:/res/icons/folder-3.ico</iconset>
-         </property>
-         <property name="iconSize">
-          <size>
-           <width>32</width>
-           <height>32</height>
-          </size>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="pushButtonSearch">
-         <property name="text">
-          <string>Go to the search settings</string>
-         </property>
-         <property name="icon">
-          <iconset resource="../images.qrc">
-           <normaloff>:/res/icons/system-search-6.ico</normaloff>:/res/icons/system-search-6.ico</iconset>
-         </property>
-         <property name="iconSize">
-          <size>
-           <width>32</width>
-           <height>32</height>
-          </size>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <spacer name="verticalSpacer">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>40</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="pageSearchSettings">
-      <layout class="QVBoxLayout" name="verticalLayout_3">
-       <property name="spacing">
-        <number>6</number>
-       </property>
-       <property name="leftMargin">
-        <number>0</number>
-       </property>
-       <property name="topMargin">
-        <number>0</number>
-       </property>
-       <property name="rightMargin">
-        <number>0</number>
-       </property>
-       <property name="bottomMargin">
-        <number>0</number>
-       </property>
-       <item>
-        <widget class="QGroupBox" name="groupBox_3">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="title">
-          <string>Search settings</string>
-         </property>
-         <property name="flat">
-          <bool>true</bool>
-         </property>
-         <layout class="QVBoxLayout" name="verticalLayout_2">
-          <item>
-           <widget class="QGroupBox" name="groupBox">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="title">
-             <string>What to search for</string>
-            </property>
-            <layout class="QHBoxLayout" name="horizontalLayout">
-             <property name="spacing">
-              <number>12</number>
-             </property>
-             <item>
-              <widget class="QCheckBox" name="checkBoxFiles">
-               <property name="text">
-                <string>Files</string>
-               </property>
-               <property name="icon">
-                <iconset resource="../images.qrc">
-                 <normaloff>:/res/icons/text-x-preview.ico</normaloff>:/res/icons/text-x-preview.ico</iconset>
-               </property>
-               <property name="iconSize">
-                <size>
-                 <width>32</width>
-                 <height>32</height>
-                </size>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QCheckBox" name="checkBoxDirs">
-               <property name="text">
-                <string>Directories</string>
-               </property>
-               <property name="icon">
-                <iconset resource="../images.qrc">
-                 <normaloff>:/res/icons/folder-3.ico</normaloff>:/res/icons/folder-3.ico</iconset>
-               </property>
-               <property name="iconSize">
-                <size>
-                 <width>32</width>
-                 <height>32</height>
-                </size>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </widget>
-          </item>
-          <item>
-           <widget class="QGroupBox" name="groupBox_2">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="title">
-             <string>Filter</string>
-            </property>
-            <layout class="QHBoxLayout" name="horizontalLayout_2">
-             <item>
-              <widget class="QComboBox" name="comboBoxFilter">
-               <property name="toolTip">
-                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-size:11pt;&quot;&gt;Sample:&lt;br/&gt;*.txt;music.mp3;sample??? &lt;/span&gt;&lt;/p&gt;&lt;p&gt;Please separate by the ';' each filters. &lt;br/&gt;&lt;/p&gt;&lt;table border=&quot;1&quot; style=&quot; border-color:#888888; border-style:solid; margin:0px;margin: 4px;&quot; cellspacing=&quot;0&quot;&gt;&lt;tr&gt;&lt;td style=&quot;padding:3;&quot;&gt;&lt;p&gt;?&lt;/p&gt;&lt;/td&gt;&lt;td style=&quot; padding:3;&quot;&gt;&lt;p&gt;matches any single character.&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot; padding:3;&quot;&gt;&lt;p&gt;*&lt;/p&gt;&lt;/td&gt;&lt;td style=&quot; padding:3;&quot;&gt;&lt;p&gt;matches zero or more of any characters.&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/body&gt;&lt;/html&gt;</string>
-               </property>
-               <property name="editable">
-                <bool>true</bool>
-               </property>
-               <property name="maxCount">
-                <number>10</number>
-               </property>
-               <property name="insertPolicy">
-                <enum>QComboBox::InsertAtTop</enum>
-               </property>
-               <property name="sizeAdjustPolicy">
-                <enum>QComboBox::AdjustToContents</enum>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </widget>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_3">
-            <item>
-             <spacer name="horizontalSpacer">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>40</width>
-                <height>20</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-            <item>
-             <widget class="QLabel" name="label">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="text">
-               <string>Hierarchy</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QSpinBox" name="spinBoxHierarchy">
-              <property name="minimumSize">
-               <size>
-                <width>100</width>
-                <height>0</height>
-               </size>
-              </property>
-              <property name="specialValueText">
-               <string>Unlimited</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-         </layout>
-        </widget>
-       </item>
-      </layout>
-     </widget>
+     <property name="title">
+      <string>What to search for</string>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <property name="spacing">
+       <number>12</number>
+      </property>
+      <item>
+       <widget class="QCheckBox" name="checkBoxFiles">
+        <property name="text">
+         <string>Files</string>
+        </property>
+        <property name="icon">
+         <iconset resource="../images.qrc">
+          <normaloff>:/res/icons/text-x-preview.ico</normaloff>:/res/icons/text-x-preview.ico</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>32</width>
+          <height>32</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="checkBoxDirs">
+        <property name="text">
+         <string>Directories</string>
+        </property>
+        <property name="icon">
+         <iconset resource="../images.qrc">
+          <normaloff>:/icons/folder</normaloff>:/icons/folder</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>32</width>
+          <height>32</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_3">
+        <item>
+         <spacer name="horizontalSpacer">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeType">
+           <enum>QSizePolicy::Fixed</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QLabel" name="label">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>Hierarchy</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QSpinBox" name="spinBoxHierarchy">
+          <property name="minimumSize">
+           <size>
+            <width>100</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="specialValueText">
+           <string>Unlimited</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer_3">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox_2">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="title">
+      <string>Filter</string>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <item>
+       <widget class="QComboBox" name="comboBoxFilter">
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;Sample:&lt;br/&gt;*.txt;music.flac;sample??? &lt;/span&gt;&lt;/p&gt;&lt;p&gt;Please separate by the ';' each filters. &lt;br/&gt;&lt;/p&gt;&lt;table border=&quot;1&quot; style=&quot; border-color:#888888; border-style:solid; margin-top:4px; margin-bottom:4px; margin-left:4px; margin-right:4px;&quot; cellspacing=&quot;0&quot; cellpadding=&quot;0&quot;&gt;&lt;tr&gt;&lt;td style=&quot; padding-left:3; padding-right:3; padding-top:3; padding-bottom:3;&quot;&gt;&lt;p&gt;?&lt;/p&gt;&lt;/td&gt;&lt;td style=&quot; padding-left:3; padding-right:3; padding-top:3; padding-bottom:3;&quot;&gt;&lt;p&gt;matches any single character.&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot; padding-left:3; padding-right:3; padding-top:3; padding-bottom:3;&quot;&gt;&lt;p&gt;*&lt;/p&gt;&lt;/td&gt;&lt;td style=&quot; padding-left:3; padding-right:3; padding-top:3; padding-bottom:3;&quot;&gt;&lt;p&gt;matches zero or more of any characters.&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="editable">
+         <bool>true</bool>
+        </property>
+        <property name="maxCount">
+         <number>10</number>
+        </property>
+        <property name="insertPolicy">
+         <enum>QComboBox::InsertAtTop</enum>
+        </property>
+        <property name="sizeAdjustPolicy">
+         <enum>QComboBox::AdjustToContents</enum>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </widget>
    </item>
    <item>
@@ -293,13 +189,6 @@
         </size>
        </property>
       </spacer>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pushButtonBack">
-       <property name="text">
-        <string>Back</string>
-       </property>
-      </widget>
      </item>
      <item>
       <widget class="QPushButton" name="pushButtonOk">
@@ -339,5 +228,24 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>pushButtonOk</sender>
+   <signal>clicked()</signal>
+   <receiver>DialogDroppedDir</receiver>
+   <slot>onPushButtonOkClicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>385</x>
+     <y>392</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>256</x>
+     <y>206</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
+ <slots>
+  <slot>onPushButtonOkClicked()</slot>
+ </slots>
 </ui>

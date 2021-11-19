@@ -24,14 +24,6 @@ SOURCES += \
     Path/PathTableView.cpp \
     PathsAnalyzer.cpp \
     SearchInDirs.cpp \
-    Settings/BuilderChainSettings.cpp \
-    Settings/CryptographicHashSettings.cpp \
-    Settings/ImageHashSettings.cpp \
-    Settings/NumberSettings.cpp \
-    Settings/OriginalNameSettings.cpp \
-    Settings/SearchSettings.cpp \
-    Settings/TextInsertionSettings.cpp \
-    Settings/TextReplaceSettings.cpp \
     StringBuilder/BuilderChain.cpp \
     StringBuilder/InsertString.cpp \
     StringBuilder/Number.cpp \
@@ -79,14 +71,6 @@ HEADERS += \
     Path/PathTableView.h \
     PathsAnalyzer.h \
     SearchInDirs.h \
-    Settings/BuilderChainSettings.h \
-    Settings/CryptographicHashSettings.h \
-    Settings/ImageHashSettings.h \
-    Settings/NumberSettings.h \
-    Settings/OriginalNameSettings.h \
-    Settings/SearchSettings.h \
-    Settings/TextInsertionSettings.h \
-    Settings/TextReplaceSettings.h \
     StringBuilder/AbstractInsertString.h \
     StringBuilder/AbstractStringBuilder.h \
     StringBuilder/BuilderChain.h \

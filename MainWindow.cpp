@@ -24,15 +24,20 @@
 #include "PathsAnalyzer.h"
 #include "Path/PathHeaderView.h"
 #include "Path/PathModel.h"
-#include "SearchInDirs.h"
 #include "widgets/DialogDroppedDir.h"
 #include "widgets/DialogLoadRenameSettings.h"
 #include "widgets/DialogSaveRenameSettings.h"
 
 #include <QDropEvent>
+#include <QMessageBox>
 #include <QMimeData>
 #include <QScopeGuard>
 #include <QDebug>
+
+namespace {
+    constexpr char settingsGroupName[] = "Main";
+    constexpr char settingsKeyDarkMode[] = "DarkMode";
+}
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -86,11 +91,6 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->actionClearItems, &QAction::triggered, m_pathModel, &PathModel::clear);
 
     m_pathModel->startCreateNewNames(ui->formStringBuilderChain->builderChain());
-
-//    QFile file("H:\\DL\\dark.pal");
-//    file.open(QIODevice::WriteOnly);
-//    QDataStream stream(&file);
-//    stream << palette();
 }
 
 MainWindow::~MainWindow()
@@ -234,6 +234,19 @@ void MainWindow::registerPaths(const QStringList &paths)
     if (!analyzer.isAllDir()) {
         qInfo() << QStringLiteral("Register dropped paths.");
         m_pathModel->addPaths(analyzer.dirs(), analyzer.files());
+
+        return;
+    }
+
+    int msgBoxResult = execConfirmRenameDirDlg(paths);
+
+    if (msgBoxResult == QMessageBox::Cancel)
+        return;
+
+    if (msgBoxResult == QMessageBox::Yes) {
+        qInfo() << QStringLiteral("Register dropped directories.");
+        m_pathModel->addPaths(analyzer.dirs(), {});
+
         return;
     }
 
@@ -242,17 +255,41 @@ void MainWindow::registerPaths(const QStringList &paths)
     if (dlg.exec() == QDialog::Rejected)
         return;
 
-    if (dlg.isRegisterDroppedDir()) {
-        qInfo() << QStringLiteral("Register dropped directories.");
-        m_pathModel->addPaths(analyzer.dirs(), {});
-        return;
-    }
+    m_pathModel->addPaths(dlg.dirsToRename(), dlg.filesToRename());
+}
 
-    SearchInDirs searchInDirs(dlg.searchSettings());
+int MainWindow::execConfirmRenameDirDlg(const QStringList &dirPaths)
+{
+    const QString titles[] = {
+        QStringLiteral("Confirm Rename Dir")
+      , QStringLiteral("Confirm Rename Dirs")
+    };
 
-    searchInDirs.exec(analyzer.dirs());
+    const QString msgs[] = {
+        QStringLiteral("Directory has been sent.\n\nWould you like to rename this dir?")
+      , QStringLiteral("Directories have been sent.\n\nWould you like to rename these dirs?")
+    };
 
-    m_pathModel->addPaths(searchInDirs.dirs(), searchInDirs.files());
+    qsizetype indexMsg = (dirPaths.size() > 1);
+
+    QMessageBox msgBox(QMessageBox::Question, titles[indexMsg], msgs[indexMsg],
+                       QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel, this);
+
+    msgBox.button(QMessageBox::No)->setText(QStringLiteral("No, search files"));
+    msgBox.button(QMessageBox::No)->setIcon(QIcon(":/icons/search"));
+    msgBox.button(QMessageBox::Yes)->setIcon(QIcon(":/icons/folder"));
+    msgBox.setDetailedText(dirPaths.join('\n'));
+
+    QList<QAbstractButton *> buttons = msgBox.buttons();
+
+    auto itr = std::find_if(buttons.begin(), buttons.end(), [&](QAbstractButton *button) {
+        return msgBox.buttonRole(button) == QMessageBox::ActionRole;
+    });
+
+    if (itr != buttons.end())
+        (*itr)->click();
+
+    return msgBox.exec();
 }
 
 void MainWindow::onButtonLoadSettingsClicked()

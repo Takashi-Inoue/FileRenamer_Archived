@@ -20,62 +20,48 @@
 #include "DialogDroppedDir.h"
 #include "ui_DialogDroppedDir.h"
 
-#include "Application.h"
+#include "SearchInDirs.h"
+
+#include <QApplication>
+#include <QFileIconProvider>
+#include <QSettings>
+
+namespace {
+constexpr char settingsGroupName[] = "Search";
+constexpr char settingsKeyFilter[] = "Filter";
+constexpr char settingsKeyFilterHistory[] = "FilterHistory";
+constexpr char settingsKeyHierarchy[] = "Hierarchy";
+constexpr char settingsKeySearchDirs[] = "SearchDirs";
+constexpr char settingsKeySearchFiles[] = "SearchFiles";
+}
 
 DialogDroppedDir::DialogDroppedDir(const QList<ParentChildrenPair> &dirs, QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::DialogDroppedDir)
+    , m_dirsToSearch(dirs)
 {
     ui->setupUi(this);
 
-    ui->pushButtonBack->setVisible(false);
-    ui->pushButtonOk->setVisible(false);
+    const QString headerText = (dirs.size() == 1 && dirs[0].second.size() == 1)
+            ? QStringLiteral("Directory")
+            : QStringLiteral("Directories");
+    ui->treeWidget->headerItem()->setText(0, headerText);
 
-    ui->tableWidget->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
-    ui->tableWidget->horizontalHeaderItem(0)->setIcon(QIcon(":/res/icons/folder-3.ico"));
+    QIcon dirIcon = QFileIconProvider().icon(QAbstractFileIconProvider::Folder);
 
     for (const ParentChildrenPair &parentChildren : dirs) {
-        auto parentDirItem = new QTableWidgetItem(parentChildren.first);
+        auto pathItem = new QTreeWidgetItem(static_cast<QTreeWidget *>(nullptr), {parentChildren.first});
+        ui->treeWidget->addTopLevelItem(pathItem);
 
         for (QStringView childName : parentChildren.second) {
-            auto childNameItem = new QTableWidgetItem(childName.toString());
-            int row = ui->tableWidget->rowCount();
-
-            ui->tableWidget->insertRow(row);
-            ui->tableWidget->setItem(row, 0, childNameItem);
-            ui->tableWidget->setItem(row, 1, parentDirItem);
+            auto item = new QTreeWidgetItem(pathItem, {childName.toString()});
+            item->setIcon(0, dirIcon);
         }
     }
 
-    const int itemCount = ui->tableWidget->rowCount();
+    ui->treeWidget->expandAll();
 
-    ui->pushButtonRegisterDir->setEnabled(itemCount != 0);
-    ui->pushButtonSearch->setEnabled(itemCount != 0);
-
-    const QString registerDirText[2] = {
-        QStringLiteral("Register these directories"),
-        QStringLiteral("Register this directory"),
-    };
-
-    const QString searchText[2] = {
-        QStringLiteral("Search in these directories (Go to settings)"),
-        QStringLiteral("Search in this directory (Go to settings)"),
-    };
-
-    ui->pushButtonRegisterDir->setText(registerDirText[itemCount == 1]);
-    ui->pushButtonSearch->setText(searchText[itemCount == 1]);
-
-    m_settings.read(Application::mainQSettings());
-
-    QStringList filtersHistory = m_settings.value(SearchSettings::filterHistory, QStringList());
-
-    for (const QString &filtersString : filtersHistory)
-        ui->comboBoxFilter->addItem(filtersString);
-
-    ui->checkBoxDirs->setChecked(m_settings.value(SearchSettings::searchDirs, false));
-    ui->checkBoxFiles->setChecked(m_settings.value(SearchSettings::searchFiles, true));
-    ui->comboBoxFilter->setCurrentText(m_settings.value(SearchSettings::filter, QString("")));
-    ui->spinBoxHierarchy->setValue(m_settings.value(SearchSettings::hierarchy, 0));
+    loadSettings();
 }
 
 DialogDroppedDir::~DialogDroppedDir()
@@ -83,34 +69,86 @@ DialogDroppedDir::~DialogDroppedDir()
     delete ui;
 }
 
-bool DialogDroppedDir::isRegisterDroppedDir() const
+QList<DialogDroppedDir::ParentChildrenPair> DialogDroppedDir::dirsToRename() const
 {
-    return m_isRegisterDir;
+    return m_dirs;
 }
 
-const SearchSettings &DialogDroppedDir::searchSettings() const
+QList<DialogDroppedDir::ParentChildrenPair> DialogDroppedDir::filesToRename() const
 {
-    return m_settings;
+    return m_files;
 }
 
-void DialogDroppedDir::on_pushButtonBack_clicked()
+void DialogDroppedDir::onPushButtonOkClicked()
 {
-    ui->stackedWidget->setCurrentIndex(0);
+    saveSettings();
 
-    ui->pushButtonBack->setVisible(false);
-    ui->pushButtonOk->setVisible(false);
+    SearchInDirs::Settings searchSettings = {
+        ui->checkBoxDirs->isChecked(),
+        ui->checkBoxFiles->isChecked(),
+        ui->spinBoxHierarchy->value(),
+        fixFiltersString(ui->comboBoxFilter->currentText()).split(';', Qt::SkipEmptyParts)
+    };
+
+    SearchInDirs searchInDirs(searchSettings);
+
+    searchInDirs.exec(m_dirsToSearch);
+    m_dirs = searchInDirs.dirs();
+    m_files = searchInDirs.files();
+
+    accept();
 }
 
-void DialogDroppedDir::on_pushButtonOk_clicked()
+QString DialogDroppedDir::fixFiltersString(QStringView filtersString) const
+{
+    QStringList filters = filtersString.toString().split(';', Qt::SkipEmptyParts);
+
+    for (QString &filter : filters) {
+        if (!filter.contains('*') && !filter.contains('?'))
+            filter = QStringLiteral("*%1*").arg(filter);
+    }
+
+    return filters.join(';');
+}
+
+QString DialogDroppedDir::iniFilePath() const
+{
+    return QApplication::applicationDirPath() + "/search.ini";
+}
+
+void DialogDroppedDir::loadSettings()
+{
+    QSettings qSettings(iniFilePath(), QSettings::IniFormat);
+
+    qSettings.beginGroup(settingsGroupName);
+
+    QStringList filtersHistory = qSettings.value(settingsKeyFilterHistory).toStringList();
+
+    for (QStringView filtersString : filtersHistory)
+        ui->comboBoxFilter->addItem(filtersString.toString());
+
+    ui->checkBoxDirs->setChecked(qSettings.value(settingsKeySearchDirs, false).toBool());
+    ui->checkBoxFiles->setChecked(qSettings.value(settingsKeySearchFiles, true).toBool());
+    ui->comboBoxFilter->setCurrentText(qSettings.value(settingsKeyFilter).toString());
+    ui->spinBoxHierarchy->setValue(qSettings.value(settingsKeyHierarchy, 0).toInt());
+
+    qSettings.endGroup();
+}
+
+void DialogDroppedDir::saveSettings() const
 {
     QString filtersString = ui->comboBoxFilter->currentText();
 
     filtersString = fixFiltersString(filtersString);
 
-    m_settings.setValue(SearchSettings::searchDirs, ui->checkBoxDirs->isChecked());
-    m_settings.setValue(SearchSettings::searchFiles, ui->checkBoxFiles->isChecked());
-    m_settings.setValue(SearchSettings::filter, filtersString);
-    m_settings.setValue(SearchSettings::hierarchy, ui->spinBoxHierarchy->value());
+    QSettings qSettings(iniFilePath(), QSettings::IniFormat);
+
+    qSettings.beginGroup(settingsGroupName);
+
+    qSettings.setValue(settingsKeySearchDirs, ui->checkBoxDirs->isChecked());
+    qSettings.setValue(settingsKeySearchFiles, ui->checkBoxFiles->isChecked());
+    qSettings.setValue(settingsKeyFilter, filtersString);
+    qSettings.setValue(settingsKeyHierarchy, ui->spinBoxHierarchy->value());
 
     QStringList filtersList;
 
@@ -120,44 +158,7 @@ void DialogDroppedDir::on_pushButtonOk_clicked()
     filtersList.prepend(filtersString);
     filtersList.removeDuplicates();
 
-    m_settings.setValue(SearchSettings::filterHistory, filtersList);
+    qSettings.setValue(settingsKeyFilterHistory, filtersList);
 
-    m_settings.write(Application::mainQSettings());
-
-    accept();
-}
-
-void DialogDroppedDir::on_pushButtonRegisterDir_clicked()
-{
-    m_isRegisterDir = true;
-
-    accept();
-}
-
-void DialogDroppedDir::on_pushButtonSearch_clicked()
-{
-    m_isRegisterDir = false;
-
-    ui->stackedWidget->setCurrentIndex(1);
-
-    ui->pushButtonBack->setVisible(true);
-    ui->pushButtonOk->setVisible(true);
-}
-
-QString DialogDroppedDir::fixFiltersString(QStringView filtersString)
-{
-    QStringList filters = filtersString.toString().split(';', Qt::SkipEmptyParts);
-
-    for (QString &filter : filters)
-        filter = fixOneFilter(filter);
-
-    return filters.join(';');
-}
-
-QString DialogDroppedDir::fixOneFilter(QStringView filter)
-{
-    if (!filter.contains('*') && !filter.contains('?'))
-        return QString("*%1*").arg(filter);
-
-    return filter.toString();
+    qSettings.endGroup();
 }

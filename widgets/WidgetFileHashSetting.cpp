@@ -20,9 +20,12 @@
 #include "WidgetFileHashSetting.h"
 #include "ui_WidgetFileHashSetting.h"
 
-#include "Application.h"
-#include "Settings/CryptographicHashSettings.h"
 #include "StringBuilderOnFile/CryptographicHash.h"
+
+namespace {
+constexpr char settingsGroupName[] = "CryptographicHash";
+constexpr char settingsKeyAlgorithm[] = "Algorithm";
+}
 
 WidgetFileHashSetting::WidgetFileHashSetting(QWidget *parent)
     : AbstractStringBuilderWidget(parent)
@@ -40,8 +43,6 @@ WidgetFileHashSetting::WidgetFileHashSetting(QWidget *parent)
 //    ui->comboBoxHashType->addItem(QStringLiteral("SHA3-512"), Algorithm::Sha3_512);
     ui->comboBoxHashType->addItem(QStringLiteral("MD5"), Algorithm::Md5);
     ui->comboBoxHashType->addItem(QStringLiteral("SHA1"), Algorithm::Sha1);
-
-    WidgetFileHashSetting::loadSettings(Application::mainQSettings());
 
     connect(ui->comboBoxHashType, &QComboBox::currentIndexChanged
           , this, &AbstractStringBuilderWidget::changeStarted);
@@ -67,24 +68,25 @@ QSharedPointer<StringBuilder::AbstractStringBuilder> WidgetFileHashSetting::Stri
 
 void WidgetFileHashSetting::loadSettings(QSharedPointer<QSettings> qSettings)
 {
-    CryptographicHashSettings settings;
+    qSettings->beginGroup(settingsGroupName);
 
-    settings.read(qSettings);
+    QVariant algorithm = qSettings->value(settingsKeyAlgorithm, QCryptographicHash::Algorithm::Sha224);
+    ui->widgetPositionFixer->loadSettings(qSettings);
 
-    int index = ui->comboBoxHashType->findData(settings.algorithm());
+    qSettings->endGroup();
+
+    int index = ui->comboBoxHashType->findData(algorithm);
 
     if (index != -1)
         ui->comboBoxHashType->setCurrentIndex(index);
-
-    ui->widgetPositionFixer->setValue(settings.position());
 }
 
 void WidgetFileHashSetting::saveSettings(QSharedPointer<QSettings> qSettings) const
 {
-    CryptographicHashSettings settings;
+    qSettings->beginGroup(settingsGroupName);
 
-    settings.setValue(CryptographicHashSettings::algorithmEntry, ui->comboBoxHashType->currentData());
-    settings.setValue(CryptographicHashSettings::positionEntity, ui->widgetPositionFixer->value());
+    qSettings->setValue(settingsKeyAlgorithm, ui->comboBoxHashType->currentData());
+    ui->widgetPositionFixer->saveSettings(qSettings);
 
-    settings.write(qSettings);
+    qSettings->endGroup();
 }

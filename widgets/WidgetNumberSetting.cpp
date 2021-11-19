@@ -20,17 +20,22 @@
 #include "WidgetNumberSetting.h"
 #include "ui_WidgetNumberSetting.h"
 
-#include "Application.h"
-#include "Settings/NumberSettings.h"
 #include "StringBuilder/Number.h"
+
+namespace {
+constexpr char settingsGroupName[] = "Number";
+constexpr char settingsKeyStart[] = "Start";
+constexpr char settingsKeyIncremental[] = "Incremental";
+constexpr char settingsKeyDigit[] = "Digit";
+constexpr char settingsKeyPrefix[] = "Prefix";
+constexpr char settingsKeySuffix[] = "Suffix";
+}
 
 WidgetNumberSetting::WidgetNumberSetting(QWidget *parent) :
     AbstractStringBuilderWidget(parent),
     ui(new Ui::WidgetNumberSetting)
 {
     ui->setupUi(this);
-
-    loadSettings(Application::mainQSettings());
 
     connect(ui->spinBoxStart, &QSpinBox::valueChanged
           , this, &AbstractStringBuilderWidget::changeStarted);
@@ -67,28 +72,28 @@ QSharedPointer<StringBuilder::AbstractStringBuilder> WidgetNumberSetting::String
 
 void WidgetNumberSetting::loadSettings(QSharedPointer<QSettings> qSettings)
 {
-    NumberSettings settings;
+    qSettings->beginGroup(settingsGroupName);
 
-    settings.read(qSettings);
+    ui->spinBoxStart->setValue(qSettings->value(settingsKeyStart, 0).toInt());
+    ui->spinBoxStep->setValue(qSettings->value(settingsKeyIncremental, 1).toInt());
+    ui->spinBoxDigit->setValue(qSettings->value(settingsKeyDigit, 0).toInt());
+    ui->lineEditPrefix->setText(qSettings->value(settingsKeyPrefix).toString());
+    ui->lineEditSuffix->setText(qSettings->value(settingsKeySuffix).toString());
+    ui->widgetPositionFixer->loadSettings(qSettings);
 
-    ui->spinBoxStart->setValue(settings.start());
-    ui->spinBoxStep->setValue(settings.step());
-    ui->spinBoxDigit->setValue(settings.digit());
-    ui->lineEditPrefix->setText(settings.prefix());
-    ui->lineEditSuffix->setText(settings.suffix());
-    ui->widgetPositionFixer->setValue(settings.position());
+    qSettings->endGroup();
 }
 
 void WidgetNumberSetting::saveSettings(QSharedPointer<QSettings> qSettings) const
 {
-    NumberSettings settings;
+    qSettings->beginGroup(settingsGroupName);
 
-    settings.setValue(NumberSettings::startEntry,    ui->spinBoxStart->value());
-    settings.setValue(NumberSettings::stepEntry,     ui->spinBoxStep->value());
-    settings.setValue(NumberSettings::digitEntry,    ui->spinBoxDigit->value());
-    settings.setValue(NumberSettings::prefixEntry,   ui->lineEditPrefix->text());
-    settings.setValue(NumberSettings::suffixEntry,   ui->lineEditSuffix->text());
-    settings.setValue(NumberSettings::positionEntry, ui->widgetPositionFixer->value());
+    qSettings->setValue(settingsKeyStart, ui->spinBoxStart->value());
+    qSettings->setValue(settingsKeyIncremental, ui->spinBoxStep->value());
+    qSettings->setValue(settingsKeyDigit, ui->spinBoxDigit->value());
+    qSettings->setValue(settingsKeyPrefix, ui->lineEditPrefix->text());
+    qSettings->setValue(settingsKeySuffix, ui->lineEditSuffix->text());
+    ui->widgetPositionFixer->saveSettings(qSettings);
 
-    settings.write(qSettings);
+    qSettings->endGroup();
 }
