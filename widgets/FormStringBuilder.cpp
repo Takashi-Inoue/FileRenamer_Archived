@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Takashi Inoue
+ * Copyright 2021 Takashi Inoue
  *
  * This file is part of FileRenamer.
  *
@@ -20,6 +20,9 @@
 #include "FormStringBuilder.h"
 #include "ui_FormStringBuilder.h"
 
+#include "Application.h"
+#include "StringBuilderWidgetFactory.h"
+#include "widgets/AbstractStringBuilderWidget.h"
 #include "widgets/WidgetPositionFixer.h"
 
 #include <QAction>
@@ -33,13 +36,6 @@ FormStringBuilder::FormStringBuilder(QWidget *parent)
 {
     ui->setupUi(this);
 
-//    ui->widgetButtons->setVisible(false);
-
-    for (auto widget : findChildren<AbstractStringBuilderWidget *>()) {
-        connect(widget, &AbstractStringBuilderWidget::changeStarted
-              , this, &FormStringBuilder::changeStarted);
-    }
-
     connect(ui->buttonRemove, &QPushButton::clicked, this, &FormStringBuilder::requestRemove);
     connect(ui->buttonRemove, &QPushButton::clicked, this, &FormStringBuilder::close);
 
@@ -48,6 +44,8 @@ FormStringBuilder::FormStringBuilder(QWidget *parent)
 
     connect(ui->comboBoxBuilders, &QComboBox::currentIndexChanged
           , this, &FormStringBuilder::changeStarted);
+
+    addBuilderWidget(0);
 }
 
 FormStringBuilder::~FormStringBuilder()
@@ -57,11 +55,7 @@ FormStringBuilder::~FormStringBuilder()
 
 QSharedPointer<StringBuilder::AbstractStringBuilder> FormStringBuilder::stringBuilder() const
 {
-    auto widget = qobject_cast<AbstractStringBuilderWidget *>(ui->stackedWidget->currentWidget());
-
-    Q_ASSERT(widget != nullptr);
-
-    return widget->StringBuilder();
+    return currentBuilderWidget()->StringBuilder();
 }
 
 int FormStringBuilder::currentBuilderIndex() const
@@ -76,22 +70,19 @@ void FormStringBuilder::setCurrentBuilderIndex(int index)
 
 void FormStringBuilder::loadBuilderSettings(QSharedPointer<QSettings> qSettings)
 {
-    ui->comboBoxBuilders->setCurrentIndex(qSettings->value(QStringLiteral("BuilderType"), 0).toInt());
+    int builderIndex = qSettings->value(QStringLiteral("BuilderType"), -1).toInt();
 
-    auto widget = qobject_cast<AbstractStringBuilderWidget *>(ui->stackedWidget->currentWidget());
+    if (builderIndex != -1)
+        ui->comboBoxBuilders->setCurrentIndex(builderIndex);
 
-    if (widget != nullptr)
-        widget->loadSettings(qSettings);
+    currentBuilderWidget()->loadSettings(qSettings);
 }
 
 void FormStringBuilder::saveCurrentBuilderSettings(QSharedPointer<QSettings> qSettings) const
 {
     qSettings->setValue(QStringLiteral("BuilderType"), ui->comboBoxBuilders->currentIndex());
 
-    auto widget = qobject_cast<AbstractStringBuilderWidget *>(ui->stackedWidget->currentWidget());
-
-    if (widget != nullptr)
-        widget->saveSettings(qSettings);
+    currentBuilderWidget()->saveSettings(qSettings);
 }
 
 void FormStringBuilder::notifySettingIndexChanged(int index, int settingsCount)
@@ -99,36 +90,41 @@ void FormStringBuilder::notifySettingIndexChanged(int index, int settingsCount)
     ui->buttonDown->setEnabled(index < settingsCount - 1);
     ui->buttonUp->setEnabled(index != 0);
 
-    for (int i = 0, count = ui->stackedWidget->count(); i < count; ++i) {
-        auto widget = qobject_cast<AbstractStringBuilderWidget *>(ui->stackedWidget->widget(i));
-        auto positionFixer = widget->findChild<WidgetPositionFixer *>();
+    auto positionFixer = currentBuilderWidget()->findChild<WidgetPositionFixer *>();
 
-        if (positionFixer != nullptr)
-            positionFixer->setEnabled(index != 0);
-    }
-
-    qDebug() << index << settingsCount;
+    if (positionFixer != nullptr)
+        positionFixer->setEnabled(index != 0);
 }
 
-//void FormStringBuilder::enterEvent(QEnterEvent *event)
-//{
-//    ui->widgetButtons->setVisible(true);
+void FormStringBuilder::onComboBoxBuildersCurrentIndexChanged(int index)
+{
+    addBuilderWidget(index);
+}
 
-//    QFrame::enterEvent(event);
-//}
+void FormStringBuilder::addBuilderWidget(int builderIndex)
+{
+    QLayoutItem *child = nullptr;
 
-//void FormStringBuilder::leaveEvent(QEvent *event)
-//{
-//    ui->widgetButtons->setVisible(false);
+    while ((child = ui->vLayout->takeAt(0)) != nullptr) {
+        delete child->widget();
+        delete child;
+    }
 
-//    QFrame::leaveEvent(event);
-//}
+    StringBuilderWidgetFactory factory;
 
-//void FormStringBuilder::moveEvent(QMoveEvent *event)
-//{
-//    QPoint cursorPos = mapToParent(mapFromGlobal(QCursor::pos()));
+    AbstractStringBuilderWidget *widget = factory.createWidget(builderIndex, this);
 
-//    ui->widgetButtons->setVisible(geometry().contains(cursorPos));
+    connect(widget, &AbstractStringBuilderWidget::changeStarted
+          , this, &FormStringBuilder::changeStarted);
 
-//    QFrame::moveEvent(event);
-//}
+    widget->loadSettings(Application::qSettingsForLatestSettings());
+
+    ui->vLayout->addWidget(widget);
+}
+
+AbstractStringBuilderWidget *FormStringBuilder::currentBuilderWidget() const
+{
+    Q_ASSERT(ui->vLayout->count() > 0);
+
+    return qobject_cast<AbstractStringBuilderWidget *>(ui->vLayout->itemAt(0)->widget());
+}

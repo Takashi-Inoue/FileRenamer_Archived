@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Takashi Inoue
+ * Copyright 2021 Takashi Inoue
  *
  * This file is part of FileRenamer.
  *
@@ -24,6 +24,8 @@
 #include <QSharedPointer>
 
 namespace StringBuilder {class AbstractStringBuilder;}
+
+class AbstractStringBuilderWidget;
 
 class QPushButton;
 class QSettings;
@@ -56,12 +58,13 @@ signals:
     void requestRemove();
     void changeStarted();
 
-protected:
-//    void enterEvent(QEnterEvent *event) override;
-//    void leaveEvent(QEvent *event) override;
-//    void moveEvent(QMoveEvent *event) override;
+private slots:
+    void onComboBoxBuildersCurrentIndexChanged(int);
 
 private:
+    void addBuilderWidget(int builderIndex);
+    AbstractStringBuilderWidget *currentBuilderWidget() const;
+
     Ui::FormStringBuilder *ui;
 };
 

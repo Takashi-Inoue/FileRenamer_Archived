@@ -29,7 +29,17 @@
     </widget>
    </item>
    <item>
-    <widget class="QLineEdit" name="lineEdit"/>
+    <widget class="HistoryComboBox" name="combox">
+     <property name="editable">
+      <bool>true</bool>
+     </property>
+     <property name="maxCount">
+      <number>24</number>
+     </property>
+     <property name="insertPolicy">
+      <enum>QComboBox::NoInsert</enum>
+     </property>
+    </widget>
    </item>
    <item>
     <widget class="WidgetPositionFixer" name="widgetPositionFixer">
@@ -62,6 +72,11 @@
    <extends>QFrame</extends>
    <header>widgets/WidgetPositionFixer.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>HistoryComboBox</class>
+   <extends>QComboBox</extends>
+   <header>widgets/HistoryComboBox.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

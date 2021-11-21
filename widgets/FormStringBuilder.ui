@@ -75,17 +75,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QStackedWidget" name="stackedWidget">
-       <property name="currentIndex">
-        <number>0</number>
-       </property>
-       <widget class="WidgetOriginalNameSetting" name="page"/>
-       <widget class="WidgetNumberSetting" name="page_2"/>
-       <widget class="WidgetReplaceSetting" name="page_3"/>
-       <widget class="WidgetInsertTextSetting" name="page_4"/>
-       <widget class="WidgetFileHashSetting" name="page_5"/>
-       <widget class="WidgetImageHashSetting" name="page_6"/>
-      </widget>
+      <layout class="QVBoxLayout" name="vLayout"/>
      </item>
     </layout>
    </item>
@@ -215,44 +205,6 @@
    </item>
   </layout>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>WidgetNumberSetting</class>
-   <extends>QWidget</extends>
-   <header>widgets/WidgetNumberSetting.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>WidgetReplaceSetting</class>
-   <extends>QWidget</extends>
-   <header>widgets/WidgetReplaceSetting.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>WidgetInsertTextSetting</class>
-   <extends>QWidget</extends>
-   <header>widgets/WidgetInsertTextSetting.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>WidgetOriginalNameSetting</class>
-   <extends>QWidget</extends>
-   <header>widgets/WidgetOriginalNameSetting.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>WidgetFileHashSetting</class>
-   <extends>QWidget</extends>
-   <header>widgets/WidgetFileHashSetting.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>WidgetImageHashSetting</class>
-   <extends>QWidget</extends>
-   <header>widgets/WidgetImageHashSetting.h</header>
-   <container>1</container>
-  </customwidget>
- </customwidgets>
  <resources>
   <include location="../images.qrc"/>
  </resources>
@@ -260,18 +212,21 @@
   <connection>
    <sender>comboBoxBuilders</sender>
    <signal>currentIndexChanged(int)</signal>
-   <receiver>stackedWidget</receiver>
-   <slot>setCurrentIndex(int)</slot>
+   <receiver>FormStringBuilder</receiver>
+   <slot>onComboBoxBuildersCurrentIndexChanged(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>129</x>
-     <y>30</y>
+     <x>215</x>
+     <y>21</y>
     </hint>
     <hint type="destinationlabel">
-     <x>240</x>
-     <y>108</y>
+     <x>232</x>
+     <y>124</y>
     </hint>
    </hints>
   </connection>
  </connections>
+ <slots>
+  <slot>onComboBoxBuildersCurrentIndexChanged(int)</slot>
+ </slots>
 </ui>

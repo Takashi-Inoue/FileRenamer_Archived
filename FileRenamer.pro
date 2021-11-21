@@ -33,6 +33,7 @@ SOURCES += \
     StringBuilderOnFile/CryptographicHash.cpp \
     StringBuilderOnFile/ImageHash.cpp \
     StringBuilderOnFile/OriginalName.cpp \
+    StringBuilderWidgetFactory.cpp \
     ThreadCreateNewNames.cpp \
     ThreadRename.cpp \
     ThreadUndoRenaming.cpp \
@@ -43,6 +44,7 @@ SOURCES += \
     widgets/DialogSaveRenameSettings.cpp \
     widgets/FormStringBuilder.cpp \
     widgets/FormStringBuilderChain.cpp \
+    widgets/HistoryComboBox.cpp \
     widgets/SavedSettingsListWidget.cpp \
     widgets/WidgetApplicationLogs.cpp \
     widgets/WidgetFileHashSetting.cpp \
@@ -84,6 +86,7 @@ HEADERS += \
     StringBuilderOnFile/IFileInfo.h \
     StringBuilderOnFile/ImageHash.h \
     StringBuilderOnFile/OriginalName.h \
+    StringBuilderWidgetFactory.h \
     ThreadCreateNewNames.h \
     ThreadRename.h \
     ThreadUndoRenaming.h \
@@ -93,6 +96,7 @@ HEADERS += \
     widgets/DialogSaveRenameSettings.h \
     widgets/FormStringBuilder.h \
     widgets/FormStringBuilderChain.h \
+    widgets/HistoryComboBox.h \
     widgets/SavedSettingsListWidget.h \
     widgets/WidgetApplicationLogs.h \
     widgets/WidgetFileHashSetting.h \
@@ -130,4 +134,4 @@ RESOURCES += \
 VERSION = 1.2.1.1
 RC_ICONS = res/images/filerenamer.ico
 QMAKE_TARGET_PRODUCT = FileRenamer
-QMAKE_TARGET_COPYRIGHT = "Copyright 2020-2021 Takashi Inoue"
+QMAKE_TARGET_COPYRIGHT = "Copyright 2021-2021 Takashi Inoue"

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Takashi Inoue
+ * Copyright 2021 Takashi Inoue
  *
  * This file is part of FileRenamer.
  *
@@ -20,15 +20,18 @@
 #include "WidgetReplaceSetting.h"
 #include "ui_WidgetReplaceSetting.h"
 
+#include "Application.h"
 #include "StringBuilder/RegExpReplace.h"
 #include "StringBuilder/ReplaceString.h"
 
+#include <QDebug>
+
 namespace {
-    constexpr char settingsGroupName[] = "TextReplace";
-    constexpr char settingsKeyAfter[]  = "After";
-    constexpr char settingsKeyBefore[] = "Before";
-    constexpr char settingsKeyUserRegexp[] = "UseRegexp";
-    constexpr char settingsKeyCaseSensitive[] = "CaseSensitive";
+constexpr char settingsGroupName[] = "TextReplace";
+constexpr char settingsKeyReplace[]  = "Replace";
+constexpr char settingsKeySearch[] = "Search";
+constexpr char settingsKeyUseRegexp[] = "UseRegexp";
+constexpr char settingsKeyCaseSensitive[] = "CaseSensitive";
 }
 
 WidgetReplaceSetting::WidgetReplaceSetting(QWidget *parent) :
@@ -43,10 +46,10 @@ WidgetReplaceSetting::WidgetReplaceSetting(QWidget *parent) :
     connect(ui->checkBoxUseRegex, &QCheckBox::clicked
           , this, &AbstractStringBuilderWidget::changeStarted);
 
-    connect(ui->lineEditAfter, &QLineEdit::textChanged
+    connect(ui->comboxReplace, &QComboBox::currentTextChanged
           , this, &AbstractStringBuilderWidget::changeStarted);
 
-    connect(ui->lineEditBefore, &QLineEdit::textChanged
+    connect(ui->comboxSearch, &QComboBox::currentTextChanged
           , this, &AbstractStringBuilderWidget::changeStarted);
 }
 
@@ -57,23 +60,28 @@ WidgetReplaceSetting::~WidgetReplaceSetting()
 
 QSharedPointer<StringBuilder::AbstractStringBuilder> WidgetReplaceSetting::StringBuilder() const
 {
-    QString before = ui->lineEditBefore->text();
-    QString after = ui->lineEditAfter->text();
+    QString replace = ui->comboxReplace->currentText();
+    QString search = ui->comboxSearch->currentText();
     bool isCaseSensitive = ui->checkBoxCaseSensitive->isChecked();
 
     if (ui->checkBoxUseRegex->isChecked())
-        return QSharedPointer<StringBuilder::RegExpReplace>::create(before, after, isCaseSensitive);
+        return QSharedPointer<StringBuilder::RegExpReplace>::create(search, replace, isCaseSensitive);
 
-    return QSharedPointer<StringBuilder::ReplaceString>::create(before, after, isCaseSensitive);
+    return QSharedPointer<StringBuilder::ReplaceString>::create(search, replace, isCaseSensitive);
 }
 
 void WidgetReplaceSetting::loadSettings(QSharedPointer<QSettings> qSettings)
 {
     qSettings->beginGroup(settingsGroupName);
 
-    ui->lineEditAfter->setText(qSettings->value(settingsKeyAfter).toString());
-    ui->lineEditBefore->setText(qSettings->value(settingsKeyBefore).toString());
-    ui->checkBoxUseRegex->setChecked(qSettings->value(settingsKeyUserRegexp).toBool());
+    ui->comboxReplace->clear();
+    ui->comboxSearch->clear();
+    ui->comboxReplace->loadSettings(qSettings, settingsKeyReplace);
+    ui->comboxSearch->loadSettings(qSettings, settingsKeySearch);
+    ui->comboxReplace->setEditText(qSettings->value(settingsKeyReplace).toString());
+    ui->comboxSearch->setEditText(qSettings->value(settingsKeySearch).toString());
+
+    ui->checkBoxUseRegex->setChecked(qSettings->value(settingsKeyUseRegexp).toBool());
     ui->checkBoxCaseSensitive->setChecked(qSettings->value(settingsKeyCaseSensitive, true).toBool());
 
     qSettings->endGroup();
@@ -83,10 +91,23 @@ void WidgetReplaceSetting::saveSettings(QSharedPointer<QSettings> qSettings) con
 {
     qSettings->beginGroup(settingsGroupName);
 
-    qSettings->setValue(settingsKeyAfter, ui->lineEditAfter->text());
-    qSettings->setValue(settingsKeyBefore, ui->lineEditBefore->text());
-    qSettings->setValue(settingsKeyUserRegexp, ui->checkBoxUseRegex->isChecked());
+    qSettings->setValue(settingsKeyReplace, ui->comboxReplace->currentText());
+    qSettings->setValue(settingsKeySearch, ui->comboxSearch->currentText());
+    qSettings->setValue(settingsKeyUseRegexp, ui->checkBoxUseRegex->isChecked());
     qSettings->setValue(settingsKeyCaseSensitive, ui->checkBoxCaseSensitive->isChecked());
 
+    ui->comboxReplace->saveSettings(qSettings, settingsKeyReplace);
+    ui->comboxSearch->saveSettings(qSettings, settingsKeySearch);
+
     qSettings->endGroup();
+}
+
+void WidgetReplaceSetting::changeEvent(QEvent *event)
+{
+    if (event->type() == QEvent::EnabledChange && !isEnabled()) {
+        ui->comboxReplace->insertCurrentTextToItem(0);
+        ui->comboxSearch->insertCurrentTextToItem(0);
+    }
+
+    AbstractStringBuilderWidget::changeEvent(event);
 }

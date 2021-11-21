@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Takashi Inoue
+ * Copyright 2021 Takashi Inoue
  *
  * This file is part of FileRenamer.
  *
@@ -37,6 +37,9 @@ public:
     QSharedPointer<StringBuilder::AbstractStringBuilder> StringBuilder() const override;
     void loadSettings(QSharedPointer<QSettings>) override;
     void saveSettings(QSharedPointer<QSettings>) const override;
+
+protected:
+    void changeEvent(QEvent *event) override;
 
 private:
     Ui::WidgetNumberSetting *ui;

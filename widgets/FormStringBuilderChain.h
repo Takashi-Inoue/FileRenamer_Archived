@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Takashi Inoue
+ * Copyright 2021 Takashi Inoue
  *
  * This file is part of FileRenamer.
  *
@@ -53,6 +53,7 @@ signals:
 
 public slots:
     FormStringBuilder *createNewSetting(int builderIndex = 0);
+    void saveLatestSettings() const;
 
 private slots:
     void startTimer();

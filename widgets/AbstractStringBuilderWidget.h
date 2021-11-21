@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Takashi Inoue
+ * Copyright 2021 Takashi Inoue
  *
  * This file is part of FileRenamer.
  *
@@ -34,8 +34,8 @@ public:
     using QWidget::QWidget;
 
     virtual QSharedPointer<StringBuilder::AbstractStringBuilder> StringBuilder() const = 0;
-    virtual void loadSettings(QSharedPointer<QSettings>) {}
-    virtual void saveSettings(QSharedPointer<QSettings>) const {}
+    virtual void loadSettings(QSharedPointer<QSettings>) = 0;
+    virtual void saveSettings(QSharedPointer<QSettings>) const = 0;
 
 signals:
     void changeStarted();

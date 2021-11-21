@@ -17,32 +17,20 @@
  * along with FileRenamer.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef WIDGETREPLACESETTING_H
-#define WIDGETREPLACESETTING_H
+#ifndef STRINGBUILDERWIDGETFACTORY_H
+#define STRINGBUILDERWIDGETFACTORY_H
 
-#include "AbstractStringBuilderWidget.h"
+class AbstractStringBuilderWidget;
 
-namespace Ui {
-class WidgetReplaceSetting;
-}
+class QWidget;
 
-class WidgetReplaceSetting : public AbstractStringBuilderWidget
+class StringBuilderWidgetFactory
 {
-    Q_OBJECT
-
 public:
-    explicit WidgetReplaceSetting(QWidget *parent = nullptr);
-    ~WidgetReplaceSetting() override;
+    StringBuilderWidgetFactory() = default;
 
-    QSharedPointer<StringBuilder::AbstractStringBuilder> StringBuilder() const override;
-    void loadSettings(QSharedPointer<QSettings>) override;
-    void saveSettings(QSharedPointer<QSettings>) const override;
-
-protected:
-    void changeEvent(QEvent *event) override;
-
-private:
-    Ui::WidgetReplaceSetting *ui;
+    // builderIndex links index of combobox in FormStringBuilder.
+    AbstractStringBuilderWidget *createWidget(int builderIndex, QWidget *parent) const;
 };
 
-#endif // WIDGETREPLACESETTING_H
+#endif // STRINGBUILDERWIDGETFACTORY_H

@@ -1,20 +1,20 @@
 /*
- * Copyright YEAR Takashi Inoue
+ * Copyright 2021 Takashi Inoue
  *
- * This file is part of APPNAME.
+ * This file is part of FileRenamer.
  *
- * APPNAME is free software: you can redistribute it and/or modify
+ * FileRenamer is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * APPNAME is distributed in the hope that it will be useful,
+ * FileRenamer is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with APPNAME.  If not, see <http://www.gnu.org/licenses/>.
+ * along with FileRenamer.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "Application.h"
@@ -22,6 +22,10 @@
 #include <QFile>
 #include <QPalette>
 #include <QStyle>
+
+namespace {
+constexpr char settingsGroupNameLatest[] = "Latest";
+}
 
 void Application::applyDarkPalette()
 {
@@ -82,4 +86,13 @@ QString Application::renameSettingsDirPath()
 QSharedPointer<QSettings> Application::mainQSettings()
 {
     return QSharedPointer<QSettings>::create(mainSettingsFilePath(), QSettings::IniFormat);
+}
+
+QSharedPointer<QSettings> Application::qSettingsForLatestSettings()
+{
+    QSharedPointer<QSettings> qSettings = mainQSettings();
+
+    qSettings->beginGroup(settingsGroupNameLatest);
+
+    return qSettings;
 }

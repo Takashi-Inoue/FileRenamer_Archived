@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Takashi Inoue
+ * Copyright 2021 Takashi Inoue
  *
  * This file is part of FileRenamer.
  *
@@ -46,10 +46,10 @@ WidgetNumberSetting::WidgetNumberSetting(QWidget *parent) :
     connect(ui->spinBoxDigit, &QSpinBox::valueChanged
           , this, &AbstractStringBuilderWidget::changeStarted);
 
-    connect(ui->lineEditPrefix, &QLineEdit::textChanged
+    connect(ui->comboxPrefix, &QComboBox::currentTextChanged
           , this, &AbstractStringBuilderWidget::changeStarted);
 
-    connect(ui->lineEditSuffix, &QLineEdit::textChanged
+    connect(ui->comboxSuffix, &QComboBox::currentTextChanged
           , this, &AbstractStringBuilderWidget::changeStarted);
 
     connect(ui->widgetPositionFixer, &WidgetPositionFixer::changeStarted
@@ -66,7 +66,7 @@ QSharedPointer<StringBuilder::AbstractStringBuilder> WidgetNumberSetting::String
     return QSharedPointer<StringBuilder::Number>::create(
                 ui->widgetPositionFixer->value()
               , ui->spinBoxStart->value(), ui->spinBoxStep->value(), ui->spinBoxDigit->value()
-              , ui->lineEditPrefix->text(), ui->lineEditSuffix->text()
+              , ui->comboxPrefix->currentText(), ui->comboxSuffix->currentText()
                 );
 }
 
@@ -74,11 +74,16 @@ void WidgetNumberSetting::loadSettings(QSharedPointer<QSettings> qSettings)
 {
     qSettings->beginGroup(settingsGroupName);
 
+    ui->comboxPrefix->clear();
+    ui->comboxSuffix->clear();
+    ui->comboxPrefix->loadSettings(qSettings, settingsKeyPrefix);
+    ui->comboxSuffix->loadSettings(qSettings, settingsKeySuffix);
+    ui->comboxPrefix->setEditText(qSettings->value(settingsKeyPrefix).toString());
+    ui->comboxSuffix->setEditText(qSettings->value(settingsKeySuffix).toString());
+
     ui->spinBoxStart->setValue(qSettings->value(settingsKeyStart, 0).toInt());
     ui->spinBoxStep->setValue(qSettings->value(settingsKeyIncremental, 1).toInt());
     ui->spinBoxDigit->setValue(qSettings->value(settingsKeyDigit, 0).toInt());
-    ui->lineEditPrefix->setText(qSettings->value(settingsKeyPrefix).toString());
-    ui->lineEditSuffix->setText(qSettings->value(settingsKeySuffix).toString());
     ui->widgetPositionFixer->loadSettings(qSettings);
 
     qSettings->endGroup();
@@ -91,9 +96,22 @@ void WidgetNumberSetting::saveSettings(QSharedPointer<QSettings> qSettings) cons
     qSettings->setValue(settingsKeyStart, ui->spinBoxStart->value());
     qSettings->setValue(settingsKeyIncremental, ui->spinBoxStep->value());
     qSettings->setValue(settingsKeyDigit, ui->spinBoxDigit->value());
-    qSettings->setValue(settingsKeyPrefix, ui->lineEditPrefix->text());
-    qSettings->setValue(settingsKeySuffix, ui->lineEditSuffix->text());
+    qSettings->setValue(settingsKeyPrefix, ui->comboxPrefix->currentText());
+    qSettings->setValue(settingsKeySuffix, ui->comboxSuffix->currentText());
     ui->widgetPositionFixer->saveSettings(qSettings);
 
+    ui->comboxPrefix->saveSettings(qSettings, settingsKeyPrefix);
+    ui->comboxSuffix->saveSettings(qSettings, settingsKeySuffix);
+
     qSettings->endGroup();
+}
+
+void WidgetNumberSetting::changeEvent(QEvent *event)
+{
+    if (event->type() == QEvent::EnabledChange && !isEnabled()) {
+        ui->comboxPrefix->insertCurrentTextToItem(0);
+        ui->comboxSuffix->insertCurrentTextToItem(0);
+    }
+
+    AbstractStringBuilderWidget::changeEvent(event);
 }

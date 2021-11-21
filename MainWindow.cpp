@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Takashi Inoue
+ * Copyright 2021 Takashi Inoue
  *
  * This file is part of FileRenamer.
  *
@@ -89,6 +89,9 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->actionStop,       &QAction::triggered, m_pathModel, &PathModel::stopRename);
     connect(ui->actionUndo,       &QAction::triggered, m_pathModel, &PathModel::undoRename);
     connect(ui->actionClearItems, &QAction::triggered, m_pathModel, &PathModel::clear);
+
+    connect(ui->actionRename, &QAction::triggered
+          , ui->formStringBuilderChain, &FormStringBuilderChain::saveLatestSettings);
 
     m_pathModel->startCreateNewNames(ui->formStringBuilderChain->builderChain());
 }
@@ -325,4 +328,3 @@ void MainWindow::onActionDarkModeTriggered(bool checked)
     checked ? Application::applyDarkPalette()
             : Application::applyDefaultPalette();
 }
-

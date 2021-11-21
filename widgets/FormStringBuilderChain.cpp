@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Takashi Inoue
+ * Copyright 2021 Takashi Inoue
  *
  * This file is part of FileRenamer.
  *
@@ -22,11 +22,12 @@
 
 #include "Application.h"
 #include "FormStringBuilder.h"
+#include "widgets/AbstractStringBuilderWidget.h"
 
 #include <QTimer>
 
 namespace {
-    constexpr char settingsKeyCount[] = "SettingsCount";
+constexpr char settingsKeyCount[] = "SettingsCount";
 }
 
 FormStringBuilderChain::FormStringBuilderChain(QWidget *parent)
@@ -98,16 +99,24 @@ void FormStringBuilderChain::loadBuilderSettings(QSharedPointer<QSettings> qSett
 
 void FormStringBuilderChain::saveCurrentBuilderSettings(QSharedPointer<QSettings> qSettings) const
 {
-    qSettings->clear();
-
     QList<FormStringBuilder *> formsBuilder = findChildren<FormStringBuilder *>();
-
-    if (formsBuilder.isEmpty())
-        return;
 
     qsizetype formsBuilderSize = formsBuilder.size();
 
     qSettings->setValue(settingsKeyCount, formsBuilderSize);
+
+    if (formsBuilder.isEmpty())
+        return;
+
+    QStringList childGroups = qSettings->childGroups();
+    QString groupName;
+    qsizetype groupNumber = 0;
+
+    while (childGroups.contains(groupName = QString::number(groupNumber++))) {
+        qSettings->beginGroup(groupName);
+        qSettings->remove("");
+        qSettings->endGroup();
+    }
 
     for (qsizetype i = 0; i < formsBuilderSize; ++i) {
         qSettings->beginGroup(QString::number(i));
@@ -138,6 +147,19 @@ FormStringBuilder *FormStringBuilderChain::createNewSetting(int builderIndex)
     startTimer();
 
     return widget;
+}
+
+void FormStringBuilderChain::saveLatestSettings() const
+{
+    QList<AbstractStringBuilderWidget *> builderWidgets = findChildren<AbstractStringBuilderWidget *>();
+
+    if (builderWidgets.isEmpty())
+        return;
+
+    QSharedPointer<QSettings> qSettings = Application::qSettingsForLatestSettings();
+
+    for (AbstractStringBuilderWidget *builderWidget : builderWidgets)
+        builderWidget->saveSettings(qSettings);
 }
 
 void FormStringBuilderChain::startTimer()

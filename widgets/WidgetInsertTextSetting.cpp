@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Takashi Inoue
+ * Copyright 2021 Takashi Inoue
  *
  * This file is part of FileRenamer.
  *
@@ -36,7 +36,7 @@ WidgetInsertTextSetting::WidgetInsertTextSetting(QWidget *parent) :
     connect(ui->widgetPositionFixer, &WidgetPositionFixer::changeStarted
           , this, &AbstractStringBuilderWidget::changeStarted);
 
-    connect(ui->lineEdit, &QLineEdit::textChanged
+    connect(ui->combox, &QComboBox::currentTextChanged
           , this, &AbstractStringBuilderWidget::changeStarted);
 }
 
@@ -48,14 +48,16 @@ WidgetInsertTextSetting::~WidgetInsertTextSetting()
 QSharedPointer<StringBuilder::AbstractStringBuilder> WidgetInsertTextSetting::StringBuilder() const
 {
     return QSharedPointer<StringBuilder::InsertString>::create(
-                ui->widgetPositionFixer->value(), ui->lineEdit->text());
+                ui->widgetPositionFixer->value(), ui->combox->currentText());
 }
 
 void WidgetInsertTextSetting::loadSettings(QSharedPointer<QSettings> qSettings)
 {
     qSettings->beginGroup(settingsGroupName);
 
-    ui->lineEdit->setText(qSettings->value(settingsKeyText).toString());
+    ui->combox->clear();
+    ui->combox->loadSettings(qSettings, settingsKeyText);
+    ui->combox->setEditText(qSettings->value(settingsKeyText).toString());
     ui->widgetPositionFixer->loadSettings(qSettings);
 
     qSettings->endGroup();
@@ -65,8 +67,17 @@ void WidgetInsertTextSetting::saveSettings(QSharedPointer<QSettings> qSettings) 
 {
     qSettings->beginGroup(settingsGroupName);
 
-    qSettings->setValue(settingsKeyText, ui->lineEdit->text());
+    qSettings->setValue(settingsKeyText, ui->combox->currentText());
+    ui->combox->saveSettings(qSettings, settingsKeyText);
     ui->widgetPositionFixer->saveSettings(qSettings);
 
     qSettings->endGroup();
+}
+
+void WidgetInsertTextSetting::changeEvent(QEvent *event)
+{
+    if (event->type() == QEvent::EnabledChange && !isEnabled())
+        ui->combox->insertCurrentTextToItem(0);
+
+    AbstractStringBuilderWidget::changeEvent(event);
 }
