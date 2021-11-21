@@ -107,6 +107,12 @@
    <header>widgets/HistoryComboBox.h</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>checkBoxUseRegex</tabstop>
+  <tabstop>checkBoxCaseSensitive</tabstop>
+  <tabstop>comboxSearch</tabstop>
+  <tabstop>comboxReplace</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

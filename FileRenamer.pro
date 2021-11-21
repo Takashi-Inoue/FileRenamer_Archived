@@ -9,7 +9,6 @@ CONFIG += c++17
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    AbstractSettings.cpp \
     Application.cpp \
     ApplicationLog/ApplicationLog.cpp \
     ApplicationLog/DebugLog.cpp \
@@ -57,7 +56,6 @@ SOURCES += \
     widgets/WidgetReplaceSetting.cpp
 
 HEADERS += \
-    AbstractSettings.h \
     Application.h \
     ApplicationLog/ApplicationLog.h \
     ApplicationLog/DebugLog.h \
@@ -131,7 +129,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 RESOURCES += \
     images.qrc
 
-VERSION = 1.2.1.1
+VERSION = 1.3.0.0
 RC_ICONS = res/images/filerenamer.ico
 QMAKE_TARGET_PRODUCT = FileRenamer
 QMAKE_TARGET_COPYRIGHT = "Copyright 2021-2021 Takashi Inoue"

@@ -39,7 +39,7 @@ int main(int argc, char *argv[])
     QApplication::setFont(font);
 
     QCoreApplication::setApplicationName("FileRenamer");
-    QCoreApplication::setApplicationVersion("1.2.1.1");
+    QCoreApplication::setApplicationVersion("1.3.0.0");
 
     DebugLog::init();
 
