@@ -22,10 +22,8 @@
 
 #include "ApplicationLog/ApplicationLog.h"
 
-#include <QClipboard>
 #include <QDir>
 #include <QFileIconProvider>
-#include <QGuiApplication>
 
 namespace Path {
 
@@ -34,15 +32,12 @@ PathEntity::PathEntity(QWeakPointer<ParentDir> parent, QStringView name, bool is
     , m_parent(parent)
     , m_name(name.toString())
 {
+    static QFileIconProvider iconProvider; // static for one-time creation.
+
     Q_ASSERT(parent != nullptr);
     Q_ASSERT(!name.isEmpty());
-}
 
-void PathEntity::copyOriginalNameToClipboard() const
-{
-    QReadLocker locker(&m_lock);
-
-    QGuiApplication::clipboard()->setText(m_name);
+    m_fileIcon = iconProvider.icon(QFileInfo(fullPath()));
 }
 
 bool PathEntity::isDir() const
@@ -151,12 +146,18 @@ QIcon PathEntity::stateIcon() const
 
 QIcon PathEntity::typeIcon() const
 {
-    static const QIcon icons[] = {
-        QFileIconProvider().icon(QAbstractFileIconProvider::File),
-        QFileIconProvider().icon(QAbstractFileIconProvider::Folder),
-    };
+    return m_fileIcon;
+}
 
-    return icons[m_isDir];
+QString PathEntity::statusText() const
+{
+    if (state() == State::initial)
+        return name();
+
+    if (state() == State::ready)
+        return QStringLiteral("%1 -> %2").arg(fullPath(), newName());
+
+    return "";
 }
 
 bool PathEntity::rename()

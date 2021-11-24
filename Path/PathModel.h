@@ -44,6 +44,10 @@ public:
 
     explicit PathModel(QObject *parent = nullptr);
 
+    enum class HSection : int {
+        originalName, newName, path
+    };
+
     // Header:
     QVariant headerData(int section, Qt::Orientation orientation
                       , int role = Qt::DisplayRole) const override;
@@ -67,8 +71,6 @@ public:
     void addPaths(QList<ParentChildrenPair> dirs, QList<ParentChildrenPair> files);
     void removeSpecifiedRows(QList<int> rows);
 
-    void copyOriginalNameToClipboard(int row) const;
-
 public slots:
     void clear();
     // Start/Stop threads
@@ -80,6 +82,7 @@ public slots:
 signals:
     void internalDataChanged();
     void itemCleared();
+    void itemCountChanged(int);
     void readyToRename();
     void renameStarted();
     void renameStopped();
@@ -94,10 +97,6 @@ private slots:
     void onNewNameStateChanged(int row);
 
 private:
-    enum class HSection : int {
-        originalName, newName, path
-    };
-
     static const inline QString m_mimeTypeModelDataList
         = QStringLiteral("application/x-qabstractitemmodeldatalist");
 

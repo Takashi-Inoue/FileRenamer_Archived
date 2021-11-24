@@ -17,28 +17,25 @@
  * along with FileRenamer.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef HISTORYCOMBOBOX_H
-#define HISTORYCOMBOBOX_H
+#ifndef COUNTERLABEL_H
+#define COUNTERLABEL_H
 
-#include <QComboBox>
-#include <QSettings>
+#include <QLabel>
 
-class HistoryComboBox : public QComboBox
+class CounterLabel : public QLabel
 {
     Q_OBJECT
 public:
-    using QComboBox::QComboBox;
+    CounterLabel(QStringView singleNumberSuffix, QStringView multiNumberSuffix, QWidget *parent = nullptr);
+    CounterLabel(QStringView suffix, QWidget *parent = nullptr);
 
-    QStringList allItemsText() const;
+public slots:
+    void setCount(int m_count);
 
-    void addCurrentTextToItem();
-    void insertCurrentTextToItem(int index);
-
-    void loadSettings(QSharedPointer<QSettings>, QString key);
-    void saveSettings(QSharedPointer<QSettings>, QString key);
-
-    void loadSettings(QSharedPointer<QSettings>, QString subGroup, QString key);
-    void saveSettings(QSharedPointer<QSettings>, QString subGroup, QString key);
+protected:
+    int m_count = 0;
+    QString m_singleSuffix;
+    QString m_multiSuffix;
 };
 
-#endif // HISTORYCOMBOBOX_H
+#endif // COUNTERLABEL_H

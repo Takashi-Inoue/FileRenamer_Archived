@@ -124,6 +124,9 @@ QVariant PathModel::data(const QModelIndex &index, int role) const
             return entity->stateIcon();
     }
 
+    if (role == Qt::StatusTipRole)
+        return entity->statusText();
+
     return QVariant();
 }
 
@@ -210,6 +213,7 @@ void PathModel::addPaths(QList<PathModel::ParentChildrenPair> dirs
 
     endResetModel();
 
+    emit itemCountChanged(rowCount());
     emit internalDataChanged();
 }
 
@@ -221,13 +225,10 @@ void PathModel::removeSpecifiedRows(QList<int> rows)
     m_dataRoot->removeSpecifiedRows(rows);
     endResetModel();
 
+    emit itemCountChanged(rowCount());
+
     m_dataRoot->entityCount() != 0 ? emit internalDataChanged()
                                    : emit itemCleared();
-}
-
-void PathModel::copyOriginalNameToClipboard(int row) const
-{
-    m_dataRoot->entity(row)->copyOriginalNameToClipboard();
 }
 
 void PathModel::clear()

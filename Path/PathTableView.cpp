@@ -20,39 +20,37 @@
 #include "PathTableView.h"
 #include "PathModel.h"
 
+#include <QClipboard>
 #include <QContextMenuEvent>
+#include <QGuiApplication>
 #include <QMenu>
 #include <QDebug>
 
 PathTableView::PathTableView(QWidget *parent)
     : QTableView(parent)
-    , m_actionCopyName(new QAction(QIcon(":/res/icons/text-x-preview.ico"), "Copy name(&C)", this))
-    , m_actionDeleteItem(new QAction(QIcon(":/res/images/x.svg"), "Delete(&D)", this))
+    , m_actionRemoveItem(new QAction(QIcon(":/res/images/x.svg"), "Remove from list(&R)", this))
 {
-    m_actionCopyName->setToolTip("Copy original name (topmost selected item)");
-    m_actionCopyName->setShortcutContext(Qt::WidgetShortcut);
-    m_actionCopyName->setShortcut(QKeySequence::Copy);
+    auto actionCopyName = new QAction(QIcon(":/icons/text"), "Copy original name(&C)", this);
 
-    m_actionDeleteItem->setToolTip("Delete selected items");
-    m_actionDeleteItem->setShortcutContext(Qt::WidgetShortcut);
-    m_actionDeleteItem->setShortcut(QKeySequence::Delete);
+    actionCopyName->setToolTip("Copy original name (current item)");
+    actionCopyName->setShortcutContext(Qt::WidgetShortcut);
+    actionCopyName->setShortcut(QKeySequence::Copy);
 
-    addAction(m_actionCopyName);
-    addAction(m_actionDeleteItem);
+    m_actionRemoveItem->setToolTip("Remove selected items from list");
+    m_actionRemoveItem->setShortcutContext(Qt::WidgetShortcut);
+    m_actionRemoveItem->setShortcut(QKeySequence::Delete);
 
-    connect(m_actionCopyName, &QAction::triggered, this, &PathTableView::onActionCopyNameTriggered);
-    connect(m_actionDeleteItem, &QAction::triggered, this, &PathTableView::onActionDeleteTriggered);
-}
+    addAction(actionCopyName);
+    addAction(m_actionRemoveItem);
 
-QList<QAction *> PathTableView::actionsToChangeItem() const
-{
-    return {m_actionCopyName, m_actionDeleteItem};
+    connect(actionCopyName, &QAction::triggered, this, &PathTableView::onActionCopyNameTriggered);
+    connect(m_actionRemoveItem, &QAction::triggered, this, &PathTableView::onActionRemoveTriggered);
 }
 
 void PathTableView::setEnableToChangeItems(bool isEnable)
 {
     setDragEnabled(isEnable);
-    m_actionDeleteItem->setEnabled(isEnable);
+    m_actionRemoveItem->setEnabled(isEnable);
 }
 
 void PathTableView::contextMenuEvent(QContextMenuEvent *event)
@@ -66,29 +64,46 @@ void PathTableView::contextMenuEvent(QContextMenuEvent *event)
         menu = new QMenu(this);
         menu->addActions(actions());
 
-        connect(m_actionDeleteItem, &QAction::triggered, menu, &QMenu::close);
+        connect(m_actionRemoveItem, &QAction::triggered, menu, &QMenu::close);
     }
 
     menu->popup(viewport()->mapToGlobal(event->pos()));
 }
 
-void PathTableView::onActionCopyNameTriggered()
+void PathTableView::selectionChanged(const QItemSelection &selected, const QItemSelection &deselected)
 {
-    auto pathModel = qobject_cast<PathModel *>(model());
+    QTableView::selectionChanged(selected, deselected);
 
-    if (pathModel == nullptr)
-        return;
+    QModelIndexList selectedRows = selectionModel()->selectedRows();
+    qsizetype selectedCount = selectedRows.count();
 
-    QModelIndexList indices = selectionModel()->selectedRows();
+    emit selectedCountChanged(selectedCount);
 
-    std::sort(indices.begin(), indices.end(), [](const QModelIndex &lhs, const QModelIndex &rhs) {
-        return lhs.row() < rhs.row();
-    });
+    QString statusText;
+    QIcon statusIcon;
 
-    pathModel->copyOriginalNameToClipboard(indices.first().row());
+    if (selectedCount == 1) {
+        statusText = selectedRows.first().data(Qt::StatusTipRole).toString();
+        statusIcon = selectedRows.first().data(Qt::DecorationRole).value<QIcon>();
+    }
+
+    emit statusTextChanged(statusIcon, statusText);
 }
 
-void PathTableView::onActionDeleteTriggered()
+void PathTableView::onActionCopyNameTriggered()
+{
+    QModelIndex index = model()->index(currentIndex().row(), int(PathModel::HSection::originalName));
+
+    QString name = index.data().toString();
+
+    QGuiApplication::clipboard()->setText(name);
+
+    QString statusText = QStringLiteral("Copied to clipboard : <i>%1</i>").arg(name);
+
+    emit statusTextChanged(QIcon(), statusText);
+}
+
+void PathTableView::onActionRemoveTriggered()
 {
     auto pathModel = qobject_cast<PathModel *>(model());
 

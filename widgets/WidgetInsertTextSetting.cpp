@@ -20,6 +20,7 @@
 #include "WidgetInsertTextSetting.h"
 #include "ui_WidgetInsertTextSetting.h"
 
+#include "FileNameVlidator.h"
 #include "StringBuilder/InsertString.h"
 
 namespace {
@@ -32,6 +33,8 @@ WidgetInsertTextSetting::WidgetInsertTextSetting(QWidget *parent) :
     ui(new Ui::WidgetInsertTextSetting)
 {
     ui->setupUi(this);
+
+    ui->combox->setValidator(new FileNameVlidator(this));
 
     connect(ui->widgetPositionFixer, &WidgetPositionFixer::changeStarted
           , this, &AbstractStringBuilderWidget::changeStarted);

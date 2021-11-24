@@ -17,28 +17,16 @@
  * along with FileRenamer.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef HISTORYCOMBOBOX_H
-#define HISTORYCOMBOBOX_H
+#include "FileNameVlidator.h"
 
-#include <QComboBox>
-#include <QSettings>
-
-class HistoryComboBox : public QComboBox
+QValidator::State FileNameVlidator::validate(QString &input, int &/*pos*/) const
 {
-    Q_OBJECT
-public:
-    using QComboBox::QComboBox;
+    static constexpr QChar invalidChars[] = {'\\', '/', ':', '*', '?', '\"', '<', '>', '|'};
 
-    QStringList allItemsText() const;
+    for (QChar qC : invalidChars) {
+        if (input.contains(qC))
+            return QValidator::Invalid;
+    }
 
-    void addCurrentTextToItem();
-    void insertCurrentTextToItem(int index);
-
-    void loadSettings(QSharedPointer<QSettings>, QString key);
-    void saveSettings(QSharedPointer<QSettings>, QString key);
-
-    void loadSettings(QSharedPointer<QSettings>, QString subGroup, QString key);
-    void saveSettings(QSharedPointer<QSettings>, QString subGroup, QString key);
-};
-
-#endif // HISTORYCOMBOBOX_H
+    return QValidator::Acceptable;
+}

@@ -36,8 +36,6 @@ class PathEntity
 public:
     PathEntity(QWeakPointer<ParentDir> parent, QStringView name, bool isDir);
 
-    void copyOriginalNameToClipboard() const;
-
     bool isDir() const;
     QString fullPath() const;
     QString parentPath() const;
@@ -59,6 +57,7 @@ public:
 
     QIcon stateIcon() const;
     QIcon typeIcon() const;
+    QString statusText() const;
 
     bool rename();
     bool undoRename();
@@ -80,6 +79,7 @@ private:
     QWeakPointer<ParentDir> m_parent;
     QString m_name;
     QString m_newName;
+    QIcon m_fileIcon;
     QHash<QCryptographicHash::Algorithm, QString> m_fileHashs;
     QString m_imageHash;
 };

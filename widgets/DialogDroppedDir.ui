@@ -52,7 +52,7 @@
         </property>
         <property name="icon">
          <iconset resource="../images.qrc">
-          <normaloff>:/res/icons/text-x-preview.ico</normaloff>:/res/icons/text-x-preview.ico</iconset>
+          <normaloff>:/icons/text</normaloff>:/icons/text</iconset>
         </property>
         <property name="iconSize">
          <size>

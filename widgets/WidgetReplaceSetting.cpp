@@ -21,6 +21,7 @@
 #include "ui_WidgetReplaceSetting.h"
 
 #include "Application.h"
+#include "FileNameVlidator.h"
 #include "StringBuilder/RegExpReplace.h"
 #include "StringBuilder/ReplaceString.h"
 
@@ -39,6 +40,8 @@ WidgetReplaceSetting::WidgetReplaceSetting(QWidget *parent) :
     ui(new Ui::WidgetReplaceSetting)
 {
     ui->setupUi(this);
+
+    ui->comboxReplace->setValidator(new FileNameVlidator(this));
 
     connect(ui->checkBoxCaseSensitive, &QCheckBox::clicked
           , this, &AbstractStringBuilderWidget::changeStarted);

@@ -43,6 +43,9 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
     , m_pathModel(new PathModel(this))
+    , m_statusItemCount(new CounterLabel(QStringLiteral("item"), QStringLiteral("items"), this))
+    , m_statusSelectedCount(new CounterLabel(QStringLiteral("selected"), this))
+    , m_statusMain(new ElideLabel(this))
 {
     ui->setupUi(this);
 
@@ -53,6 +56,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     ui->dockWidgetLogs->setVisible(false);
     ui->splitter->setSizes({350, 450});
+
+    initStatusBar();
 
     ui->actionDarkMode->setChecked(Application::isDarkMode());
 
@@ -143,6 +148,40 @@ void MainWindow::onSortingBroken()
     QHeaderView *header = ui->tableView->horizontalHeader();
 
     header->setSortIndicatorShown(false);
+}
+
+void MainWindow::onButtonLoadSettingsClicked()
+{
+    DialogLoadRenameSettings dlg(this);
+
+    if (dlg.exec() != QDialog::Accepted)
+        return;
+
+    auto qSettings = QSharedPointer<QSettings>::create(dlg.settingFullPath(), QSettings::IniFormat);
+
+    ui->formStringBuilderChain->loadBuilderSettings(qSettings);
+}
+
+void MainWindow::onButtonSaveSettingsClicked()
+{
+    DialogSaveRenameSettings dlg(this);
+
+    if (dlg.exec() != QDialog::Accepted)
+        return;
+
+    const QString newSettingPath = dlg.newSettingFullpath();
+
+    auto qSettings = QSharedPointer<QSettings>::create(newSettingPath, QSettings::IniFormat);
+
+    qSettings->clear();
+
+    ui->formStringBuilderChain->saveCurrentBuilderSettings(qSettings);
+}
+
+void MainWindow::onActionDarkModeTriggered(bool checked)
+{
+    checked ? Application::applyDarkPalette()
+            : Application::applyDefaultPalette();
 }
 
 void MainWindow::adaptorToChangeState()
@@ -295,36 +334,40 @@ int MainWindow::execConfirmRenameDirDlg(const QStringList &dirPaths)
     return msgBox.exec();
 }
 
-void MainWindow::onButtonLoadSettingsClicked()
+/*-------- initialize UI --------*/
+void MainWindow::initStatusBar()
 {
-    DialogLoadRenameSettings dlg(this);
+    m_statusMain->setElideMode(Qt::ElideMiddle);
 
-    if (dlg.exec() != QDialog::Accepted)
-        return;
+    QFontMetrics fontMetrics(m_statusMain->font());
 
-    auto qSettings = QSharedPointer<QSettings>::create(dlg.settingFullPath(), QSettings::IniFormat);
+    int labelWidth = int(fontMetrics.boundingRect("888888 selected").width() * 1.1);
 
-    ui->formStringBuilderChain->loadBuilderSettings(qSettings);
+    m_statusItemCount->setFixedWidth(labelWidth);
+    m_statusItemCount->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
+    m_statusSelectedCount->setFixedWidth(labelWidth);
+    m_statusSelectedCount->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
+
+    ui->statusBar->layout()->setContentsMargins(0, 0, 0, 0);
+    ui->statusBar->addPermanentWidget(m_statusItemCount, 1);
+    ui->statusBar->addPermanentWidget(createVLine());
+    ui->statusBar->addPermanentWidget(m_statusSelectedCount, 1);
+    ui->statusBar->addPermanentWidget(createVLine());
+    ui->statusBar->addPermanentWidget(m_statusMain, 8);
+
+    connect(m_pathModel, &PathModel::itemCountChanged, m_statusItemCount, &CounterLabel::setCount);
+
+    connect(ui->tableView, &PathTableView::selectedCountChanged, m_statusSelectedCount, &CounterLabel::setCount);
+    connect(ui->tableView, SIGNAL(statusTextChanged(QIcon, QString))
+          , m_statusMain, SLOT(setTextWithElide(QIcon, QString)));
 }
 
-void MainWindow::onButtonSaveSettingsClicked()
+QFrame *MainWindow::createVLine()
 {
-    DialogSaveRenameSettings dlg(this);
+    auto vLine = new QFrame(this);
 
-    if (dlg.exec() != QDialog::Accepted)
-        return;
+    vLine->setFrameStyle(int(QFrame::Sunken) | int(QFrame::VLine));
+    vLine->setLineWidth(1);
 
-    const QString newSettingPath = dlg.newSettingFullpath();
-
-    auto qSettings = QSharedPointer<QSettings>::create(newSettingPath, QSettings::IniFormat);
-
-    qSettings->clear();
-
-    ui->formStringBuilderChain->saveCurrentBuilderSettings(qSettings);
-}
-
-void MainWindow::onActionDarkModeTriggered(bool checked)
-{
-    checked ? Application::applyDarkPalette()
-            : Application::applyDefaultPalette();
+    return vLine;
 }

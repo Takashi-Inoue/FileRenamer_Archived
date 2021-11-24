@@ -97,8 +97,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>558</width>
-             <height>575</height>
+             <width>550</width>
+             <height>550</height>
             </rect>
            </property>
           </widget>
@@ -194,6 +194,7 @@
    </attribute>
    <widget class="WidgetApplicationLogs" name="dockWidgetContents"/>
   </widget>
+  <widget class="QStatusBar" name="statusBar"/>
   <action name="actionRename">
    <property name="icon">
     <iconset resource="images.qrc">
@@ -259,7 +260,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="images.qrc">
+    <iconset>
      <normaloff>:/res/icons/text-x-preview.ico</normaloff>:/res/icons/text-x-preview.ico</iconset>
    </property>
    <property name="text">

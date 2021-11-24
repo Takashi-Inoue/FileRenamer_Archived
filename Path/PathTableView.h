@@ -30,19 +30,22 @@ class PathTableView : public QTableView
 public:
     PathTableView(QWidget *parent = nullptr);
 
-    QList<QAction *> actionsToChangeItem() const;
     void setEnableToChangeItems(bool isEnable);
+
+signals:
+    void selectedCountChanged(qsizetype);
+    void statusTextChanged(QIcon, QString);
 
 protected:
     void contextMenuEvent(QContextMenuEvent *event) override;
+    void selectionChanged(const QItemSelection &selected, const QItemSelection &deselected) override;
 
 private slots:
     void onActionCopyNameTriggered();
-    void onActionDeleteTriggered();
+    void onActionRemoveTriggered();
 
 private:
-    QAction *m_actionCopyName;
-    QAction *m_actionDeleteItem;
+    QAction *m_actionRemoveItem;
 };
 
 #endif // PATHTABLEVIEW_H

@@ -20,6 +20,9 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include "widgets/CounterLabel.h"
+#include "widgets/ElideLabel.h"
+
 #include <QMainWindow>
 #include <QSharedPointer>
 
@@ -45,12 +48,13 @@ protected:
 private slots:
     void onPathsDataChanged();
     void onSortingBroken();
-    void adaptorToChangeState();
 
     void onButtonLoadSettingsClicked();
     void onButtonSaveSettingsClicked();
 
     void onActionDarkModeTriggered(bool checked);
+
+    void adaptorToChangeState();
 
 private:
     enum State : int {
@@ -61,8 +65,14 @@ private:
     void registerPaths(const QStringList &paths);
     int execConfirmRenameDirDlg(const QStringList &dirPaths);
 
+    void initStatusBar();
+    QFrame *createVLine();
+
     Ui::MainWindow *ui;
 
     PathModel *m_pathModel;
+    CounterLabel *m_statusItemCount;
+    CounterLabel *m_statusSelectedCount;
+    ElideLabel *m_statusMain;
 };
 #endif // MAINWINDOW_H

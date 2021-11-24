@@ -17,28 +17,33 @@
  * along with FileRenamer.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef HISTORYCOMBOBOX_H
-#define HISTORYCOMBOBOX_H
+#ifndef ELIDELABEL_H
+#define ELIDELABEL_H
 
-#include <QComboBox>
-#include <QSettings>
+#include <QLabel>
+#include <QIcon>
 
-class HistoryComboBox : public QComboBox
+class ElideLabel : public QLabel
 {
     Q_OBJECT
 public:
-    using QComboBox::QComboBox;
+    using QLabel::QLabel;
 
-    QStringList allItemsText() const;
+    void setElideMode(Qt::TextElideMode elideMode);
 
-    void addCurrentTextToItem();
-    void insertCurrentTextToItem(int index);
+public slots:
+    void setTextWithElide(QString text);
+    void setTextWithElide(QIcon icon, QString text);
 
-    void loadSettings(QSharedPointer<QSettings>, QString key);
-    void saveSettings(QSharedPointer<QSettings>, QString key);
+protected:
+    void resizeEvent(QResizeEvent *event) override;
+    void paintEvent(QPaintEvent *event) override;
 
-    void loadSettings(QSharedPointer<QSettings>, QString subGroup, QString key);
-    void saveSettings(QSharedPointer<QSettings>, QString subGroup, QString key);
+    void elide();
+
+    QIcon m_icon;
+    QString m_originalText;
+    Qt::TextElideMode m_elideMode = Qt::ElideRight;
 };
 
-#endif // HISTORYCOMBOBOX_H
+#endif // ELIDELABEL_H

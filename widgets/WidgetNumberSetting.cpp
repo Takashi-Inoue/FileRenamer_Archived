@@ -20,6 +20,7 @@
 #include "WidgetNumberSetting.h"
 #include "ui_WidgetNumberSetting.h"
 
+#include "FileNameVlidator.h"
 #include "StringBuilder/Number.h"
 
 namespace {
@@ -36,6 +37,11 @@ WidgetNumberSetting::WidgetNumberSetting(QWidget *parent) :
     ui(new Ui::WidgetNumberSetting)
 {
     ui->setupUi(this);
+
+    auto fileNameValidator = new FileNameVlidator(this);
+
+    ui->comboxPrefix->setValidator(fileNameValidator);
+    ui->comboxSuffix->setValidator(fileNameValidator);
 
     connect(ui->spinBoxStart, &QSpinBox::valueChanged
           , this, &AbstractStringBuilderWidget::changeStarted);

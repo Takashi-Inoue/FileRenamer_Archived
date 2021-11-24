@@ -17,28 +17,24 @@
  * along with FileRenamer.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef HISTORYCOMBOBOX_H
-#define HISTORYCOMBOBOX_H
+#include "CounterLabel.h"
 
-#include <QComboBox>
-#include <QSettings>
-
-class HistoryComboBox : public QComboBox
+CounterLabel::CounterLabel(QStringView singleNumberSuffix, QStringView multiNumberSuffix, QWidget *parent)
+    : QLabel(QStringLiteral("0 %1").arg(singleNumberSuffix), parent)
+    , m_singleSuffix(singleNumberSuffix.toString())
+    , m_multiSuffix(multiNumberSuffix.toString())
 {
-    Q_OBJECT
-public:
-    using QComboBox::QComboBox;
+}
 
-    QStringList allItemsText() const;
+CounterLabel::CounterLabel(QStringView suffix, QWidget *parent)
+    :CounterLabel(suffix, suffix, parent)
+{
+}
 
-    void addCurrentTextToItem();
-    void insertCurrentTextToItem(int index);
+void CounterLabel::setCount(int m_count)
+{
+    QString countText = (m_count > 1) ? QStringLiteral("%1 %2").arg(m_count).arg(m_multiSuffix)
+                                      : QStringLiteral("%1 %2").arg(m_count).arg(m_singleSuffix);
 
-    void loadSettings(QSharedPointer<QSettings>, QString key);
-    void saveSettings(QSharedPointer<QSettings>, QString key);
-
-    void loadSettings(QSharedPointer<QSettings>, QString subGroup, QString key);
-    void saveSettings(QSharedPointer<QSettings>, QString subGroup, QString key);
-};
-
-#endif // HISTORYCOMBOBOX_H
+    setText(countText);
+}

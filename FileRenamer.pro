@@ -13,6 +13,7 @@ SOURCES += \
     ApplicationLog/ApplicationLog.cpp \
     ApplicationLog/DebugLog.cpp \
     ApplicationLog/LogData.cpp \
+    FileNameVlidator.cpp \
     ImageHash/ImageHashCalculator.cpp \
     Path/ParentDir.cpp \
     Path/PathEntity.cpp \
@@ -38,9 +39,11 @@ SOURCES += \
     ThreadUndoRenaming.cpp \
     main.cpp \
     MainWindow.cpp \
+    widgets/CounterLabel.cpp \
     widgets/DialogDroppedDir.cpp \
     widgets/DialogLoadRenameSettings.cpp \
     widgets/DialogSaveRenameSettings.cpp \
+    widgets/ElideLabel.cpp \
     widgets/FormStringBuilder.cpp \
     widgets/FormStringBuilderChain.cpp \
     widgets/HistoryComboBox.cpp \
@@ -60,6 +63,7 @@ HEADERS += \
     ApplicationLog/ApplicationLog.h \
     ApplicationLog/DebugLog.h \
     ApplicationLog/LogData.h \
+    FileNameVlidator.h \
     ImageHash/ImageHashCalculator.h \
     MainWindow.h \
     Path/ParentDir.h \
@@ -89,9 +93,11 @@ HEADERS += \
     ThreadRename.h \
     ThreadUndoRenaming.h \
     widgets/AbstractStringBuilderWidget.h \
+    widgets/CounterLabel.h \
     widgets/DialogDroppedDir.h \
     widgets/DialogLoadRenameSettings.h \
     widgets/DialogSaveRenameSettings.h \
+    widgets/ElideLabel.h \
     widgets/FormStringBuilder.h \
     widgets/FormStringBuilderChain.h \
     widgets/HistoryComboBox.h \
