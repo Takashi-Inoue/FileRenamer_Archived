@@ -31,8 +31,8 @@
 
 PathTableView::PathTableView(QWidget *parent)
     : QTableView(parent)
-    , m_actions(QMetaEnum::fromType<Actions>().keyCount(), nullptr)
 {
+    createActions();
     createContextMenu();
 }
 
@@ -40,9 +40,9 @@ void PathTableView::setEnableToChangeItems(bool isEnable)
 {
     setDragEnabled(isEnable);
 
-    Q_CHECK_PTR(m_actions[RemoveItem]);
+    Q_CHECK_PTR(m_actions[Actions::RemoveItem]);
 
-    m_actions[RemoveItem]->setEnabled(isEnable);
+    m_actions[Actions::RemoveItem]->setEnabled(isEnable);
 }
 
 void PathTableView::contextMenuEvent(QContextMenuEvent *event)
@@ -55,15 +55,14 @@ void PathTableView::contextMenuEvent(QContextMenuEvent *event)
 
     Q_CHECK_PTR(menu);
     Q_CHECK_PTR(pathModel);
-    Q_CHECK_PTR(m_menuSection);
 
     QModelIndex index = currentIndex();
 
-    m_menuSection->setText(index.data().toString());
+    m_sections[Sections::FileName]->setText(index.data().toString());
 
     if (index.column() == int(PathModel::HSection::path) || pathModel->isDir(index)) {
-        m_actions[OpenPath]->setText(QStringLiteral("Open directory(&O)"));
-        m_actions[DeletePath]->setText(QStringLiteral("Delete directory(&D)"));
+        m_actions[Actions::OpenPath]->setText(QStringLiteral("Open directory(&O)"));
+        m_actions[Actions::DeletePath]->setText(QStringLiteral("Delete directory(&D)"));
     }
 
     auto hSection = PathModel::HSection(index.column());
@@ -71,11 +70,11 @@ void PathTableView::contextMenuEvent(QContextMenuEvent *event)
     if (hSection == PathModel::HSection::newName) {
         bool isExist = QFileInfo::exists(pathModel->fullPath(index));
 
-        m_actions[OpenPath]->setEnabled(isExist);
-        m_actions[DeletePath]->setEnabled(isExist);
+        m_actions[Actions::OpenPath]->setEnabled(isExist);
+        m_actions[Actions::DeletePath]->setEnabled(isExist);
     } else {
-        m_actions[OpenPath]->setEnabled(true);
-        m_actions[DeletePath]->setEnabled(index.column() != int(PathModel::HSection::path));
+        m_actions[Actions::OpenPath]->setEnabled(true);
+        m_actions[Actions::DeletePath]->setEnabled(index.column() != int(PathModel::HSection::path));
     }
 
     menu->popup(viewport()->mapToGlobal(event->pos()));
@@ -173,74 +172,86 @@ void PathTableView::removeSelectedRows()
     pathModel->removeSpecifiedRows(rows);
 }
 
-void PathTableView::createContextMenu()
+void PathTableView::createActions()
 {
-    // RemoveItem, CopyName, DeletePath, OpenPath, OpenMulti
-    const QStringList texts = {
-        QStringLiteral("Remove from list(&R)")
-      , QStringLiteral("Copy name(&C)")
-      , QStringLiteral("Delete file(&D)")
-      , QStringLiteral("Open file(&O)")
-      , QStringLiteral("Open both files(&B)")
+    const QHash<Actions, QString> texts = {
+        {Actions::RemoveItem, QStringLiteral("Remove from list(&R)")}
+      , {Actions::CopyName,   QStringLiteral("Copy name(&C)")}
+      , {Actions::DeletePath, QStringLiteral("Delete file(&D)")}
+      , {Actions::OpenPath,   QStringLiteral("Open file(&O)")}
+      , {Actions::OpenMulti , QStringLiteral("Open both files(&B)")}
     };
 
-    const QList<QIcon> icons = {
-        QIcon(QStringLiteral(":/res/images/x.svg"))
-      , QIcon(QStringLiteral(":/res/images/file.svg"))
-      , QIcon(QStringLiteral(":/res/images/delete_file.svg"))
-      , QIcon(QStringLiteral(":/res/images/exec.svg"))
-      , QIcon(QStringLiteral(":/res/images/exec.svg"))
+    const QHash<Actions, QIcon> icons = {
+        {Actions::RemoveItem, QIcon(QStringLiteral(":/res/images/x.svg"))}
+      , {Actions::CopyName,   QIcon(QStringLiteral(":/res/images/file.svg"))}
+      , {Actions::DeletePath, QIcon(QStringLiteral(":/res/images/delete_file.svg"))}
+      , {Actions::OpenPath,   QIcon(QStringLiteral(":/res/images/exec.svg"))}
+      , {Actions::OpenMulti , QIcon(QStringLiteral(":/res/images/exec_double.svg"))}
     };
 
-    const QKeySequence shortcuts[] = {
-        QKeySequence::Delete
-      , QKeySequence::Copy
-      , QKeySequence::DeleteEndOfWord
-      , QKeySequence::Open
-      , QStringLiteral("Ctrl+Shift+O")
+    const QHash<Actions, QKeySequence> shortcuts = {
+        {Actions::RemoveItem, QKeySequence::Delete}
+      , {Actions::CopyName,   QKeySequence::Copy}
+      , {Actions::DeletePath, QKeySequence::DeleteEndOfWord}
+      , {Actions::OpenPath,   QKeySequence::Open}
+      , {Actions::OpenMulti , QStringLiteral("Ctrl+Shift+O")}
     };
 
-    const QStringList slotNames = {
-        QStringLiteral("removeSelectedRows()")
-      , QStringLiteral("copyName()")
-      , QStringLiteral("deleteFile()")
-      , QStringLiteral("openFile()")
-      , QStringLiteral("openBothFiles()")
+    const QHash<Actions, QString> slotNames = {
+        {Actions::RemoveItem, QStringLiteral("removeSelectedRows()")}
+      , {Actions::CopyName,   QStringLiteral("copyName()")}
+      , {Actions::DeletePath, QStringLiteral("deleteFile()")}
+      , {Actions::OpenPath,   QStringLiteral("openFile()")}
+      , {Actions::OpenMulti , QStringLiteral("openBothFiles()")}
     };
 
-    auto menu = new QMenu(this);
+    QMetaEnum enumActions = QMetaEnum::fromType<Actions>();
 
-    for (int i = 0, count = QMetaEnum::fromType<Actions>().keyCount(); i < count; ++i) {
-        m_actions[i] = new QAction(icons[i], texts[i], menu);
-        m_actions[i]->setShortcutContext(Qt::WidgetShortcut);
-        m_actions[i]->setShortcut(shortcuts[i]);
+    for (int i = 0, count = enumActions.keyCount(); i < count; ++i) {
+        Actions actionType = Actions(enumActions.value(i));
+        QAction *action = new QAction(icons[actionType], texts[actionType], this);
 
-        int slotIndex = PathTableView::metaObject()->indexOfSlot(qPrintable(slotNames[i]));
-        int signalIndex = m_actions[i]->metaObject()->indexOfSignal("triggered(bool)");
+        m_actions[actionType] = action;
+
+        action->setShortcutContext(Qt::WidgetShortcut);
+        action->setShortcut(shortcuts[actionType]);
+
+        int slotIndex = PathTableView::metaObject()->indexOfSlot(qPrintable(slotNames[actionType]));
+        int signalIndex = action->metaObject()->indexOfSignal("triggered(bool)");
 
         Q_ASSERT(slotIndex != -1 && signalIndex != -1);
 
-        QMetaMethod signal = m_actions[i]->metaObject()->method(signalIndex);
+        QMetaMethod signal = action->metaObject()->method(signalIndex);
         QMetaMethod slot = PathTableView::metaObject()->method(slotIndex);
 
-        connect(m_actions[i], signal, this, slot);
+        connect(action, signal, this, slot);
     }
+}
+
+void PathTableView::createContextMenu()
+{
+    Q_ASSERT(m_actions.size() == QMetaEnum::fromType<Actions>().keyCount());
+
+    auto menu = new QMenu(this);
 
     QAction *sectionHeader = menu->addSection(QStringLiteral("List"));
-    menu->addAction(m_actions[RemoveItem]);
-    m_menuSection = menu->addSection(QStringLiteral("Original file"));
-    menu->addAction(m_actions[CopyName]);
-    menu->addAction(m_actions[OpenPath]);
-    menu->addAction(m_actions[DeletePath]);
-    menu->addSeparator();
-    menu->addAction(m_actions[OpenMulti]);
+
+    menu->addAction(m_actions[Actions::RemoveItem]);
+    m_sections[Sections::FileName] = menu->addSection(QStringLiteral("Original file"));
+    menu->addAction(m_actions[Actions::CopyName]);
+    menu->addAction(m_actions[Actions::OpenPath]);
+    menu->addAction(m_actions[Actions::DeletePath]);
+    m_sections[Sections::MultiFiles] = menu->addSection(QStringLiteral("Both files"));
+    menu->addAction(m_actions[Actions::OpenMulti]);
 
     QFont font(sectionHeader->font());
 
     font.setBold(true);
     font.setPointSizeF(font.pointSizeF() + 0.5);
     sectionHeader->setFont(font);
-    m_menuSection->setFont(font);
+    m_sections[Sections::FileName]->setFont(font);
+    m_sections[Sections::MultiFiles]->setFont(font);
 
-    addActions(m_actions);
+    addActions(m_actions.values());
 }

@@ -32,8 +32,12 @@ public:
 
     void setEnableToChangeItems(bool isEnable);
 
-    enum Actions {
+    enum class Actions : int {
         RemoveItem, CopyName, DeletePath, OpenPath, OpenMulti
+    };
+
+    enum class Sections : int {
+        FileName, MultiFiles
     };
 
     Q_ENUM(Actions)
@@ -55,11 +59,11 @@ private slots:
     void removeSelectedRows();
 
 private:
+    void createActions();
     void createContextMenu();
 
-    QList<QAction *> m_actions;
-
-    QAction *m_menuSection = nullptr;
+    QHash<Actions, QAction *> m_actions;
+    QHash<Sections, QAction *> m_sections;
 };
 
 #endif // PATHTABLEVIEW_H
