@@ -22,35 +22,27 @@
 
 #include <QClipboard>
 #include <QContextMenuEvent>
+#include <QDesktopServices>
+#include <QFileInfo>
 #include <QGuiApplication>
 #include <QMenu>
+#include <QMetaEnum>
 #include <QDebug>
 
 PathTableView::PathTableView(QWidget *parent)
     : QTableView(parent)
-    , m_actionRemoveItem(new QAction(QIcon(":/res/images/x.svg"), "Remove from list(&R)", this))
+    , m_actions(QMetaEnum::fromType<Actions>().keyCount(), nullptr)
 {
-    auto actionCopyName = new QAction(QIcon(":/icons/text"), "Copy original name(&C)", this);
-
-    actionCopyName->setToolTip("Copy original name (current item)");
-    actionCopyName->setShortcutContext(Qt::WidgetShortcut);
-    actionCopyName->setShortcut(QKeySequence::Copy);
-
-    m_actionRemoveItem->setToolTip("Remove selected items from list");
-    m_actionRemoveItem->setShortcutContext(Qt::WidgetShortcut);
-    m_actionRemoveItem->setShortcut(QKeySequence::Delete);
-
-    addAction(actionCopyName);
-    addAction(m_actionRemoveItem);
-
-    connect(actionCopyName, &QAction::triggered, this, &PathTableView::onActionCopyNameTriggered);
-    connect(m_actionRemoveItem, &QAction::triggered, this, &PathTableView::onActionRemoveTriggered);
+    createContextMenu();
 }
 
 void PathTableView::setEnableToChangeItems(bool isEnable)
 {
     setDragEnabled(isEnable);
-    m_actionRemoveItem->setEnabled(isEnable);
+
+    Q_CHECK_PTR(m_actions[RemoveItem]);
+
+    m_actions[RemoveItem]->setEnabled(isEnable);
 }
 
 void PathTableView::contextMenuEvent(QContextMenuEvent *event)
@@ -59,12 +51,31 @@ void PathTableView::contextMenuEvent(QContextMenuEvent *event)
         return;
 
     auto menu = findChild<QMenu *>();
+    auto pathModel = qobject_cast<PathModel*>(model());
 
-    if (menu == nullptr) {
-        menu = new QMenu(this);
-        menu->addActions(actions());
+    Q_CHECK_PTR(menu);
+    Q_CHECK_PTR(pathModel);
+    Q_CHECK_PTR(m_menuSection);
 
-        connect(m_actionRemoveItem, &QAction::triggered, menu, &QMenu::close);
+    QModelIndex index = currentIndex();
+
+    m_menuSection->setText(index.data().toString());
+
+    if (index.column() == int(PathModel::HSection::path) || pathModel->isDir(index)) {
+        m_actions[OpenPath]->setText(QStringLiteral("Open directory(&O)"));
+        m_actions[DeletePath]->setText(QStringLiteral("Delete directory(&D)"));
+    }
+
+    auto hSection = PathModel::HSection(index.column());
+
+    if (hSection == PathModel::HSection::newName) {
+        bool isExist = QFileInfo::exists(pathModel->fullPath(index));
+
+        m_actions[OpenPath]->setEnabled(isExist);
+        m_actions[DeletePath]->setEnabled(isExist);
+    } else {
+        m_actions[OpenPath]->setEnabled(true);
+        m_actions[DeletePath]->setEnabled(index.column() != int(PathModel::HSection::path));
     }
 
     menu->popup(viewport()->mapToGlobal(event->pos()));
@@ -81,29 +92,73 @@ void PathTableView::selectionChanged(const QItemSelection &selected, const QItem
 
     QString statusText;
     QIcon statusIcon;
+    QString stateText;
+    QIcon stateIcon;
 
     if (selectedCount == 1) {
-        statusText = selectedRows.first().data(Qt::StatusTipRole).toString();
-        statusIcon = selectedRows.first().data(Qt::DecorationRole).value<QIcon>();
+        QModelIndex &index = selectedRows.first();
+
+        statusText = index.data(Qt::StatusTipRole).toString();
+        statusIcon = index.data(Qt::DecorationRole).value<QIcon>();
+        stateText = index.data(PathModel::StateTextRole).toString();
+        stateIcon = index.data(PathModel::StateIconRole).value<QIcon>();
     }
 
     emit statusTextChanged(statusIcon, statusText);
+    emit stateTextChanged(stateIcon, stateText);
 }
 
-void PathTableView::onActionCopyNameTriggered()
+void PathTableView::copyName()
 {
-    QModelIndex index = model()->index(currentIndex().row(), int(PathModel::HSection::originalName));
+    QString text = currentIndex().data().toString();
 
-    QString name = index.data().toString();
+    QGuiApplication::clipboard()->setText(text);
 
-    QGuiApplication::clipboard()->setText(name);
-
-    QString statusText = QStringLiteral("Copied to clipboard : <i>%1</i>").arg(name);
+    QString statusText = QStringLiteral("Copied to clipboard : <b>%1</b>").arg(text);
 
     emit statusTextChanged(QIcon(), statusText);
 }
 
-void PathTableView::onActionRemoveTriggered()
+void PathTableView::openFile()
+{
+    auto pathModel = qobject_cast<PathModel*>(model());
+
+    Q_CHECK_PTR(pathModel);
+
+    QString fullPath = pathModel->fullPath(currentIndex());
+
+    if (!QFileInfo::exists(fullPath))
+        return;
+
+    QDesktopServices::openUrl(QUrl::fromLocalFile(fullPath));
+}
+
+void PathTableView::deleteFile()
+{
+    const QModelIndex index = currentIndex();
+
+    if (index.column() == int(PathModel::HSection::path))
+        return;
+
+    auto pathModel = qobject_cast<PathModel*>(model());
+
+    Q_CHECK_PTR(pathModel);
+
+    QString fullPath = pathModel->fullPath(index);
+
+    if (!QFileInfo::exists(fullPath))
+        return;
+
+    if (QFile::moveToTrash(fullPath) && index.column() == int(PathModel::HSection::originalName))
+        pathModel->removeSpecifiedRows({index.row()});
+}
+
+void PathTableView::openBothFiles()
+{
+
+}
+
+void PathTableView::removeSelectedRows()
 {
     auto pathModel = qobject_cast<PathModel *>(model());
 
@@ -116,4 +171,76 @@ void PathTableView::onActionRemoveTriggered()
         rows << modelIndex.row();
 
     pathModel->removeSpecifiedRows(rows);
+}
+
+void PathTableView::createContextMenu()
+{
+    // RemoveItem, CopyName, DeletePath, OpenPath, OpenMulti
+    const QStringList texts = {
+        QStringLiteral("Remove from list(&R)")
+      , QStringLiteral("Copy name(&C)")
+      , QStringLiteral("Delete file(&D)")
+      , QStringLiteral("Open file(&O)")
+      , QStringLiteral("Open both files(&B)")
+    };
+
+    const QList<QIcon> icons = {
+        QIcon(QStringLiteral(":/res/images/x.svg"))
+      , QIcon(QStringLiteral(":/res/images/file.svg"))
+      , QIcon(QStringLiteral(":/res/images/delete_file.svg"))
+      , QIcon(QStringLiteral(":/res/images/exec.svg"))
+      , QIcon(QStringLiteral(":/res/images/exec.svg"))
+    };
+
+    const QKeySequence shortcuts[] = {
+        QKeySequence::Delete
+      , QKeySequence::Copy
+      , QKeySequence::DeleteEndOfWord
+      , QKeySequence::Open
+      , QStringLiteral("Ctrl+Shift+O")
+    };
+
+    const QStringList slotNames = {
+        QStringLiteral("removeSelectedRows()")
+      , QStringLiteral("copyName()")
+      , QStringLiteral("deleteFile()")
+      , QStringLiteral("openFile()")
+      , QStringLiteral("openBothFiles()")
+    };
+
+    auto menu = new QMenu(this);
+
+    for (int i = 0, count = QMetaEnum::fromType<Actions>().keyCount(); i < count; ++i) {
+        m_actions[i] = new QAction(icons[i], texts[i], menu);
+        m_actions[i]->setShortcutContext(Qt::WidgetShortcut);
+        m_actions[i]->setShortcut(shortcuts[i]);
+
+        int slotIndex = PathTableView::metaObject()->indexOfSlot(qPrintable(slotNames[i]));
+        int signalIndex = m_actions[i]->metaObject()->indexOfSignal("triggered(bool)");
+
+        Q_ASSERT(slotIndex != -1 && signalIndex != -1);
+
+        QMetaMethod signal = m_actions[i]->metaObject()->method(signalIndex);
+        QMetaMethod slot = PathTableView::metaObject()->method(slotIndex);
+
+        connect(m_actions[i], signal, this, slot);
+    }
+
+    QAction *sectionHeader = menu->addSection(QStringLiteral("List"));
+    menu->addAction(m_actions[RemoveItem]);
+    m_menuSection = menu->addSection(QStringLiteral("Original file"));
+    menu->addAction(m_actions[CopyName]);
+    menu->addAction(m_actions[OpenPath]);
+    menu->addAction(m_actions[DeletePath]);
+    menu->addSeparator();
+    menu->addAction(m_actions[OpenMulti]);
+
+    QFont font(sectionHeader->font());
+
+    font.setBold(true);
+    font.setPointSizeF(font.pointSizeF() + 0.5);
+    sectionHeader->setFont(font);
+    m_menuSection->setFont(font);
+
+    addActions(m_actions);
 }

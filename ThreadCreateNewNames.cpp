@@ -103,7 +103,7 @@ bool ThreadCreateNewNames::checkNewNames(HashToCheckEntities &hashToCheckNames)
         const qsizetype count = itr->size();
 
         if (count == 1)
-            itr->first().first->notNeedToCheckNewName();
+            isOk &= itr->first().first->checkSelfNewName();
 
         for (qsizetype i = 0; i < count - 1; ++i) {
             const EntityToIndex &lhs = itr->at(i);

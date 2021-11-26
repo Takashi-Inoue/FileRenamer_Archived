@@ -53,9 +53,11 @@ public:
     void setNewName(QStringView newName);
 
     bool checkForNewNameCollisions(QSharedPointer<PathEntity> other);
-    void notNeedToCheckNewName();
+    bool checkSelfNewName();
 
     QIcon stateIcon() const;
+    QString stateText() const;
+
     QIcon typeIcon() const;
     QString statusText() const;
 
@@ -64,17 +66,24 @@ public:
 
 private:
     enum class State : int {
-        initial, ready, hasCollision, success, failure
+        initial, ready, sameNewName, success, failure
+    };
+
+    enum class ErrorCode : int {
+        noError, alreadyExist, sourceNotFound, unknown
     };
 
     void setState(State state);
     State state() const;
+
+    void findErrorCause();
 
     mutable QReadWriteLock m_lock;
 
     const bool m_isDir;
 
     State m_state = State::initial;
+    ErrorCode m_errorCode = ErrorCode::noError;
 
     QWeakPointer<ParentDir> m_parent;
     QString m_name;

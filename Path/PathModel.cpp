@@ -127,6 +127,12 @@ QVariant PathModel::data(const QModelIndex &index, int role) const
     if (role == Qt::StatusTipRole)
         return entity->statusText();
 
+    if (role == StateTextRole)
+        return entity->stateText();
+
+    if (role == StateIconRole)
+        return entity->stateIcon();
+
     return QVariant();
 }
 
@@ -229,6 +235,26 @@ void PathModel::removeSpecifiedRows(QList<int> rows)
 
     m_dataRoot->entityCount() != 0 ? emit internalDataChanged()
                                    : emit itemCleared();
+}
+
+bool PathModel::isDir(const QModelIndex &index) const
+{
+    Q_ASSERT(index.isValid());
+
+    return m_dataRoot->entity(index.row())->isDir();
+}
+
+QString PathModel::fullPath(const QModelIndex &index) const
+{
+    QSharedPointer<Path::PathEntity> entity = m_dataRoot->entity(index.row());
+
+    if (index.column() == int(HSection::originalName))
+        return entity->fullPath();
+
+    if (index.column() == int(HSection::newName))
+        return QStringLiteral("%1%2").arg(entity->parentPath(), entity->newName());
+
+    return entity->parentPath();
 }
 
 void PathModel::clear()

@@ -24,5 +24,8 @@
         <file>res/images/exit.svg</file>
         <file>res/images/down.svg</file>
         <file>res/images/up.svg</file>
+        <file>res/images/exec.svg</file>
+        <file>res/images/file.svg</file>
+        <file>res/images/delete_file.svg</file>
     </qresource>
 </RCC>

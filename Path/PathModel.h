@@ -44,6 +44,10 @@ public:
 
     explicit PathModel(QObject *parent = nullptr);
 
+    enum Role {
+        StateTextRole = Qt::UserRole + 1, StateIconRole
+    };
+
     enum class HSection : int {
         originalName, newName, path
     };
@@ -70,6 +74,9 @@ public:
     // Add/Remove data:
     void addPaths(QList<ParentChildrenPair> dirs, QList<ParentChildrenPair> files);
     void removeSpecifiedRows(QList<int> rows);
+
+    bool isDir(const QModelIndex &index) const;
+    QString fullPath(const QModelIndex &index) const;
 
 public slots:
     void clear();

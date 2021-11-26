@@ -23,6 +23,7 @@ SOURCES += \
     Path/PathRoot.cpp \
     Path/PathTableView.cpp \
     PathsAnalyzer.cpp \
+    RenameState/RenameStateInitial.cpp \
     SearchInDirs.cpp \
     StringBuilder/BuilderChain.cpp \
     StringBuilder/InsertString.cpp \
@@ -74,6 +75,8 @@ HEADERS += \
     Path/PathRoot.h \
     Path/PathTableView.h \
     PathsAnalyzer.h \
+    RenameState/RenameStateIState.h \
+    RenameState/RenameStateInitial.h \
     SearchInDirs.h \
     StringBuilder/AbstractInsertString.h \
     StringBuilder/AbstractStringBuilder.h \

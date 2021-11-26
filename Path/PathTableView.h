@@ -32,20 +32,34 @@ public:
 
     void setEnableToChangeItems(bool isEnable);
 
+    enum Actions {
+        RemoveItem, CopyName, DeletePath, OpenPath, OpenMulti
+    };
+
+    Q_ENUM(Actions)
+
 signals:
     void selectedCountChanged(qsizetype);
     void statusTextChanged(QIcon, QString);
+    void stateTextChanged(QIcon, QString);
 
 protected:
     void contextMenuEvent(QContextMenuEvent *event) override;
     void selectionChanged(const QItemSelection &selected, const QItemSelection &deselected) override;
 
 private slots:
-    void onActionCopyNameTriggered();
-    void onActionRemoveTriggered();
+    void copyName();
+    void openFile();
+    void deleteFile();
+    void openBothFiles();
+    void removeSelectedRows();
 
 private:
-    QAction *m_actionRemoveItem;
+    void createContextMenu();
+
+    QList<QAction *> m_actions;
+
+    QAction *m_menuSection = nullptr;
 };
 
 #endif // PATHTABLEVIEW_H

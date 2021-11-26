@@ -108,9 +108,16 @@ void PathEntity::setNewName(QStringView newName)
 
 bool PathEntity::checkForNewNameCollisions(QSharedPointer<PathEntity> other)
 {
+    if (isDir() && newName().isEmpty()) {
+        if (state() != State::initial)
+            setState(State::initial);
+
+        return false;
+    }
+
     if (newName() == other->newName()) {
-        setState(State::hasCollision);
-        other->setState(State::hasCollision);
+        setState(State::sameNewName);
+        other->setState(State::sameNewName);
 
         return false;
     }
@@ -124,24 +131,50 @@ bool PathEntity::checkForNewNameCollisions(QSharedPointer<PathEntity> other)
     return true;
 }
 
-void PathEntity::notNeedToCheckNewName()
+bool PathEntity::checkSelfNewName()
 {
+    const QString newname = newName();
+
+    if (newname.isEmpty()/* || newname == name()*/) {
+        if (state() != State::initial)
+            setState(State::initial);
+
+        return false;
+    }
+
     setState(State::ready);
+
+    return true;
 }
 
 QIcon PathEntity::stateIcon() const
 {
     static const QHash<int, QIcon> icons = {
-        {int(State::initial),      QIcon(QStringLiteral(":/res/images/circlegray.svg"))},
-        {int(State::ready),        QIcon(QStringLiteral(":/res/images/circlegreen.svg"))},
-        {int(State::hasCollision), QIcon(QStringLiteral(":/res/images/collision.svg"))},
-        {int(State::success),      QIcon(QStringLiteral(":/res/images/success.svg"))},
-        {int(State::failure),      QIcon(QStringLiteral(":/res/images/failure.svg"))},
+        {int(State::initial),     QIcon(QStringLiteral(":/res/images/circlegray.svg"))},
+        {int(State::ready),       QIcon(QStringLiteral(":/res/images/circlegreen.svg"))},
+        {int(State::sameNewName), QIcon(QStringLiteral(":/res/images/collision.svg"))},
+        {int(State::success),     QIcon(QStringLiteral(":/res/images/success.svg"))},
+        {int(State::failure),     QIcon(QStringLiteral(":/res/images/failure.svg"))},
     };
 
     QReadLocker locker(&m_lock);
 
     return icons[int(m_state)];
+}
+
+QString PathEntity::stateText() const
+{
+    static const QHash<int, QString> texts = {
+        {int(State::initial),     QStringLiteral("Waiting")},
+        {int(State::ready),       QStringLiteral("Ready")},
+        {int(State::sameNewName), QStringLiteral("Same new name")},
+        {int(State::success),     QStringLiteral("Succeeded")},
+        {int(State::failure),     QStringLiteral("Failed")},
+    };
+
+    QReadLocker locker(&m_lock);
+
+    return texts[int(m_state)];
 }
 
 QIcon PathEntity::typeIcon() const
@@ -151,13 +184,31 @@ QIcon PathEntity::typeIcon() const
 
 QString PathEntity::statusText() const
 {
-    if (state() == State::initial)
-        return name();
+    switch (state()) {
+    case State::initial:
+        return fullPath();
 
-    if (state() == State::ready)
+    case State::ready:
         return QStringLiteral("%1 -> %2").arg(fullPath(), newName());
 
-    return "";
+    case State::sameNewName:
+        return QStringLiteral("New name <b>%1</b> is duplicated.").arg(newName());
+
+    case State::success:
+        return QStringLiteral("New path: %1%2").arg(parentPath(), newName());
+
+    case State::failure:
+        if (m_errorCode == ErrorCode::alreadyExist)
+            return QStringLiteral("<b>%1%2</b> already exeists.").arg(parentPath(), newName());
+
+        if (m_errorCode == ErrorCode::sourceNotFound)
+            return QStringLiteral("<b>%1</b> does not exeists.").arg(fullPath());
+
+        if (m_errorCode == ErrorCode::unknown)
+            return QStringLiteral("Unknown error occered. Please confirm that file is not opened.");
+    }
+
+    return QString();
 }
 
 bool PathEntity::rename()
@@ -177,14 +228,18 @@ bool PathEntity::rename()
     QString result = isOk ? QStringLiteral("SUCCEEDED")
                           : QStringLiteral("---FAILED");
 
-    QString log = QStringLiteral("%1 - %2/%3 > %4").arg(result, dir.absolutePath(), m_name, m_newName);
+    QString log = QStringLiteral("%1 - %2/%3 -> %4").arg(result, dir.absolutePath(), m_name, m_newName);
 
     ApplicationLog::instance().log(log, QStringLiteral("Rename"));
 
     m_lock.unlock();
 
-    isOk ? setState(State::success)
-         : setState(State::failure);
+    if (isOk) {
+        setState(State::success);
+    } else {
+        setState(State::failure);
+        findErrorCause();
+    }
 
     return isOk;
 }
@@ -203,7 +258,7 @@ bool PathEntity::undoRename()
     QString result = isOk ? QStringLiteral("SUCCEEDED")
                           : QStringLiteral("---FAILED");
 
-    QString log = QStringLiteral("%1 - %2/%3 > %4").arg(result, dir.absolutePath(), m_newName, m_name);
+    QString log = QStringLiteral("%1 - %2/%3 -> %4").arg(result, dir.absolutePath(), m_newName, m_name);
 
     ApplicationLog::instance().log(log, QStringLiteral("Undo"));
 
@@ -227,6 +282,22 @@ PathEntity::State PathEntity::state() const
     QReadLocker locker(&m_lock);
 
     return m_state;
+}
+
+void PathEntity::findErrorCause()
+{
+    Q_ASSERT(state() == State::failure);
+
+    ErrorCode errorCode = ErrorCode::unknown;
+
+    if (!QFileInfo::exists(fullPath()))
+        errorCode = ErrorCode::sourceNotFound;
+    else if (QFileInfo::exists(QStringLiteral("%1%2").arg(parentPath(), newName())))
+        errorCode = ErrorCode::alreadyExist;
+
+    QWriteLocker locker(&m_lock);
+
+    m_errorCode = errorCode;
 }
 
 } // namespace Path

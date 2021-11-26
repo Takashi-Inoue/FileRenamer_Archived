@@ -24,9 +24,11 @@
 #include "PathsAnalyzer.h"
 #include "Path/PathHeaderView.h"
 #include "Path/PathModel.h"
+#include "widgets/CounterLabel.h"
 #include "widgets/DialogDroppedDir.h"
 #include "widgets/DialogLoadRenameSettings.h"
 #include "widgets/DialogSaveRenameSettings.h"
+#include "widgets/ElideLabel.h"
 
 #include <QDropEvent>
 #include <QMessageBox>
@@ -43,9 +45,6 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
     , m_pathModel(new PathModel(this))
-    , m_statusItemCount(new CounterLabel(QStringLiteral("item"), QStringLiteral("items"), this))
-    , m_statusSelectedCount(new CounterLabel(QStringLiteral("selected"), this))
-    , m_statusMain(new ElideLabel(this))
 {
     ui->setupUi(this);
 
@@ -337,29 +336,42 @@ int MainWindow::execConfirmRenameDirDlg(const QStringList &dirPaths)
 /*-------- initialize UI --------*/
 void MainWindow::initStatusBar()
 {
-    m_statusMain->setElideMode(Qt::ElideMiddle);
+    auto statusItemCount = new CounterLabel(QStringLiteral("item"), QStringLiteral("items"), this);
+    auto statusSelectedCount = new CounterLabel(QStringLiteral("selected"), this);
+    auto statusState = new ElideLabel(this);
+    auto statusMain = new ElideLabel(this);
 
-    QFontMetrics fontMetrics(m_statusMain->font());
+    statusMain->setElideMode(Qt::ElideMiddle);
+
+    QFontMetrics fontMetrics(statusSelectedCount->font());
 
     int labelWidth = int(fontMetrics.boundingRect("888888 selected").width() * 1.1);
 
-    m_statusItemCount->setFixedWidth(labelWidth);
-    m_statusItemCount->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
-    m_statusSelectedCount->setFixedWidth(labelWidth);
-    m_statusSelectedCount->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
+    statusItemCount->setFixedWidth(labelWidth);
+    statusItemCount->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
+    statusSelectedCount->setFixedWidth(labelWidth);
+    statusSelectedCount->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
 
     ui->statusBar->layout()->setContentsMargins(0, 0, 0, 0);
-    ui->statusBar->addPermanentWidget(m_statusItemCount, 1);
+    ui->statusBar->addPermanentWidget(statusItemCount, 1);
     ui->statusBar->addPermanentWidget(createVLine());
-    ui->statusBar->addPermanentWidget(m_statusSelectedCount, 1);
+    ui->statusBar->addPermanentWidget(statusSelectedCount, 1);
     ui->statusBar->addPermanentWidget(createVLine());
-    ui->statusBar->addPermanentWidget(m_statusMain, 8);
+    ui->statusBar->addPermanentWidget(statusState, 1);
+    ui->statusBar->addPermanentWidget(createVLine());
+    ui->statusBar->addPermanentWidget(statusMain, 8);
 
-    connect(m_pathModel, &PathModel::itemCountChanged, m_statusItemCount, &CounterLabel::setCount);
+    labelWidth = int(fontMetrics.boundingRect("Same new name").width() * 1.1) + statusState->height() + 2;
+    statusState->setFixedWidth(labelWidth);
+    statusState->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
 
-    connect(ui->tableView, &PathTableView::selectedCountChanged, m_statusSelectedCount, &CounterLabel::setCount);
-    connect(ui->tableView, SIGNAL(statusTextChanged(QIcon, QString))
-          , m_statusMain, SLOT(setTextWithElide(QIcon, QString)));
+    connect(m_pathModel, &PathModel::itemCountChanged, statusItemCount, &CounterLabel::setCount);
+
+    connect(ui->tableView, &PathTableView::selectedCountChanged, statusSelectedCount, &CounterLabel::setCount);
+    connect(ui->tableView, SIGNAL(statusTextChanged(QIcon,QString))
+            , statusMain, SLOT(setTextWithElide(QIcon,QString)));
+    connect(ui->tableView, SIGNAL(stateTextChanged(QIcon,QString))
+            , statusState, SLOT(setTextWithElide(QIcon,QString)));
 }
 
 QFrame *MainWindow::createVLine()

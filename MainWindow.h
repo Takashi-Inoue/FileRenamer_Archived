@@ -20,10 +20,8 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include "widgets/CounterLabel.h"
-#include "widgets/ElideLabel.h"
-
 #include <QMainWindow>
+#include <QFrame>
 #include <QSharedPointer>
 
 QT_BEGIN_NAMESPACE
@@ -71,8 +69,5 @@ private:
     Ui::MainWindow *ui;
 
     PathModel *m_pathModel;
-    CounterLabel *m_statusItemCount;
-    CounterLabel *m_statusSelectedCount;
-    ElideLabel *m_statusMain;
 };
 #endif // MAINWINDOW_H
