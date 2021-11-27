@@ -30,6 +30,8 @@ class PathTableView : public QTableView
 public:
     PathTableView(QWidget *parent = nullptr);
 
+    void setModel(QAbstractItemModel *model) override;
+
     void setEnableToChangeItems(bool isEnable);
 
     enum class Actions : int {
@@ -59,11 +61,6 @@ private slots:
     void removeSelectedRows();
 
 private:
-    void createActions();
-    void createContextMenu();
-
-    QHash<Actions, QAction *> m_actions;
-    QHash<Sections, QAction *> m_sections;
 };
 
 #endif // PATHTABLEVIEW_H

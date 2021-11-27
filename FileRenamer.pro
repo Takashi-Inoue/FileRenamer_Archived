@@ -22,6 +22,7 @@ SOURCES += \
     Path/PathModel.cpp \
     Path/PathRoot.cpp \
     Path/PathTableView.cpp \
+    Path/PathTableViewMenu.cpp \
     PathsAnalyzer.cpp \
     RenameState/RenameStateInitial.cpp \
     SearchInDirs.cpp \
@@ -74,6 +75,7 @@ HEADERS += \
     Path/PathModel.h \
     Path/PathRoot.h \
     Path/PathTableView.h \
+    Path/PathTableViewMenu.h \
     PathsAnalyzer.h \
     RenameState/RenameStateIState.h \
     RenameState/RenameStateInitial.h \

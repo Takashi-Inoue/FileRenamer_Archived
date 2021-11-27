@@ -49,7 +49,7 @@ public:
     };
 
     enum class HSection : int {
-        originalName, newName, path
+        OriginalName, NewName, Path
     };
 
     // Header:
@@ -75,8 +75,13 @@ public:
     void addPaths(QList<ParentChildrenPair> dirs, QList<ParentChildrenPair> files);
     void removeSpecifiedRows(QList<int> rows);
 
-    bool isDir(const QModelIndex &index) const;
+    bool isDir(int row) const;
     QString fullPath(const QModelIndex &index) const;
+    QString fullPath(int row, HSection section) const;
+    QString name(const QModelIndex &index) const;
+    QString name(int row, HSection section) const;
+    QString originalName(int row) const;
+    QString newName(int row) const;
 
 public slots:
     void clear();

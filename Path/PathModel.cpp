@@ -59,9 +59,9 @@ QVariant PathModel::headerData(int section, Qt::Orientation orientation, int rol
 
     if (role == Qt::DecorationRole) {
         static const QMap<HSection, QVariant> m_iconMap = {
-            {HSection::originalName, QIcon(QStringLiteral(":/res/images/rename_old.svg"))},
-            {HSection::newName,      QIcon(QStringLiteral(":/res/images/rename_new.svg"))},
-            {HSection::path,         QIcon(QStringLiteral(":/res/icons/folder-3.ico"))},
+            {HSection::OriginalName, QIcon(QStringLiteral(":/res/images/rename_old.svg"))},
+            {HSection::NewName,      QIcon(QStringLiteral(":/res/images/rename_new.svg"))},
+            {HSection::Path,         QIcon(QStringLiteral(":/res/icons/folder-3.ico"))},
         };
 
         return m_iconMap[HSection(section)];
@@ -69,9 +69,9 @@ QVariant PathModel::headerData(int section, Qt::Orientation orientation, int rol
 
     if (role == Qt::DisplayRole) {
         static const QMap<HSection, QString> m_textMap = {
-            {HSection::originalName, QStringLiteral("Original name")},
-            {HSection::newName,      QStringLiteral("New name")},
-            {HSection::path,         QStringLiteral("Path")},
+            {HSection::OriginalName, QStringLiteral("Original name")},
+            {HSection::NewName,      QStringLiteral("New name")},
+            {HSection::Path,         QStringLiteral("Path")},
         };
 
         return m_textMap[HSection(section)];
@@ -106,21 +106,21 @@ QVariant PathModel::data(const QModelIndex &index, int role) const
     HSection hSection = HSection(index.column());
 
     if (role == Qt::DisplayRole) {
-        if (hSection == HSection::originalName)
+        if (hSection == HSection::OriginalName)
             return entity->name();
 
-        if (hSection == HSection::newName)
+        if (hSection == HSection::NewName)
             return entity->newName();
 
-        if (hSection == HSection::path)
+        if (hSection == HSection::Path)
             return entity->parentPath();
     }
 
     if (role == Qt::DecorationRole) {
-        if (hSection == HSection::originalName)
+        if (hSection == HSection::OriginalName)
             return entity->typeIcon();
 
-        if (hSection == HSection::newName)
+        if (hSection == HSection::NewName)
             return entity->stateIcon();
     }
 
@@ -145,7 +145,7 @@ void PathModel::sort(int column, Qt::SortOrder order)
 
     beginResetModel();
 
-    column == int(HSection::originalName) ? m_dataRoot->sortByEntityName(order)
+    column == int(HSection::OriginalName) ? m_dataRoot->sortByEntityName(order)
                                           : m_dataRoot->sortByParentDir(order);
 
     endResetModel();
@@ -237,24 +237,62 @@ void PathModel::removeSpecifiedRows(QList<int> rows)
                                    : emit itemCleared();
 }
 
-bool PathModel::isDir(const QModelIndex &index) const
+bool PathModel::isDir(int row) const
 {
-    Q_ASSERT(index.isValid());
-
-    return m_dataRoot->entity(index.row())->isDir();
+    return m_dataRoot->entity(row)->isDir();
 }
 
 QString PathModel::fullPath(const QModelIndex &index) const
 {
-    QSharedPointer<Path::PathEntity> entity = m_dataRoot->entity(index.row());
+    return fullPath(index.row(), HSection(index.column()));
+}
 
-    if (index.column() == int(HSection::originalName))
+QString PathModel::fullPath(int row, HSection section) const
+{
+    QSharedPointer<Path::PathEntity> entity = m_dataRoot->entity(row);
+
+    if (section == HSection::OriginalName)
         return entity->fullPath();
 
-    if (index.column() == int(HSection::newName))
+    if (section == HSection::NewName)
         return QStringLiteral("%1%2").arg(entity->parentPath(), entity->newName());
 
     return entity->parentPath();
+}
+
+QString PathModel::name(const QModelIndex &index) const
+{
+    return name(index.row(), HSection(index.column()));
+}
+
+QString PathModel::name(int row, HSection section) const
+{
+    QSharedPointer<Path::PathEntity> entity = m_dataRoot->entity(row);
+
+    if (section == HSection::OriginalName)
+        return entity->name();
+
+    if (section == HSection::NewName)
+        return entity->newName();
+
+    if (section == HSection::Path)
+        return entity->parentPath();
+
+    return QString();
+}
+
+QString PathModel::originalName(int row) const
+{
+    QSharedPointer<Path::PathEntity> entity = m_dataRoot->entity(row);
+
+    return entity->name();
+}
+
+QString PathModel::newName(int row) const
+{
+    QSharedPointer<Path::PathEntity> entity = m_dataRoot->entity(row);
+
+    return entity->newName();
 }
 
 void PathModel::clear()
@@ -311,8 +349,8 @@ void PathModel::onCreateNameCompleted()
     if (m_dataRoot->isEmpty())
         return;
 
-    QModelIndex tl = index(0, int(HSection::newName));
-    QModelIndex br = index(int(m_dataRoot->entityCount() - 1), int(HSection::newName));
+    QModelIndex tl = index(0, int(HSection::NewName));
+    QModelIndex br = index(int(m_dataRoot->entityCount() - 1), int(HSection::NewName));
 
     emit dataChanged(tl, br, {Qt::DecorationRole});
     emit readyToRename();
@@ -320,8 +358,8 @@ void PathModel::onCreateNameCompleted()
 
 void PathModel::onNewNameCollisionDetected(QPair<int, int> indices)
 {
-    QModelIndex lIndex = index(indices.first,  int(HSection::newName));
-    QModelIndex rIndex = index(indices.second, int(HSection::newName));
+    QModelIndex lIndex = index(indices.first,  int(HSection::NewName));
+    QModelIndex rIndex = index(indices.second, int(HSection::NewName));
 
     emit dataChanged(lIndex, lIndex, {Qt::DecorationRole});
     emit dataChanged(rIndex, rIndex, {Qt::DecorationRole});
@@ -329,14 +367,14 @@ void PathModel::onNewNameCollisionDetected(QPair<int, int> indices)
 
 void PathModel::onNewNameCreated(int row)
 {
-    QModelIndex modelIndex = index(row, int(HSection::newName));
+    QModelIndex modelIndex = index(row, int(HSection::NewName));
 
     emit dataChanged(modelIndex, modelIndex, {Qt::DisplayRole});
 }
 
 void PathModel::onNewNameStateChanged(int row)
 {
-    QModelIndex modelIndex = index(row, int(HSection::newName));
+    QModelIndex modelIndex = index(row, int(HSection::NewName));
 
     emit dataChanged(modelIndex, modelIndex, {Qt::DecorationRole});
 }

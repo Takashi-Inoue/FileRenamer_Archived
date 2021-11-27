@@ -60,6 +60,9 @@ MainWindow::MainWindow(QWidget *parent)
 
     ui->actionDarkMode->setChecked(Application::isDarkMode());
 
+    ui->tableView->setHorizontalHeader(new PathHeaderView(ui->tableView));
+    ui->tableView->setModel(m_pathModel);
+
     setState(State::initial);
 
     QStringList paths = QApplication::arguments();
@@ -67,9 +70,6 @@ MainWindow::MainWindow(QWidget *parent)
     paths.pop_front();
 
     registerPaths(paths);
-
-    ui->tableView->setHorizontalHeader(new PathHeaderView(ui->tableView));
-    ui->tableView->setModel(m_pathModel);
 
     connect(ui->formStringBuilderChain, &FormStringBuilderChain::settingsChanged
           , m_pathModel, &PathModel::startCreateNewNames);
