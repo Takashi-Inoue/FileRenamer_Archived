@@ -246,6 +246,11 @@ bool PathEntity::rename()
 
 bool PathEntity::undoRename()
 {
+    if (state() == State::failure) {
+        setState(State::ready);
+        return true;
+    }
+
     if (state() != State::success)
         return false;
 
