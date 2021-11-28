@@ -148,7 +148,18 @@ void PathTableView::deleteFile()
 
 void PathTableView::openBothFiles()
 {
+    auto pathModel = qobject_cast<PathModel*>(model());
 
+    Q_CHECK_PTR(pathModel);
+
+    QString fullPathOriginal = pathModel->fullPath(currentIndex().row(), PathModel::HSection::OriginalName);
+    QString fullPathNew = pathModel->fullPath(currentIndex().row(), PathModel::HSection::NewName);
+
+    if (!QFileInfo::exists(fullPathOriginal) || !QFileInfo::exists(fullPathNew))
+        return;
+
+    QDesktopServices::openUrl(QUrl::fromLocalFile(fullPathOriginal));
+    QDesktopServices::openUrl(QUrl::fromLocalFile(fullPathNew));
 }
 
 void PathTableView::removeSelectedRows()

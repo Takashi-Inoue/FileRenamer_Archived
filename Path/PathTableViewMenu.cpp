@@ -1,20 +1,20 @@
 /*
- * Copyright YEAR Takashi Inoue
+ * Copyright 2021 Takashi Inoue
  *
- * This file is part of APPNAME.
+ * This file is part of FileRenamer.
  *
- * APPNAME is free software: you can redistribute it and/or modify
+ * FileRenamer is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * APPNAME is distributed in the hope that it will be useful,
+ * FileRenamer is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with APPNAME.  If not, see <http://www.gnu.org/licenses/>.
+ * along with FileRenamer.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "PathTableViewMenu.h"
@@ -25,6 +25,10 @@
 #include <QFileInfo>
 #include <QMetaEnum>
 #include <QModelIndex>
+
+namespace {
+constexpr int sectionTextWidth = 300;
+}
 
 PathTableViewMenu::PathTableViewMenu(QAbstractItemView *view, QWidget *parent)
     : QMenu(parent)
@@ -40,7 +44,7 @@ PathTableViewMenu::PathTableViewMenu(QAbstractItemView *view, QWidget *parent)
     createMenu();
 }
 
-void PathTableViewMenu::addActionsToWidget(QWidget *widget)
+void PathTableViewMenu::addActionsToWidget(QWidget *widget) const
 {
     widget->addActions(m_actions.values());
 }
@@ -52,20 +56,24 @@ void PathTableViewMenu::setEnabledActions(Action action, bool isEnable)
 
 void PathTableViewMenu::updateActions()
 {
+    using HSection = PathModel::HSection;
     const QModelIndex currentIndex = m_view->currentIndex();
-    const auto currentSection = PathModel::HSection(currentIndex.column());
-    const QString displayedText(m_model->data(currentIndex).toString());
 
-    m_actions[Action::CopyName]->setText(QStringLiteral("Copy name \"%1\"").arg(displayedText));
+    const auto currentSection = HSection(currentIndex.column());
 
-    QFileInfo newPathInfo(m_model->fullPath(currentIndex.row(), PathModel::HSection::NewName));
-    bool isNewPathExists = newPathInfo.exists();
+    const QString copyNameText((currentSection == HSection::Path) ? QStringLiteral("Copy path")
+                                                                  : QStringLiteral("Copy name"));
+
+    m_actions[Action::CopyName]->setText(copyNameText);
+
+    QFileInfo newPathInfo(m_model->fullPath(currentIndex.row(), HSection::NewName));
+    const bool isNewPathExists = newPathInfo.exists();
 
     m_actions[Action::OpenMulti]->setEnabled(isNewPathExists);
 
     bool isDir = true;
 
-    if (currentSection == PathModel::HSection::NewName) {
+    if (currentSection == HSection::NewName) {
         isDir = isNewPathExists ? newPathInfo.isDir()
                                 : m_model->isDir(currentIndex.row());
         m_actions[Action::OpenPath]->setEnabled(isNewPathExists);
@@ -73,7 +81,7 @@ void PathTableViewMenu::updateActions()
     } else {
         m_actions[Action::OpenPath]->setEnabled(true);
 
-        bool isCurrentSectionOriginalName = currentSection == PathModel::HSection::OriginalName;
+        bool isCurrentSectionOriginalName = currentSection == HSection::OriginalName;
 
         m_actions[Action::DeletePath]->setEnabled(isCurrentSectionOriginalName);
 
@@ -81,16 +89,31 @@ void PathTableViewMenu::updateActions()
             isDir = m_model->isDir(currentIndex.row());
     }
 
-    const QString typeText = isDir ? QStringLiteral("dir")
+    const QString typeText = isDir ? QStringLiteral("directory")
                                    : QStringLiteral("file");
 
-    m_actions[Action::OpenPath]->setText(QStringLiteral("Open %1 \"%2\"").arg(typeText, displayedText));
-    m_actions[Action::DeletePath]->setText(QStringLiteral("Delete %1 \"%2\"").arg(typeText, displayedText));
+    const QString openPathText = QStringLiteral("Open %1").arg(typeText);
+    const QString deletePathText = QStringLiteral("Delete %1").arg(typeText);
+
+    m_actions[Action::OpenPath]->setText(openPathText);
+    m_actions[Action::DeletePath]->setText(deletePathText);
 
     const QString originalName = m_model->originalName(currentIndex.row());
     const QString newName = m_model->newName(currentIndex.row());
 
-    m_actions[Action::OpenMulti]->setText(QStringLiteral("Open \"%1\" | \"%2\"").arg(originalName, newName));
+    m_actions[Action::OpenMulti]->setText(QStringLiteral("Open both files/dirs"));
+
+    adjustSize();
+
+    if (width() < sectionTextWidth)
+        setMinimumWidth(sectionTextWidth + 20);
+
+    const QString sectionNameText(m_model->data(currentIndex).toString());
+    const QString sectionBothText(QStringLiteral("%1 | %2").arg(originalName, newName));
+    const QFont &sectionFont(m_sections[Section::FileName]->font());
+
+    m_sections[Section::FileName]->setText(elide(sectionNameText, sectionFont, sectionTextWidth));
+    m_sections[Section::MultiFiles]->setText(elide(sectionBothText, sectionFont, sectionTextWidth));
 }
 
 void PathTableViewMenu::createActions()
@@ -115,7 +138,7 @@ void PathTableViewMenu::createActions()
         {Action::RemoveItem, QKeySequence::Delete}
       , {Action::CopyName,   QKeySequence::Copy}
       , {Action::OpenPath,   QKeySequence::Open}
-      , {Action::DeletePath, QKeySequence::DeleteEndOfWord}
+      , {Action::DeletePath, QKeySequence()}
       , {Action::OpenMulti , QStringLiteral("Ctrl+Shift+O")}
     };
 
@@ -152,7 +175,7 @@ void PathTableViewMenu::createActions()
 
 void PathTableViewMenu::createMenu()
 {
-    addSection(QStringLiteral("List"));
+    QAction *sectionList = addSection(QStringLiteral("List"));
 
     addAction(m_actions[Action::RemoveItem]);
 
@@ -165,4 +188,21 @@ void PathTableViewMenu::createMenu()
     m_sections[Section::MultiFiles] = addSection(QStringLiteral("both"));
 
     addAction(m_actions[Action::OpenMulti]);
+
+    QFont sectionFont(sectionList->font());
+
+    sectionFont.setBold(true);
+    sectionFont.setItalic(true);
+//    sectionFont.setPointSizeF(sectionFont.pointSizeF() + 0.5);
+    sectionFont.setUnderline(true);
+
+    sectionList->setFont(sectionFont);
+
+    for (auto itr = m_sections.begin(), end = m_sections.end(); itr != end; ++itr)
+        itr.value()->setFont(sectionFont);
+}
+
+QString PathTableViewMenu::elide(QStringView text, const QFont &font, int width) const
+{
+    return QFontMetrics(font).elidedText(text.toString(), Qt::ElideMiddle, width);
 }
